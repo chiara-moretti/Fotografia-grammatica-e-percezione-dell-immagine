@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mappa Fotografia - Categorie</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 1rem; background: #fafafa; color: #222; }
+    h1 { margin: 0 0 0.5rem; font-size: 1.4rem; }
+    p { margin: 0 0 1rem; }
+    #grafico { width: 100%; height: 80vh; border: 1px solid #ddd; background: #fff; }
+    .link { stroke: #a7a7a7; stroke-opacity: 0.55; }
+    .node circle { stroke: #fff; stroke-width: 1.5px; }
+    .node text { pointer-events: none; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <h1>Mappa Fotografia</h1>
+  <p>Relazioni: <strong>Categoria Principale -> Sottocategoria -> Dettaglio</strong></p>
+  <svg id="grafico"></svg>
+
+  <script>
+    const csvText = `Categoria Principale,Sottocategoria,Dettaglio / Note
+Il fotoromanzo,Descrizione,Storia di un genere che nasconde una struttura narrativa derivata da Propp. Il target è migrato su telenovelas e romanzo rosa.
+La moda,Descrizione,"La comunicazione (settimane della moda, sfilate, siti, blog influencer). Variazione e permanere di modelli, gusti e legame con l'arte."
+La pubblicità,Descrizione,"Dai manifesti di inizio secolo, alle riviste, Carosello, spot, fino ai banner su siti e social."
+La cronaca,Settore,Nera
+La cronaca,Settore,Rosa
+La cronaca,Settore,Sportiva
+La cronaca,Settore,Politica
+La cronaca,Settore,Economica
+Immagini scientifiche,Scopo,Riprese realizzate a scopo di studio e ricerca
+Immagini scientifiche,Scopo,Riprese realizzate a scopo di documentazione
+Immagini scientifiche,Scopo,Riprese realizzate a scopo di divulgazione
+Immagini industriali,Scopo,Riprese realizzate a scopo di studio e ricerca
+Immagini industriali,Scopo,Riprese realizzate a scopo di catalogazione
+Immagini industriali,Scopo,Riprese realizzate a scopo di pubblicitario
+Riprese aeree,Uso civile,Riprese per uso metereologico
+Riprese aeree,Uso civile,Rilievi per l'urbanistica
+Riprese aeree,Uso civile,Riprese per lo studio ideo geologico del territorio
+Riprese aeree,Uso militare,Riprese per cartografia
+Riprese aeree,Uso militare,Riprese per spionaggio
+Riprese aeree,Uso militare,Riprese per il controllo strategico del territorio
+Il mondo dell'arte,La riproduzione delle opere,Pittura
+Il mondo dell'arte,La riproduzione delle opere,Scultura
+Il mondo dell'arte,La riproduzione delle opere,Architettura
+Il mondo dell'arte,La documentazione degli eventi,Teatro
+Il mondo dell'arte,La documentazione degli eventi,Danza
+Il mondo dell'arte,La documentazione degli eventi,Musica
+Il mondo dell'arte,La documentazione degli eventi,Cinema
+Il mondo dell'arte,L'aspetto creativo/artistico,Esposizioni / mostre
+Il mondo dell'arte,L'aspetto creativo/artistico,Pubblicazioni
+Il mondo dell'arte,L'aspetto creativo/artistico,Collezione
+Il mondo dell'arte,L'aspetto creativo/artistico,Commercio
+Il mondo editoriale,Argomenti,"Natura, Viaggi, Turismo, Avventura, Cucina, Giochi, Didattica"
+Il mondo editoriale,Argomenti,"Sport, Fitness, Auto, Moto, Ciclismo, Sci, Musica"
+Il mondo editoriale,Argomenti,"Arte, Architettura, Arredamento, Giardinaggio, Hobbistica, Bricolage, Informatica"
+Prodotti di stampa,Formato,Cartoline
+Prodotti di stampa,Formato,Poster
+Prodotti di stampa,Formato,Calendari
+Prodotti di stampa,Formato,Figurine
+Immagini ricordo,Soggetto,Famiglia
+Immagini ricordo,Soggetto,Ricorrenze
+Immagini ricordo,Soggetto,Vacanze
+Immagini ricordo,Soggetto,Cerimonie
+Immagini ricordo,Soggetto,Feste
+Immagini ricordo,Soggetto,Viaggi
+Immagini ricordo,Soggetto,Tempo libero
+Pratica amatoriale,Attività,"Partecipazione a circoli, club, gruppi"
+Pratica amatoriale,Attività,Concorsi
+Il ritratto,Uso istituzionale/pubblico,"La fototessera, i documenti e il controllo dell'identità"
+Il ritratto,Uso istituzionale/pubblico,"Le fotografie segnaletiche, dall'identikit alla schedatura"
+Il ritratto,Uso istituzionale/pubblico,I casellari giudiziari`;
+
+    const righe = d3.csvParse(csvText);
+    const rootId = "Fotografia";
+    const nodesMap = new Map([[rootId, { id: rootId, level: 0 }]]);
+    const linksMap = new Map();
+
+    const addNode = (id, level) => {
+      if (!nodesMap.has(id)) nodesMap.set(id, { id, level });
+    };
+
+    const addLink = (source, target) => {
+      const key = `${source}__${target}`;
+      if (!linksMap.has(key)) linksMap.set(key, { source, target });
+    };
+
+    righe.forEach((r) => {
+      const categoria = (r["Categoria Principale"] || "").trim();
+      const sottocategoria = (r["Sottocategoria"] || "").trim();
+      const dettaglio = (r["Dettaglio / Note"] || "").trim();
+      if (!categoria || !sottocategoria || !dettaglio) return;
+
+      const subId = `${categoria} -> ${sottocategoria}`;
+      const detId = `${subId} -> ${dettaglio}`;
+
+      addNode(categoria, 1);
+      addNode(subId, 2);
+      addNode(detId, 3);
+      addLink(rootId, categoria);
+      addLink(categoria, subId);
+      addLink(subId, detId);
+    });
+
+    const nodes = Array.from(nodesMap.values());
+    const links = Array.from(linksMap.values());
+    const width = 1400;
+    const height = 900;
+    const svg = d3.select("#grafico").attr("viewBox", [0, 0, width, height]);
+    const color = d3.scaleOrdinal()
+      .domain([0, 1, 2, 3])
+      .range(["#d32f2f", "#1976d2", "#388e3c", "#f57c00"]);
+
+    const simulation = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id((d) => d.id).distance((d) => {
+        if (d.source.level === 0) return 150;
+        if (d.source.level === 1) return 115;
+        return 90;
+      }))
+      .force("charge", d3.forceManyBody().strength(-160))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("collision", d3.forceCollide().radius(28));
+
+    const link = svg.append("g")
+      .selectAll("line")
+      .data(links)
+      .join("line")
+      .attr("class", "link")
+      .attr("stroke-width", 1.3);
+
+    const node = svg.append("g")
+      .selectAll("g")
+      .data(nodes)
+      .join("g")
+      .attr("class", "node")
+      .call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended));
+
+    node.append("circle")
+      .attr("r", (d) => {
+        if (d.level === 0) return 22;
+        if (d.level === 1) return 15;
+        if (d.level === 2) return 10;
+        return 6;
+      })
+      .attr("fill", (d) => color(d.level));
+
+    node.append("title").text((d) => d.id);
+
+    node.append("text")
+      .attr("x", 10)
+      .attr("y", 4)
+      .text((d) => {
+        if (d.level === 0) return d.id;
+        const parts = d.id.split(" -> ");
+        return parts[parts.length - 1];
+      });
+
+    simulation.on("tick", () => {
+      link
+        .attr("x1", (d) => d.source.x)
+        .attr("y1", (d) => d.source.y)
+        .attr("x2", (d) => d.target.x)
+        .attr("y2", (d) => d.target.y);
+
+      node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+    });
+
+    function dragstarted(event) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      event.subject.fx = event.subject.x;
+      event.subject.fy = event.subject.y;
+    }
+
+    function dragged(event) {
+      event.subject.fx = event.x;
+      event.subject.fy = event.y;
+    }
+
+    function dragended(event) {
+      if (!event.active) simulation.alphaTarget(0);
+      event.subject.fx = null;
+      event.subject.fy = null;
+    }
+  </script>
+</body>
+</html>
