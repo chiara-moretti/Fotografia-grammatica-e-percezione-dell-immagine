@@ -1,0 +1,1903 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mappa Concettuale Fotografia — Cerchio generi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #ffffff;
+      --panel: #ffffff;
+      --text: #0a0a0a;
+      --muted: #5c5c5c;
+      --border: #0a0a0a;
+      --accent: #0a0a0a;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    body > canvas {
+      position: fixed !important;
+      inset: 0;
+      z-index: 0;
+      opacity: 0;
+      pointer-events: none;
+      width: 1px !important;
+      height: 1px !important;
+    }
+
+    #chord-root {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background: #f0f0f2;
+      font-family: "Space Grotesk", system-ui, sans-serif;
+    }
+
+    #chord-root svg {
+      display: block;
+      cursor: grab;
+    }
+
+    #chord-root svg:active {
+      cursor: grabbing;
+    }
+
+    #status-bar {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      left: auto;
+      z-index: 8;
+      max-width: min(360px, calc(100vw - 24px));
+      padding: 8px 12px;
+      background: #fff;
+      border: 2px solid var(--border);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--text);
+      box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.12);
+      pointer-events: none;
+    }
+
+    #status-bar.status-bar--error {
+      color: #b00020;
+    }
+
+    #ui {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 12;
+      background: var(--panel);
+      border: 3px solid var(--border);
+      border-radius: 0;
+      padding: 14px 16px 16px;
+      width: min(380px, calc(100vw - 24px));
+      box-sizing: border-box;
+      box-shadow: 6px 6px 0 var(--border);
+    }
+
+    #ui h1 {
+      margin: 0 0 10px;
+      font-family: "Archivo Black", "Space Grotesk", sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      line-height: 1.15;
+      text-transform: uppercase;
+    }
+
+    #ui .subtitle {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 500;
+    }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.45;
+      border-top: 2px solid var(--border);
+      padding-top: 10px;
+    }
+
+    .zoom-controls {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .zoom-btn {
+      background: #fff;
+      color: var(--text);
+      border: 2px solid var(--border);
+      border-radius: 0;
+      width: 32px;
+      height: 28px;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .zoom-btn:hover {
+      background: var(--border);
+      color: #fff;
+    }
+
+    .zoom-readout {
+      font-size: 12px;
+      color: var(--text);
+      font-weight: 600;
+      min-width: 52px;
+      text-align: center;
+    }
+
+    .chrono-play-row {
+      margin-top: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    #chrono-play {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--accent);
+      border: 2px solid var(--border);
+      border-radius: 0;
+      cursor: pointer;
+      font-family: inherit;
+      flex-shrink: 0;
+      box-shadow: 4px 4px 0 var(--border);
+    }
+
+    #chrono-play:hover:not(:disabled) {
+      transform: translate(1px, 1px);
+      box-shadow: 3px 3px 0 var(--border);
+    }
+
+    #chrono-play:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .view-switch-row {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 2px solid var(--border);
+    }
+
+    .view-switch-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text);
+      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: 0;
+      cursor: pointer;
+      font-family: inherit;
+      text-decoration: none;
+      box-shadow: 4px 4px 0 var(--border);
+    }
+
+    .view-switch-btn:hover {
+      transform: translate(1px, 1px);
+      box-shadow: 3px 3px 0 var(--border);
+    }
+
+    #chrono-play .play-icon {
+      font-size: 9px;
+      line-height: 1;
+    }
+
+    .chrono-play-hint {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+      flex: 1;
+      min-width: 0;
+      font-weight: 500;
+    }
+
+    #filters-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 12;
+      width: min(320px, calc(100vw - 16px));
+      box-sizing: border-box;
+      padding: 16px 16px 24px;
+      background: var(--panel);
+      border-left: 3px solid var(--border);
+      overflow-y: auto;
+      pointer-events: auto;
+    }
+
+    #filters-panel h2 {
+      margin: 0 0 12px;
+      font-family: "Archivo Black", sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    #filters-panel .filters-panel-hint {
+      margin: 0 0 16px;
+      font-size: 11px;
+      line-height: 1.45;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .filter-groups {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .filter-group-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.3;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 6px;
+    }
+
+    .filter-group-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .filter input {
+      cursor: pointer;
+      width: 14px;
+      height: 14px;
+      accent-color: var(--border);
+    }
+
+    .badge {
+      width: 10px;
+      height: 10px;
+      border-radius: 0;
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+
+    .chrono-range {
+      margin: 0 0 10px;
+      font-size: 11px;
+      line-height: 1.4;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .chord-legend {
+      margin-top: 12px;
+      padding: 10px 0 0;
+      border-top: 2px solid var(--border);
+      font-size: 10px;
+      line-height: 1.5;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .chord-legend-title {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .chord-legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .chord-legend-swatch {
+      width: 22px;
+      height: 10px;
+      border-radius: 0;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .chord-legend-swatch--theme {
+      background: rgba(22, 108, 92, 0.75);
+    }
+
+    .chord-legend-swatch--tag {
+      background: rgba(155, 95, 48, 0.72);
+    }
+
+    .chord-legend-swatch--cat {
+      background: rgba(88, 52, 168, 0.65);
+    }
+
+    #detail-panel {
+      position: fixed;
+      left: 12px;
+      bottom: 12px;
+      z-index: 45;
+      width: min(380px, calc(100vw - 24px));
+      max-height: min(58vh, 520px);
+      box-sizing: border-box;
+      padding: 14px 16px 16px;
+      background: #fff;
+      border: 3px solid var(--border);
+      border-radius: 0;
+      box-shadow: 8px 8px 0 var(--border);
+      overflow-y: auto;
+      display: none;
+      pointer-events: auto;
+      font-family: "Space Grotesk", system-ui, sans-serif;
+    }
+
+    #detail-panel.detail-panel--open {
+      display: block;
+    }
+
+    #detail-panel #detail-close {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--border);
+      border: 2px solid var(--border);
+      border-radius: 0;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    #detail-panel #detail-close:hover {
+      background: #fff;
+      color: var(--text);
+    }
+
+    #detail-panel h2 {
+      margin: 0 0 10px;
+      font-family: "Archivo Black", sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    #detail-panel .detail-mappa-source {
+      margin: 0 0 14px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.45;
+      font-weight: 500;
+    }
+
+    #detail-panel .detail-subgroup {
+      margin-bottom: 14px;
+    }
+
+    #detail-panel .detail-subtitle {
+      margin: 0 0 8px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: var(--text);
+      text-transform: uppercase;
+    }
+
+    #detail-panel ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    #detail-panel .detail-empty {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+      font-weight: 500;
+    }
+
+    #link-relation-panel {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      z-index: 46;
+      width: min(380px, calc(100vw - 24px));
+      max-height: min(52vh, 440px);
+      box-sizing: border-box;
+      padding: 14px 16px 16px;
+      background: #fff;
+      border: 3px solid var(--border);
+      border-radius: 0;
+      box-shadow: -8px 8px 0 var(--border);
+      overflow-y: auto;
+      display: none;
+      pointer-events: auto;
+      font-family: "Space Grotesk", system-ui, sans-serif;
+    }
+
+    #link-relation-panel.link-relation-panel--open {
+      display: block;
+    }
+
+    #link-relation-panel #link-relation-close {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--border);
+      border: 2px solid var(--border);
+      border-radius: 0;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    #link-relation-panel #link-relation-close:hover {
+      background: #fff;
+      color: var(--text);
+    }
+
+    #link-relation-panel h2 {
+      margin: 0 0 8px;
+      font-family: "Archivo Black", sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--text);
+      line-height: 1.25;
+    }
+
+    #link-relation-panel .link-relation-pair {
+      margin: 0 0 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    #link-relation-panel .link-relation-weight {
+      margin: 0 0 10px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    #link-relation-panel ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    #link-relation-panel li {
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div id="chord-root" aria-label="Cerchio generi e percorso cronologico"></div>
+  <div id="status-bar" aria-live="polite"></div>
+  <div id="ui">
+    <h1>Cerchio — generi e percorso</h1>
+    <p class="subtitle">
+      Ogni <strong>pallino</strong> è un genere sul cerchio (ordinati per tema/categoria). Le <strong>curve colorate</strong> collegano generi affini (stessa categoria in Mappa, stesso macro-tema e/o stessi tag del CSV): <strong>clic</strong> su una curva per aprire il riepilogo del legame. Il <strong>raggio</strong> dipende soprattutto dai <strong>sottogruppi</strong> in Mappa, con un contributo da quante righe ha e dalla lunghezza del nome. Una <strong>sola linea nera</strong> segue il cronologico come nella 3D (Play).
+    </p>
+    <p id="chrono-range" class="chrono-range" aria-live="polite"></p>
+    <div class="hint">
+      Trascina sul diagramma per spostarlo, rotella o + / − per zoom. Clic su un pallino per aprire i dettagli del genere. Clic su una <strong>curva colorata</strong> tra due pallini per vedere cosa lega quei generi.
+    </div>
+    <div class="chord-legend" aria-label="Legenda">
+      <div class="chord-legend-title">Lettura del cerchio</div>
+      <div class="chord-legend-row" style="padding-left: 0; border: none; gap: 6px;">
+        <span style="width: 14px; height: 14px; border-radius: 50%; background: #6cf; border: 2px solid #0a0a0a; flex-shrink: 0;" aria-hidden="true"></span>
+        Raggio ≈ sottogruppi (Sottocategoria) + peso delle righe Mappa; se i valori coincidono, i raggi si distanziano comunque lungo l’ordine sul cerchio.
+      </div>
+      <div class="chord-legend-row" style="padding-left: 0; margin-top: 4px;">
+        Linea nera = un solo percorso cronologico (stesso CSV della 3D).
+      </div>
+      <div class="chord-legend-row" style="padding-left: 0; margin-top: 4px;">
+        <span style="width: 22px; height: 3px; background: linear-gradient(90deg, #9aa0b8, #c4c8d4); border-radius: 2px; flex-shrink: 0; opacity: 0.85;" aria-hidden="true"></span>
+        Curve colorate = affinità tra generi (stessa voce in Mappa, stesso macro-tema e/o stessi tag CSV); più il legame è forte, più la linea è visibile. <strong>Clic</strong> sulla curva per il dettaglio del legame.
+      </div>
+    </div>
+    <div class="zoom-controls">
+      <button id="zoom-out" class="zoom-btn" type="button">−</button>
+      <button id="zoom-in" class="zoom-btn" type="button">+</button>
+      <span id="zoom-readout" class="zoom-readout">100%</span>
+    </div>
+    <div class="chrono-play-row">
+      <button id="chrono-play" type="button" aria-label="Avvia percorso cronologico">
+        <span class="play-icon" aria-hidden="true">▶</span>
+        <span id="chrono-play-label">Percorso</span>
+      </button>
+      <span id="chrono-play-hint" class="chrono-play-hint">Play anima una linea nera all’interno del cerchio che collega i generi in ordine cronologico, segmento per segmento.</span>
+    </div>
+    <div class="view-switch-row">
+      <a href="index.html" class="view-switch-btn">Visualizzazione 3D</a>
+    </div>
+  </div>
+
+  <aside id="link-relation-panel" aria-hidden="true" aria-label="Dettaglio collegamento tra generi">
+    <button id="link-relation-close" type="button">← Chiudi</button>
+    <h2 id="link-relation-heading">Collegamento</h2>
+    <p id="link-relation-pair" class="link-relation-pair"></p>
+    <p id="link-relation-weight" class="link-relation-weight" hidden></p>
+    <ul id="link-relation-reasons"></ul>
+  </aside>
+
+  <aside id="detail-panel" aria-hidden="true" aria-label="Dettaglio categoria">
+    <button id="detail-close" type="button">← Chiudi dettaglio</button>
+    <h2 id="detail-category-title"></h2>
+    <p id="detail-mappa-source" class="detail-mappa-source"></p>
+    <div id="detail-groups"></div>
+    <p id="detail-empty" class="detail-empty" hidden></p>
+  </aside>
+
+  <aside id="filters-panel" aria-label="Filtri mappa">
+    <h2>Filtri</h2>
+    <p class="filters-panel-hint">
+      Stesse regole della vista 3D: combinazioni su tutte le dimensioni. Sul cerchio, l’ordine è per <strong>tema / categoria</strong>; le <strong>curve interne</strong> mostrano affinità tra generi; il percorso cronologico resta per Play e per il testo sotto.
+    </p>
+    <div id="filters-root" class="filter-groups"></div>
+  </aside>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.3/p5.min.js"></script>
+  <script>
+    let table;
+    let graph;
+    let loadError = "";
+    let rowsLoaded = 0;
+
+    /** @type {d3.ZoomBehavior<SVGSVGElement, unknown> | null} */
+    let chordZoomBehavior = null;
+    /** @type {d3.Selection<SVGSVGElement, unknown, HTMLElement, unknown> | null} */
+    let chordSvgD3 = null;
+    let chordResizeTimer = null;
+
+    /** Dati per la linea Play (punti sul raggio interno, stessi angoli degli archi). */
+    let chordChronoPlayCache = null;
+
+    const CHRONO_SEG_DRAW_MS = 520;
+    const CHRONO_SEG_GAP_MS = 90;
+    let chronoLinesMode = "hidden";
+    let chronoAnimStartMs = 0;
+    let chronoAnimPathSig = "";
+
+    let filterState = {
+      audience: new Set(),
+      artistic: new Set(),
+      professional: new Set()
+    };
+
+    const CSV_PATH = "Foglio di lavoro senza nome - Generefotografico-PubblicoNessunoPrivato-Artistico.csv";
+    const MAPPA_CSV_PATH = "Mappa Fotografia.csv";
+
+    const GENRE_TO_MAPPA_CATEGORY = {
+      "Il fotoromanzo": "Il fotoromanzo",
+      "La moda": "La moda",
+      "La pubblicità": "La pubblicità",
+      "La cronaca": "La cronaca",
+      "Immagini scientifiche": "Immagini scientifiche",
+      "Immagini industriali": "Immagini industriali",
+      "Riprese aeree civili": "Riprese aeree",
+      "Riprese aeree militari": "Riprese aeree",
+      "Riproduzione opere d'arte": "Il mondo dell'arte",
+      "Documentazione eventi artistici": "Il mondo dell'arte",
+      "Fotografia creativa/artistica": "Il mondo dell'arte",
+      "Immagini editoriali": "Il mondo editoriale",
+      "Cartoline": "Prodotti di stampa",
+      "Poster": "Prodotti di stampa",
+      "Calendari": "Prodotti di stampa",
+      "Figurine": "Prodotti di stampa",
+      "Immagini ricordo": "Immagini ricordo",
+      "Fotografia amatoriale (circoli/concorsi)": "Pratica amatoriale",
+      "Ritratto/fototessera/segnaletica": "Il ritratto"
+    };
+
+    /**
+     * Macro-temi per collegamenti “concettuali” tra generi (stesso valore => corda dedicata).
+     */
+    const THEMATIC_CLUSTER = {
+      "Il fotoromanzo": "narrazione_e_media",
+      "La moda": "comunicazione_e_mercato",
+      "La pubblicità": "comunicazione_e_mercato",
+      "La cronaca": "realtà_e_inchiesta",
+      "Immagini scientifiche": "sapere_e_tecnica",
+      "Immagini industriali": "sapere_e_tecnica",
+      "Riprese aeree civili": "territorio_e_visione",
+      "Riprese aeree militari": "territorio_e_visione",
+      "Riproduzione opere d'arte": "arte_e_patrimonio",
+      "Documentazione eventi artistici": "arte_e_patrimonio",
+      "Fotografia creativa/artistica": "arte_e_patrimonio",
+      "Immagini editoriali": "editoria_e_divulgazione",
+      "Cartoline": "oggetti_e_collezionismo",
+      "Poster": "oggetti_e_collezionismo",
+      "Calendari": "oggetti_e_collezionismo",
+      "Figurine": "oggetti_e_collezionismo",
+      "Immagini ricordo": "memoria_e_privato",
+      "Fotografia amatoriale (circoli/concorsi)": "pratica_sociale",
+      "Ritratto/fototessera/segnaletica": "identità_e_istituzioni"
+    };
+
+    /** Etichette leggibili per gli id di macro-tema (tooltip / pannello collegamenti). */
+    const MACRO_THEME_LABEL_IT = {
+      narrazione_e_media: "Narrazione e media",
+      comunicazione_e_mercato: "Comunicazione e mercato",
+      realtà_e_inchiesta: "Realtà e inchiesta",
+      sapere_e_tecnica: "Sapere e tecnica",
+      territorio_e_visione: "Territorio e visione",
+      arte_e_patrimonio: "Arte e patrimonio",
+      editoria_e_divulgazione: "Editoria e divulgazione",
+      oggetti_e_collezionismo: "Oggetti e collezionismo",
+      memoria_e_privato: "Memoria e privato",
+      pratica_sociale: "Pratica sociale",
+      identità_e_istituzioni: "Identità e istituzioni"
+    };
+
+    let mappaByCategory = new Map();
+    let mappaCsvError = "";
+    let detailFocusId = null;
+
+    const paletteAudience = {
+      Pubblico: [116, 209, 255],
+      Privato: [255, 127, 127],
+      Nessuno: [168, 176, 200]
+    };
+    const paletteArtistic = {
+      Artistico: [201, 156, 255],
+      Scientifico: [110, 231, 183],
+      Nessuno: [140, 148, 168]
+    };
+    const palettePro = {
+      Professionale: [255, 209, 102],
+      Amatoriale: [251, 191, 119],
+      Nessuno: [130, 138, 158]
+    };
+
+    function setup() {
+      textFont("Arial");
+      textSize(12);
+      textAlign(CENTER, CENTER);
+      const cnv = createCanvas(1, 1);
+      if (cnv && cnv.elt) {
+        cnv.elt.style.display = "none";
+      }
+      attachFilterEvents();
+      attachZoomControls();
+      attachChronoPlayButton();
+      attachDetailPanelClose();
+      attachLinkRelationPanelEvents();
+      loadMappaFotografiaTable();
+      updateZoomReadout(1);
+      updateChronoPlayUi();
+      graph = {
+        categories: [],
+        subcategories: [],
+        details: [],
+        links: [],
+        detailInterweaves: [],
+        chronoOrder: [],
+        filterMeta: { audience: [], artistic: [], professional: [] },
+        filterTitles: { audience: "", artistic: "", professional: "" }
+      };
+
+      loadTable(
+        CSV_PATH,
+        "csv",
+        "header",
+        (loadedTable) => {
+          table = loadedTable;
+          graph = buildGraph2D(table);
+          rowsLoaded = graph.details.length;
+          loadError = "";
+          mountFiltersFromGraph(graph);
+          updateChronoRangeHint();
+          resetChronoLineAnimationForNewPath();
+          renderChordDiagram();
+          updateStatusBar();
+        },
+        () => {
+          loadError = "Errore CSV: apri con server locale (non file://).";
+          renderChordDiagram();
+          updateStatusBar();
+        }
+      );
+    }
+
+    function draw() {
+      updateChronoLineAnimation();
+      updateChordChronoPlayPath();
+    }
+
+    function windowResized() {
+      if (chordResizeTimer) clearTimeout(chordResizeTimer);
+      chordResizeTimer = setTimeout(() => {
+        chordResizeTimer = null;
+        renderChordDiagram();
+      }, 120);
+    }
+
+    function updateStatusBar() {
+      const el = document.getElementById("status-bar");
+      if (!el) return;
+      el.textContent = loadError || `Righe caricate: ${rowsLoaded}`;
+      el.classList.toggle("status-bar--error", Boolean(loadError));
+    }
+
+    function nodeColorRgbString(node) {
+      const c = nodeColor(node);
+      return `rgb(${Math.round(c[0])}, ${Math.round(c[1])}, ${Math.round(c[2])})`;
+    }
+
+    function thematicCluster(genreLabel) {
+      if (Object.prototype.hasOwnProperty.call(THEMATIC_CLUSTER, genreLabel)) {
+        return THEMATIC_CLUSTER[genreLabel];
+      }
+      return null;
+    }
+
+    /** Ordine sul cerchio: categoria Mappa → macro-tema → tag → nome (non cronologia). */
+    function orderedForRelationalChord() {
+      if (!graph?.details) return [];
+      const vis = graph.details.filter((d) => nodeVisible(d));
+      return vis.slice().sort((a, b) => {
+        const ka = genreToMappaCategoryKey(a.label) || "\uffff";
+        const kb = genreToMappaCategoryKey(b.label) || "\uffff";
+        let cmp = ka.localeCompare(kb, "it", { sensitivity: "accent" });
+        if (cmp !== 0) return cmp;
+        const ta = thematicCluster(a.label) || "";
+        const tb = thematicCluster(b.label) || "";
+        cmp = ta.localeCompare(tb, "it");
+        if (cmp !== 0) return cmp;
+        const sa = `${a.tags.audience}|${a.tags.artistic}|${a.tags.professional}`;
+        const sb = `${b.tags.audience}|${b.tags.artistic}|${b.tags.professional}`;
+        cmp = sa.localeCompare(sb, "it");
+        if (cmp !== 0) return cmp;
+        return a.label.localeCompare(b.label, "it");
+      });
+    }
+
+    /** Punteggio legame concettuale tra due generi (come nel chord “relazionale”). */
+    function relationalChordWeight(a, b) {
+      let w = 0;
+      const ka = genreToMappaCategoryKey(a.label);
+      const kb = genreToMappaCategoryKey(b.label);
+      if (ka && kb && ka === kb) w += 4;
+      const ca = thematicCluster(a.label);
+      const cb = thematicCluster(b.label);
+      if (ca && cb && ca === cb) w += 3;
+      const ta = a.tags || {};
+      const tb = b.tags || {};
+      if (ta.audience && ta.audience === tb.audience) w += 1;
+      if (ta.artistic && ta.artistic === tb.artistic) w += 1;
+      if (ta.professional && ta.professional === tb.professional) w += 1;
+      return w;
+    }
+
+    /** Frasi esplicative per il pannello “cosa corrisponde” al collegamento (stessi criteri del peso). */
+    function relationalChordReasonLines(a, b) {
+      const lines = [];
+      const ft = graph?.filterTitles || {
+        audience: "Pubblico / destinatario",
+        artistic: "Artistico / scientifico",
+        professional: "Professionale / amatoriale"
+      };
+      const ka = genreToMappaCategoryKey(a.label);
+      const kb = genreToMappaCategoryKey(b.label);
+      if (ka && kb && ka === kb) {
+        lines.push(`Stessa categoria in Mappa Fotografia.csv: «${ka}».`);
+      }
+      const ca = thematicCluster(a.label);
+      const cb = thematicCluster(b.label);
+      if (ca && cb && ca === cb) {
+        const lab = MACRO_THEME_LABEL_IT[ca] || ca.replace(/_/g, " ");
+        lines.push(`Stesso macro-tema (raggruppamento concettuale): ${lab}.`);
+      }
+      const ta = a.tags || {};
+      const tb = b.tags || {};
+      if (ta.audience && ta.audience === tb.audience) {
+        lines.push(`${ft.audience}: valore condiviso «${ta.audience}».`);
+      }
+      if (ta.artistic && ta.artistic === tb.artistic) {
+        lines.push(`${ft.artistic}: valore condiviso «${ta.artistic}».`);
+      }
+      if (ta.professional && ta.professional === tb.professional) {
+        lines.push(`${ft.professional}: valore condiviso «${ta.professional}».`);
+      }
+      return lines;
+    }
+
+    function closeLinkRelationPanel() {
+      const panel = document.getElementById("link-relation-panel");
+      if (!panel) return;
+      panel.classList.remove("link-relation-panel--open");
+      panel.setAttribute("aria-hidden", "true");
+    }
+
+    function openLinkRelationPanel(linkDatum) {
+      if (!linkDatum?.source || !linkDatum?.target) return;
+      const panel = document.getElementById("link-relation-panel");
+      const pairEl = document.getElementById("link-relation-pair");
+      const listEl = document.getElementById("link-relation-reasons");
+      const weightEl = document.getElementById("link-relation-weight");
+      if (!panel || !pairEl || !listEl) return;
+      const a = linkDatum.source;
+      const b = linkDatum.target;
+      const la = labelWithYearTitle(a);
+      const lb = labelWithYearTitle(b);
+      pairEl.innerHTML = `${la} <span style="color:var(--muted);font-weight:600;">↔</span> ${lb}`;
+      const reasons = relationalChordReasonLines(a, b);
+      listEl.innerHTML = "";
+      reasons.forEach((text) => {
+        const li = document.createElement("li");
+        li.textContent = text;
+        listEl.appendChild(li);
+      });
+      if (weightEl) {
+        const w = relationalChordWeight(a, b);
+        weightEl.hidden = false;
+        weightEl.textContent = `Somma dei criteri (peso visualizzato sulla curva): ${w}.`;
+      }
+      panel.classList.add("link-relation-panel--open");
+      panel.setAttribute("aria-hidden", "false");
+    }
+
+    function attachLinkRelationPanelEvents() {
+      const btn = document.getElementById("link-relation-close");
+      if (!btn || btn.dataset.bound === "1") return;
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", () => closeLinkRelationPanel());
+      window.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape" || detailFocusId) return;
+        const lr = document.getElementById("link-relation-panel");
+        if (lr && lr.classList.contains("link-relation-panel--open")) closeLinkRelationPanel();
+      });
+    }
+
+    /** Archi interni tra coppie con affinità sufficiente (stessa categoria Mappa, macro-tema e/o tag). */
+    function buildRelationalLinksForChord(nodes) {
+      const out = [];
+      const n = nodes.length;
+      for (let i = 0; i < n; i++) {
+        for (let j = i + 1; j < n; j++) {
+          const a = nodes[i];
+          const b = nodes[j];
+          const weight = relationalChordWeight(a, b);
+          if (weight >= 2) out.push({ source: a, target: b, weight });
+        }
+      }
+      out.sort((x, y) => x.weight - y.weight);
+      return out;
+    }
+
+    /** Curva tipo chord: quadratic da punto sul cerchio, controllo verso il centro. */
+    function relationalChordPathD(x0, y0, x1, y1) {
+      const mx = (x0 + x1) * 0.5;
+      const my = (y0 + y1) * 0.5;
+      const inset = 0.3;
+      const cx = mx * inset;
+      const cy = my * inset;
+      return `M${x0},${y0} Q${cx},${cy} ${x1},${y1}`;
+    }
+
+    function blendNodeColorsForChordStroke(a, b) {
+      const ca = nodeColor(a);
+      const cb = nodeColor(b);
+      const m = [(ca[0] + cb[0]) * 0.5, (ca[1] + cb[1]) * 0.5, (ca[2] + cb[2]) * 0.5];
+      const gx = 136;
+      const gy = 138;
+      const gz = 150;
+      const t = 0.52;
+      const o = [
+        m[0] * t + gx * (1 - t),
+        m[1] * t + gy * (1 - t),
+        m[2] * t + gz * (1 - t)
+      ];
+      return `rgb(${Math.round(o[0])},${Math.round(o[1])},${Math.round(o[2])})`;
+    }
+
+    /**
+     * Sottogruppi = valori distinti della colonna «Sottocategoria» in Mappa Fotografia.csv
+     * per le righe associate a quel genere (stesso filtro del pannello dettaglio).
+     * Se non ci sono righe in mappa: 1 (pallino minimo). Se ci sono righe ma «Sottocategoria» vuota ovunque: conta le righe.
+     */
+    function countSubgroupsForGenre(node) {
+      const rows = getMappaRowsForGenre(node.label);
+      if (!rows || rows.length === 0) return 1;
+      const subs = new Set();
+      rows.forEach((r) => {
+        const s = String(r.sub || "").trim();
+        if (s) subs.add(s);
+      });
+      if (subs.size > 0) return subs.size;
+      return Math.max(1, rows.length);
+    }
+
+    /**
+     * Valore continuo per il raggio: combina sottogruppi, quantità di righe Mappa e lunghezza etichetta,
+     * così i pallini non restano tutti uguali quando molti generi hanno lo stesso n. di Sottocategoria.
+     */
+    function dotSizeMetric(node) {
+      const rows = getMappaRowsForGenre(node.label) || [];
+      const subs = new Set();
+      rows.forEach((r) => {
+        const s = String(r.sub || "").trim();
+        if (s) subs.add(s);
+      });
+      const nSub = subs.size > 0 ? subs.size : (rows.length > 0 ? 1 : 0);
+      const lab = String(node.label || "").length;
+      return Math.max(0.5, nSub * 14 + rows.length * 1.05 + lab * 0.22);
+    }
+
+    /** Raggi finali: scala lineare sui punteggi; se tutti uguali, scala per posizione nell’elenco ordinato. */
+    function computeDotRadii(ordered, rMin, rMax) {
+      const n = ordered.length;
+      const counts = ordered.map((d) => countSubgroupsForGenre(d));
+      const scores = ordered.map((d) => dotSizeMetric(d));
+      const minS = Math.min(...scores);
+      const maxS = Math.max(...scores);
+      const radii = scores.map((s, i) => {
+        if (n <= 1) {
+          return rMin + (rMax - rMin) * 0.44;
+        }
+        if (maxS - minS < 1e-6) {
+          return rMin + (rMax - rMin) * (i / Math.max(1, n - 1));
+        }
+        const t = (s - minS) / (maxS - minS);
+        return rMin + (rMax - rMin) * constrain(t, 0, 1);
+      });
+      return { counts, scores, radii };
+    }
+
+    function chronoPlayPointForNode(cache, node) {
+      const ang = cache.angleById.get(node.id);
+      if (ang === undefined || !Number.isFinite(ang)) return null;
+      const R = cache.ringR;
+      return { x: R * Math.cos(ang), y: R * Math.sin(ang) };
+    }
+
+    function buildChronoPlayPathString(pathNodes, st) {
+      if (!pathNodes.length || !chordChronoPlayCache) return "";
+      const cache = chordChronoPlayCache;
+      const pt = (node) => chronoPlayPointForNode(cache, node);
+      const p0 = pt(pathNodes[0]);
+      if (!p0) return "";
+      let d = `M${p0.x},${p0.y}`;
+      for (let k = 1; k <= st.fullThrough + 1 && k < pathNodes.length; k++) {
+        const p = pt(pathNodes[k]);
+        if (p) d += `L${p.x},${p.y}`;
+      }
+      if (st.partialFrom && st.partialTo) {
+        const A = pt(st.partialFrom);
+        const B = pt(st.partialTo);
+        if (A && B) {
+          const t = constrain(st.partialT, 0, 1);
+          d += `L${A.x + (B.x - A.x) * t},${A.y + (B.y - A.y) * t}`;
+        }
+      }
+      return d;
+    }
+
+    function updateChordChronoPlayPath() {
+      const cache = chordChronoPlayCache;
+      if (!cache?.pathMain || !graph?.chronoOrder) return;
+      const pathNodes = graph.chronoOrder.filter(nodeVisible);
+      if (pathNodes.length < 2 || chronoLinesMode === "hidden") {
+        cache.pathHalo.attr("d", "").attr("stroke-opacity", 0);
+        cache.pathMain.attr("d", "").attr("stroke-opacity", 0);
+        return;
+      }
+      const st = getChronoAnimationDrawState(pathNodes);
+      const d = buildChronoPlayPathString(pathNodes, st);
+      if (!d) {
+        cache.pathHalo.attr("d", "").attr("stroke-opacity", 0);
+        cache.pathMain.attr("d", "").attr("stroke-opacity", 0);
+        return;
+      }
+      cache.pathHalo.attr("d", d).attr("stroke-opacity", 1);
+      cache.pathMain.attr("d", d).attr("stroke-opacity", 1);
+    }
+
+    function renderChordDiagram() {
+      closeLinkRelationPanel();
+      const root = document.getElementById("chord-root");
+      if (!root || typeof d3 === "undefined") return;
+      root.innerHTML = "";
+      chordSvgD3 = null;
+      chordZoomBehavior = null;
+      chordChronoPlayCache = null;
+
+      if (loadError) {
+        root.appendChild(Object.assign(document.createElement("p"), {
+          textContent: loadError,
+          style: "padding:28px 20px;font-size:14px;max-width:420px;line-height:1.5;"
+        }));
+        return;
+      }
+      if (!graph?.details?.length) return;
+
+      const ordered = orderedForRelationalChord();
+      const n = ordered.length;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const size = Math.min(w, h);
+      const ringR = size * 0.30;
+
+      const svg = d3.select(root).append("svg")
+        .attr("id", "chord-svg")
+        .attr("width", w)
+        .attr("height", h)
+        .attr("viewBox", `0 0 ${w} ${h}`)
+        .style("touch-action", "none");
+
+      svg.append("defs").append("filter")
+        .attr("id", "dot-shadow")
+        .attr("x", "-40%")
+        .attr("y", "-40%")
+        .attr("width", "180%")
+        .attr("height", "180%")
+        .append("feDropShadow")
+        .attr("dx", 0)
+        .attr("dy", 1.5)
+        .attr("stdDeviation", 1.8)
+        .attr("flood-opacity", 0.18);
+
+      chordSvgD3 = svg;
+      const zoomWrap = svg.append("g").attr("class", "chord-zoom-wrap");
+      const g = zoomWrap.append("g").attr("transform", `translate(${w * 0.5},${h * 0.5})`);
+
+      g.append("circle")
+        .attr("r", ringR + 70)
+        .attr("fill", "#f4f4f6")
+        .attr("stroke", "#dedee2")
+        .attr("stroke-width", 1);
+      g.append("circle")
+        .attr("r", ringR)
+        .attr("fill", "none")
+        .attr("stroke", "#d4d4da")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", "5 8");
+
+      if (n === 0) {
+        g.append("text")
+          .attr("text-anchor", "middle")
+          .attr("dy", "0.35em")
+          .style("font-size", "14px")
+          .style("fill", "#5c5c5c")
+          .text("Nessun genere visibile: regola i filtri.");
+        wireChordZoom(svg, zoomWrap, w, h);
+        return;
+      }
+
+      const rMin = 6;
+      const rMax = 30;
+      const { counts, radii } = computeDotRadii(ordered, rMin, rMax);
+
+      const angleById = new Map();
+      ordered.forEach((node, k) => {
+        const ang = -Math.PI / 2 + (2 * Math.PI * k) / n;
+        angleById.set(node.id, ang);
+      });
+
+      if (n === 1) {
+        const node = ordered[0];
+        const r = radii[0];
+        g.append("circle")
+          .attr("cx", 0)
+          .attr("cy", 0)
+          .attr("r", r)
+          .attr("fill", nodeColorRgbString(node))
+          .attr("stroke", "#0a0a0a")
+          .attr("stroke-width", 2)
+          .attr("filter", "url(#dot-shadow)")
+          .style("cursor", "pointer")
+          .attr("title", () => {
+            const rc = (getMappaRowsForGenre(node.label) || []).length;
+            return `${labelWithYearTitle(node)} — ${counts[0]} sottogruppi (Sottocategoria), ${rc} voci in Mappa`;
+          })
+          .on("click", () => enterDetailView2D(node));
+        g.append("text")
+          .attr("text-anchor", "middle")
+          .attr("y", r + 18)
+          .style("font-size", "12px")
+          .style("font-weight", "700")
+          .style("font-family", '"Space Grotesk", system-ui, sans-serif')
+          .style("fill", "#0a0a0a")
+          .text(shortenToThreeWords(node.label) + formatYearSuffix(node));
+        const playLayer1 = g.append("g")
+          .attr("class", "chrono-play-layer")
+          .style("pointer-events", "none");
+        const pathHalo1 = playLayer1.append("path")
+          .attr("fill", "none")
+          .attr("stroke", "#ffffff")
+          .attr("stroke-width", 6)
+          .attr("stroke-linecap", "round");
+        const pathMain1 = playLayer1.append("path")
+          .attr("fill", "none")
+          .attr("stroke", "#0a0a0a")
+          .attr("stroke-width", 3)
+          .attr("stroke-linecap", "round");
+        chordChronoPlayCache = {
+          angleById,
+          ringR: 0,
+          pathHalo: pathHalo1,
+          pathMain: pathMain1
+        };
+        updateChordChronoPlayPath();
+        wireChordZoom(svg, zoomWrap, w, h);
+        return;
+      }
+
+      const linkList = !detailFocusId ? buildRelationalLinksForChord(ordered) : [];
+      const ptRing = (node) => {
+        const ang = angleById.get(node.id);
+        return { x: ringR * Math.cos(ang), y: ringR * Math.sin(ang) };
+      };
+      const linksG = g.append("g")
+        .attr("class", "relational-chords")
+        .style("pointer-events", "all");
+      const linkWrap = linksG.selectAll("g.relational-chord-wrap")
+        .data(linkList)
+        .join("g")
+        .attr("class", "relational-chord-wrap")
+        .style("cursor", "pointer")
+        .on("click", (event, d) => {
+          event.stopPropagation();
+          openLinkRelationPanel(d);
+        });
+      linkWrap.each(function (d) {
+        const sel = d3.select(this);
+        if (sel.select("path.relational-chord-hit").empty()) {
+          sel.append("path").attr("class", "relational-chord-hit");
+          sel.append("path").attr("class", "relational-chord");
+        }
+        const p0 = ptRing(d.source);
+        const p1 = ptRing(d.target);
+        const pathD = relationalChordPathD(p0.x, p0.y, p1.x, p1.y);
+        sel.select("path.relational-chord-hit")
+          .attr("d", pathD)
+          .attr("fill", "none")
+          .attr("stroke", "transparent")
+          .attr("stroke-width", 18)
+          .attr("pointer-events", "stroke")
+          .attr("stroke-linecap", "round");
+        sel.select("path.relational-chord")
+          .attr("d", pathD)
+          .attr("fill", "none")
+          .attr("stroke", blendNodeColorsForChordStroke(d.source, d.target))
+          .attr("stroke-width", 0.55 + Math.min(d.weight, 10) * 0.16)
+          .attr("stroke-opacity", Math.min(0.44, 0.09 + (d.weight - 2) * 0.035))
+          .attr("stroke-linecap", "round")
+          .style("pointer-events", "none")
+          .style("vector-effect", "non-scaling-stroke");
+      });
+
+      const nodesG = g.append("g").attr("class", "genre-nodes");
+      nodesG.selectAll("circle.genre-dot")
+        .data(ordered)
+        .join("circle")
+        .attr("class", "genre-dot")
+        .attr("cx", (d) => ringR * Math.cos(angleById.get(d.id)))
+        .attr("cy", (d) => ringR * Math.sin(angleById.get(d.id)))
+        .attr("r", (d, i) => radii[i])
+        .attr("fill", (d) => nodeColorRgbString(d))
+        .attr("stroke", "#0a0a0a")
+        .attr("stroke-width", 2)
+        .attr("filter", "url(#dot-shadow)")
+        .style("cursor", "pointer")
+        .attr("title", (d, i) => {
+          const rc = (getMappaRowsForGenre(d.label) || []).length;
+          return `${labelWithYearTitle(d)} — ${counts[i]} sottogruppi (Sottocategoria), ${rc} voci in Mappa`;
+        })
+        .on("click", (event, d) => {
+          event.stopPropagation();
+          enterDetailView2D(d);
+        });
+
+      const labelGap = 14 + rMax * 0.35;
+      nodesG.selectAll("text.genre-dot-label")
+        .data(ordered)
+        .join("text")
+        .attr("class", "genre-dot-label")
+        .attr("text-anchor", "middle")
+        .attr("x", (d) => (ringR + labelGap) * Math.cos(angleById.get(d.id)))
+        .attr("y", (d) => (ringR + labelGap) * Math.sin(angleById.get(d.id)))
+        .attr("dy", "0.35em")
+        .style("font-size", "10px")
+        .style("font-weight", "700")
+        .style("font-family", '"Space Grotesk", system-ui, sans-serif')
+        .style("fill", "#0a0a0a")
+        .style("paint-order", "stroke fill")
+        .style("stroke", "#ffffff")
+        .style("stroke-width", "3px")
+        .style("pointer-events", "none")
+        .text((d) => shortenToThreeWords(d.label) + formatYearSuffix(d));
+
+      const playLayer = g.append("g")
+        .attr("class", "chrono-play-layer")
+        .style("pointer-events", "none");
+      const pathHalo = playLayer.append("path")
+        .attr("class", "chrono-play-halo")
+        .attr("fill", "none")
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 6)
+        .attr("stroke-linecap", "round")
+        .attr("stroke-linejoin", "round");
+      const pathMain = playLayer.append("path")
+        .attr("class", "chrono-play-main")
+        .attr("fill", "none")
+        .attr("stroke", "#0a0a0a")
+        .attr("stroke-width", 3)
+        .attr("stroke-linecap", "round")
+        .attr("stroke-linejoin", "round");
+
+      chordChronoPlayCache = {
+        angleById,
+        ringR,
+        pathHalo,
+        pathMain
+      };
+      updateChordChronoPlayPath();
+
+      wireChordZoom(svg, zoomWrap, w, h);
+    }
+
+    function wireChordZoom(svg, zoomWrap, w, h) {
+      chordZoomBehavior = d3.zoom()
+        .scaleExtent([0.32, 5])
+        .extent([[0, 0], [w, h]])
+        .on("zoom", (event) => {
+          zoomWrap.attr("transform", event.transform);
+          updateZoomReadout(event.transform.k);
+        });
+      svg.call(chordZoomBehavior);
+      svg.on("dblclick.zoom", null);
+    }
+
+    function mountFiltersFromGraph(g) {
+      const root = document.getElementById("filters-root");
+      if (!root || !g?.filterMeta) return;
+      root.innerHTML = "";
+      const dims = [
+        { key: "audience", title: g.filterTitles.audience, values: g.filterMeta.audience },
+        { key: "artistic", title: g.filterTitles.artistic, values: g.filterMeta.artistic },
+        { key: "professional", title: g.filterTitles.professional, values: g.filterMeta.professional }
+      ];
+      filterState = {
+        audience: new Set(g.filterMeta.audience),
+        artistic: new Set(g.filterMeta.artistic),
+        professional: new Set(g.filterMeta.professional)
+      };
+      dims.forEach(({ key, title, values }) => {
+        const wrap = document.createElement("div");
+        wrap.className = "filter-group";
+        const t = document.createElement("div");
+        t.className = "filter-group-title";
+        t.textContent = title;
+        wrap.appendChild(t);
+        const row = document.createElement("div");
+        row.className = "filter-group-items";
+        values.forEach((val) => {
+          const id = `f-${key}-${hashCode(String(val))}`;
+          const lab = document.createElement("label");
+          lab.className = "filter";
+          const inp = document.createElement("input");
+          inp.type = "checkbox";
+          inp.id = id;
+          inp.checked = true;
+          inp.dataset.dim = key;
+          inp.dataset.filterValue = val;
+          const badge = document.createElement("span");
+          badge.className = "badge";
+          badge.style.background = badgeColorForDim(key, val);
+          lab.appendChild(inp);
+          lab.appendChild(badge);
+          lab.appendChild(document.createTextNode(val));
+          row.appendChild(lab);
+        });
+        wrap.appendChild(row);
+        root.appendChild(wrap);
+      });
+    }
+
+    function badgeColorForDim(dimKey, val) {
+      const map =
+        dimKey === "audience" ? paletteAudience
+          : dimKey === "artistic" ? paletteArtistic
+            : palettePro;
+      const rgb = map[val];
+      if (rgb) return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+      return "rgb(140, 150, 175)";
+    }
+
+    function attachFilterEvents() {
+      const panel = document.getElementById("filters-panel");
+      if (!panel || panel.dataset.filterBound === "1") return;
+      panel.dataset.filterBound = "1";
+      panel.addEventListener("change", (e) => {
+        const t = e.target;
+        if (t.type !== "checkbox") return;
+        const dim = t.dataset.dim;
+        const val = t.dataset.filterValue;
+        if (!dim || val === undefined) return;
+        const set = filterState[dim];
+        if (!set) return;
+        if (t.checked) set.add(val);
+        else set.delete(val);
+        updateChronoRangeHint();
+        resetChronoLineAnimationForNewPath();
+        renderChordDiagram();
+      });
+    }
+
+    function chronoVisiblePathSig() {
+      if (!graph?.chronoOrder) return "";
+      return graph.chronoOrder.filter(nodeVisible).map((n) => n.id).join("|");
+    }
+
+    function resetChronoLineAnimationForNewPath() {
+      const sig = chronoVisiblePathSig();
+      if (sig === chronoAnimPathSig) return;
+      chronoAnimPathSig = sig;
+      chronoLinesMode = "hidden";
+      chronoAnimStartMs = 0;
+      updateChronoPlayUi();
+    }
+
+    function attachChronoPlayButton() {
+      const btn = document.getElementById("chrono-play");
+      if (!btn || btn.dataset.bound === "1") return;
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", () => {
+        const path = graph?.chronoOrder ? graph.chronoOrder.filter(nodeVisible) : [];
+        if (path.length < 2) return;
+        chronoAnimPathSig = chronoVisiblePathSig();
+        chronoLinesMode = "animating";
+        chronoAnimStartMs = millis();
+        updateChronoPlayUi();
+      });
+    }
+
+    function updateChronoPlayUi() {
+      const btn = document.getElementById("chrono-play");
+      const label = document.getElementById("chrono-play-label");
+      if (!btn) return;
+      const path = graph?.chronoOrder ? graph.chronoOrder.filter(nodeVisible) : [];
+      const canPlay = path.length >= 2 && !loadError;
+      const busy = chronoLinesMode === "animating";
+      btn.disabled = !canPlay || busy;
+      if (label) {
+        if (!canPlay) label.textContent = "Percorso";
+        else if (busy) label.textContent = "In corso…";
+        else if (chronoLinesMode === "full") label.textContent = "Rivedi";
+        else label.textContent = "Play";
+      }
+      btn.setAttribute("aria-busy", busy ? "true" : "false");
+    }
+
+    function chronoAnimationTotalMs(segmentCount) {
+      if (segmentCount <= 0) return 0;
+      return segmentCount * CHRONO_SEG_DRAW_MS + max(0, segmentCount - 1) * CHRONO_SEG_GAP_MS;
+    }
+
+    function updateChronoLineAnimation() {
+      if (chronoLinesMode !== "animating") return;
+      const path = graph?.chronoOrder ? graph.chronoOrder.filter(nodeVisible) : [];
+      if (path.length < 2 || chronoVisiblePathSig() !== chronoAnimPathSig) {
+        chronoLinesMode = "hidden";
+        updateChronoPlayUi();
+        return;
+      }
+      const nSeg = path.length - 1;
+      const total = chronoAnimationTotalMs(nSeg);
+      const elapsed = millis() - chronoAnimStartMs;
+      if (elapsed >= total) {
+        chronoLinesMode = "full";
+        updateChronoPlayUi();
+      }
+    }
+
+    function getChronoAnimationDrawState(path) {
+      const nSeg = path.length - 1;
+      if (nSeg < 1) return { fullThrough: -1, partialFrom: null, partialTo: null, partialT: 0 };
+      if (chronoLinesMode === "full") {
+        return { fullThrough: nSeg - 1, partialFrom: null, partialTo: null, partialT: 1 };
+      }
+      if (chronoLinesMode === "hidden") {
+        return { fullThrough: -1, partialFrom: null, partialTo: null, partialT: 0 };
+      }
+      const elapsed = millis() - chronoAnimStartMs;
+      for (let i = 0; i < nSeg; i++) {
+        const segStart = i * (CHRONO_SEG_DRAW_MS + CHRONO_SEG_GAP_MS);
+        const drawEnd = segStart + CHRONO_SEG_DRAW_MS;
+        if (elapsed < segStart) {
+          return { fullThrough: i - 1, partialFrom: null, partialTo: null, partialT: 0 };
+        }
+        if (elapsed < drawEnd) {
+          const t = constrain((elapsed - segStart) / CHRONO_SEG_DRAW_MS, 0, 1);
+          return { fullThrough: i - 1, partialFrom: path[i], partialTo: path[i + 1], partialT: t };
+        }
+      }
+      return { fullThrough: nSeg - 1, partialFrom: null, partialTo: null, partialT: 1 };
+    }
+
+    function formatYearSuffix(node) {
+      if (node.level !== 2 || node.year == null || !Number.isFinite(node.year)) return "";
+      return ` (${node.year})`;
+    }
+
+    function labelWithYearTitle(node) {
+      return `${node.label}${formatYearSuffix(node)}`;
+    }
+
+    function updateChronoRangeHint() {
+      const el = document.getElementById("chrono-range");
+      if (!el || !graph?.chronoOrder?.length) {
+        if (el) el.textContent = "";
+        return;
+      }
+      const path = graph.chronoOrder.filter(nodeVisible);
+      if (path.length === 0) {
+        el.textContent = "Nessun genere visibile: regola i filtri per vedere il percorso.";
+        return;
+      }
+      const first = path[0];
+      const last = path[path.length - 1];
+      const y0 = first.year;
+      const y1 = last.year;
+      const same = path.length === 1;
+      if (same) {
+        el.textContent = `Un solo punto visibile: ${y0} — ${first.label}.`;
+        return;
+      }
+      el.textContent = `Inizio percorso: ${y0} — ${first.label}. Fine: ${y1} — ${last.label}. (${path.length} generi)`;
+    }
+
+    function loadMappaFotografiaTable() {
+      loadTable(
+        MAPPA_CSV_PATH,
+        "csv",
+        "header",
+        (loaded) => {
+          mappaByCategory = buildMappaIndex(loaded);
+          mappaCsvError = "";
+          if (detailFocusId) refreshDetailPanel();
+          renderChordDiagram();
+        },
+        () => {
+          mappaCsvError = "Impossibile caricare Mappa Fotografia.csv (serve un server locale, non file://).";
+          mappaByCategory = new Map();
+          if (detailFocusId) refreshDetailPanel();
+          renderChordDiagram();
+        }
+      );
+    }
+
+    function buildMappaIndex(csv) {
+      const map = new Map();
+      if (!csv) return map;
+      const rows = csv.getRows().filter((r) => {
+        const c0 = String(r.get(0) || "").replace(/^\uFEFF/, "").trim();
+        return c0.length > 0;
+      });
+      rows.forEach((row) => {
+        const cat = String(row.get(0) || "").replace(/^\uFEFF/, "").trim();
+        if (!cat) return;
+        const sub = String(row.get(1) || "").trim();
+        const det = String(row.get(2) || "").trim();
+        if (!map.has(cat)) map.set(cat, []);
+        map.get(cat).push({ sub, det });
+      });
+      return map;
+    }
+
+    function genreToMappaCategoryKey(genreLabel) {
+      if (Object.prototype.hasOwnProperty.call(GENRE_TO_MAPPA_CATEGORY, genreLabel)) {
+        return GENRE_TO_MAPPA_CATEGORY[genreLabel];
+      }
+      const norm = String(genreLabel || "").trim();
+      if (mappaByCategory.has(norm)) return norm;
+      for (const k of mappaByCategory.keys()) {
+        if (k.localeCompare(norm, "it", { sensitivity: "accent" }) === 0) return k;
+      }
+      return null;
+    }
+
+    function refineMappaRowsForGenre(genreLabel, mappaCategoryKey, rows) {
+      if (!rows || rows.length === 0) return rows;
+      const g = String(genreLabel || "").trim();
+
+      const stampaFormati = ["Cartoline", "Poster", "Calendari", "Figurine"];
+      if (stampaFormati.includes(g)) {
+        const hit = rows.filter((r) => {
+          if (!r.det) return false;
+          return r.det.localeCompare(g, "it", { sensitivity: "accent" }) === 0;
+        });
+        return hit.length ? hit : rows;
+      }
+
+      if (g === "Riprese aeree civili") {
+        const hit = rows.filter((r) => /civile/i.test(r.sub || ""));
+        return hit.length ? hit : rows;
+      }
+      if (g === "Riprese aeree militari") {
+        const hit = rows.filter((r) => /militare/i.test(r.sub || ""));
+        return hit.length ? hit : rows;
+      }
+
+      if (g === "Riproduzione opere d'arte") {
+        const hit = rows.filter((r) => /riproduzione delle opere/i.test(r.sub || ""));
+        return hit.length ? hit : rows;
+      }
+      if (g === "Documentazione eventi artistici") {
+        const hit = rows.filter((r) => /documentazione degli eventi/i.test(r.sub || ""));
+        return hit.length ? hit : rows;
+      }
+      if (g === "Fotografia creativa/artistica") {
+        const hit = rows.filter((r) => /aspetto creativo/i.test(r.sub || ""));
+        return hit.length ? hit : rows;
+      }
+
+      return rows;
+    }
+
+    function getMappaRowsForGenre(genreLabel) {
+      const key = genreToMappaCategoryKey(genreLabel);
+      if (!key) return [];
+      const rows = mappaByCategory.get(key) || [];
+      return refineMappaRowsForGenre(genreLabel, key, rows);
+    }
+
+    function attachDetailPanelClose() {
+      const btn = document.getElementById("detail-close");
+      if (!btn || btn.dataset.bound === "1") return;
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", () => exitDetailView2D());
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && detailFocusId) exitDetailView2D();
+      });
+    }
+
+    function enterDetailView2D(node) {
+      if (!node || node.level !== 2 || !graph) return;
+      closeLinkRelationPanel();
+      detailFocusId = node.id;
+      chronoLinesMode = "hidden";
+      updateDetailPanelDom(true);
+      refreshDetailPanel();
+      updateChronoPlayUi();
+      renderChordDiagram();
+    }
+
+    function exitDetailView2D() {
+      detailFocusId = null;
+      updateDetailPanelDom(false);
+      resetChronoLineAnimationForNewPath();
+      updateChronoPlayUi();
+      renderChordDiagram();
+    }
+
+    function updateDetailPanelDom(open) {
+      const panel = document.getElementById("detail-panel");
+      if (!panel) return;
+      panel.classList.toggle("detail-panel--open", open);
+      panel.setAttribute("aria-hidden", open ? "false" : "true");
+    }
+
+    function refreshDetailPanel() {
+      const titleEl = document.getElementById("detail-category-title");
+      const groupsEl = document.getElementById("detail-groups");
+      const emptyEl = document.getElementById("detail-empty");
+      const srcEl = document.getElementById("detail-mappa-source");
+      if (!titleEl || !groupsEl || !emptyEl) return;
+
+      const node = graph?.details?.find((n) => n.id === detailFocusId);
+      if (!node) return;
+
+      titleEl.textContent = node.label;
+      const mappaKey = genreToMappaCategoryKey(node.label);
+      const rows = getMappaRowsForGenre(node.label);
+      if (srcEl) {
+        if (mappaCsvError) srcEl.textContent = mappaCsvError;
+        else if (mappaKey) {
+          const n = rows.length;
+          srcEl.textContent = n === 1
+            ? `Da Mappa Fotografia.csv — categoria «${mappaKey}», 1 voce per questo genere.`
+            : `Da Mappa Fotografia.csv — categoria «${mappaKey}», ${n} voci per questo genere.`;
+        } else srcEl.textContent = "Nessuna categoria in Mappa Fotografia.csv associata a questo genere.";
+      }
+      groupsEl.innerHTML = "";
+      if (rows.length === 0) {
+        emptyEl.hidden = false;
+        emptyEl.textContent = mappaCsvError
+          ? "Correggi il caricamento del CSV per vedere i dettagli."
+          : (mappaKey
+            ? "Nessuna riga trovata per questa categoria nel CSV."
+            : "Aggiungi una corrispondenza nello script (GENRE_TO_MAPPA_CATEGORY) per collegare questo genere alla mappa.");
+        return;
+      }
+      emptyEl.hidden = true;
+
+      const bySub = new Map();
+      rows.forEach(({ sub, det }) => {
+        const k = sub || "—";
+        if (!bySub.has(k)) bySub.set(k, []);
+        if (det) bySub.get(k).push(det);
+      });
+
+      bySub.forEach((items, sub) => {
+        const wrap = document.createElement("div");
+        wrap.className = "detail-subgroup";
+        const st = document.createElement("h3");
+        st.className = "detail-subtitle";
+        st.textContent = sub;
+        wrap.appendChild(st);
+        const ul = document.createElement("ul");
+        items.forEach((text) => {
+          const li = document.createElement("li");
+          li.textContent = text;
+          ul.appendChild(li);
+        });
+        wrap.appendChild(ul);
+        groupsEl.appendChild(wrap);
+      });
+    }
+
+    function buildGraph2D(csv) {
+      const details = [];
+      const links = [];
+      const cols = csv.columns || [];
+      const filterTitles = {
+        audience: cols[1] || "Colonna 2",
+        artistic: cols[2] || "Colonna 3",
+        professional: cols[3] || "Colonna 4"
+      };
+
+      const rows = csv.getRows().filter((r) => String(r.get(0) || "").trim().length > 0);
+      const audienceSet = new Set();
+      const artisticSet = new Set();
+      const professionalSet = new Set();
+
+      rows.forEach((row) => {
+        const aud = String(row.get(1) || "").trim();
+        const art = String(row.get(2) || "").trim();
+        const pro = String(row.get(3) || "").trim();
+        if (aud) audienceSet.add(aud);
+        if (art) artisticSet.add(art);
+        if (pro) professionalSet.add(pro);
+      });
+
+      const sortVals = (a, b) => a.localeCompare(b, "it");
+      const filterMeta = {
+        audience: [...audienceSet].sort(sortVals),
+        artistic: [...artisticSet].sort(sortVals),
+        professional: [...professionalSet].sort(sortVals)
+      };
+
+      const dataRows = rows.filter((r) => String(r.get(0) || "").trim().length > 0);
+
+      dataRows.forEach((row, idx) => {
+        const genre = String(row.get(0) || "").trim();
+        const audience = String(row.get(1) || "").trim();
+        const artistic = String(row.get(2) || "").trim();
+        const professional = String(row.get(3) || "").trim();
+        const yearParsed = parseInt(String(row.get(4) || "").replace(/\D/g, ""), 10);
+        const year = Number.isFinite(yearParsed) ? yearParsed : 1800 + idx;
+        details.push({
+          id: `det-${idx}`,
+          label: genre,
+          level: 2,
+          year,
+          tags: { audience, artistic, professional }
+        });
+      });
+
+      const chronoOrder = [...details].sort((a, b) => {
+        if (a.year !== b.year) return a.year - b.year;
+        return a.label.localeCompare(b.label, "it");
+      });
+
+      return {
+        categories: [],
+        subcategories: [],
+        details,
+        links,
+        detailInterweaves: [],
+        chronoOrder,
+        filterMeta,
+        filterTitles
+      };
+    }
+
+    function detailDimsVisible(d) {
+      if (!d.tags || !graph?.filterMeta) return true;
+      const t = d.tags;
+      const fm = graph.filterMeta;
+      if (fm.audience.length && !filterState.audience.has(t.audience)) return false;
+      if (fm.artistic.length && !filterState.artistic.has(t.artistic)) return false;
+      if (fm.professional.length && !filterState.professional.has(t.professional)) return false;
+      return true;
+    }
+
+    function nodeVisible(node) {
+      if (detailFocusId) {
+        if (node.level === 2) return node.id === detailFocusId;
+        return false;
+      }
+      if (node.level === 2) return detailDimsVisible(node);
+      return true;
+    }
+
+    function nodeColor(node) {
+      if (node.level === 2 && node.tags) {
+        const t = node.tags;
+        const colors = [];
+        if (filterState.audience.has(t.audience) && paletteAudience[t.audience]) {
+          colors.push(paletteAudience[t.audience]);
+        }
+        if (filterState.artistic.has(t.artistic) && paletteArtistic[t.artistic]) {
+          colors.push(paletteArtistic[t.artistic]);
+        }
+        if (filterState.professional.has(t.professional) && palettePro[t.professional]) {
+          colors.push(palettePro[t.professional]);
+        }
+        if (colors.length > 0) {
+          const c = [0, 0, 0];
+          colors.forEach((x) => {
+            c[0] += x[0];
+            c[1] += x[1];
+            c[2] += x[2];
+          });
+          const n = colors.length;
+          return [c[0] / n, c[1] / n, c[2] / n];
+        }
+      }
+      return genreHueRgb(node.label || "");
+    }
+
+    function genreHueRgb(label) {
+      const h = ((hashCode(label) % 360) + 360) % 360;
+      const s = 0.58;
+      const v = 0.9;
+      const c = v * s;
+      const x = c * (1 - abs(((h / 60) % 2) - 1));
+      const m = v - c;
+      let rp = 0;
+      let gp = 0;
+      let bp = 0;
+      if (h < 60) { rp = c; gp = x; }
+      else if (h < 120) { rp = x; gp = c; }
+      else if (h < 180) { gp = c; bp = x; }
+      else if (h < 240) { gp = x; bp = c; }
+      else if (h < 300) { rp = x; bp = c; }
+      else { rp = c; bp = x; }
+      return [(rp + m) * 255, (gp + m) * 255, (bp + m) * 255];
+    }
+
+    function attachZoomControls() {
+      const zoomInBtn = document.getElementById("zoom-in");
+      const zoomOutBtn = document.getElementById("zoom-out");
+      zoomInBtn.addEventListener("click", () => {
+        if (chordSvgD3 && chordZoomBehavior) {
+          chordSvgD3.transition().duration(140).call(chordZoomBehavior.scaleBy, 1.14);
+        }
+      });
+      zoomOutBtn.addEventListener("click", () => {
+        if (chordSvgD3 && chordZoomBehavior) {
+          chordSvgD3.transition().duration(140).call(chordZoomBehavior.scaleBy, 1 / 1.14);
+        }
+      });
+
+      window.addEventListener("keydown", (e) => {
+        if (!chordSvgD3 || !chordZoomBehavior) return;
+        if (e.key === "+" || e.key === "=") {
+          chordSvgD3.transition().duration(100).call(chordZoomBehavior.scaleBy, 1.08);
+        }
+        if (e.key === "-") {
+          chordSvgD3.transition().duration(100).call(chordZoomBehavior.scaleBy, 1 / 1.08);
+        }
+      });
+    }
+
+    function updateZoomReadout(scaleK) {
+      const el = document.getElementById("zoom-readout");
+      if (!el) return;
+      const k = typeof scaleK === "number" && Number.isFinite(scaleK) ? scaleK : 1;
+      el.textContent = `${Math.round(k * 100)}%`;
+    }
+
+    function shortenToThreeWords(label) {
+      const words = String(label || "").trim().split(/\s+/).filter(Boolean);
+      if (words.length <= 3) return words.join(" ");
+      return `${words.slice(0, 3).join(" ")}...`;
+    }
+
+    function hashCode(str) {
+      let h = 0;
+      for (let i = 0; i < str.length; i++) {
+        h = ((h << 5) - h) + str.charCodeAt(i);
+        h |= 0;
+      }
+      return abs(h);
+    }
+  </script>
+</body>
+</html>
