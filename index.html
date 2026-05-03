@@ -10,9 +10,6 @@
       --panel: rgba(10, 14, 24, 0.85);
       --text: #e8ecff;
       --muted: #9aa7c5;
-      --privato: #ff7f7f;
-      --pubblico: #74d1ff;
-      --istituzionale: #ffd166;
     }
 
     html, body {
@@ -24,11 +21,17 @@
       font-family: Inter, Segoe UI, Roboto, sans-serif;
     }
 
+    body > canvas {
+      position: fixed !important;
+      inset: 0;
+      z-index: 1;
+    }
+
     #ui {
       position: fixed;
       top: 14px;
       left: 14px;
-      z-index: 10;
+      z-index: 12;
       background: var(--panel);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 12px;
@@ -50,28 +53,6 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.35;
-    }
-
-    .filters {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 8px;
-    }
-
-    .filter {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      user-select: none;
-    }
-
-    .badge {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      display: inline-block;
     }
 
     .hint {
@@ -106,6 +87,121 @@
       text-align: center;
     }
 
+    .chrono-play-row {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #chrono-play {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      background: linear-gradient(145deg, rgba(100, 180, 255, 0.35), rgba(60, 120, 200, 0.25));
+      border: 1px solid rgba(130, 200, 255, 0.45);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    #chrono-play:hover:not(:disabled) {
+      background: linear-gradient(145deg, rgba(120, 200, 255, 0.45), rgba(70, 140, 220, 0.35));
+    }
+
+    #chrono-play:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    #chrono-play .play-icon {
+      font-size: 10px;
+      line-height: 1;
+    }
+
+    .chrono-play-hint {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.3;
+      flex: 1;
+      min-width: 0;
+    }
+
+    #filters-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 12;
+      width: min(300px, calc(100vw - 24px));
+      box-sizing: border-box;
+      padding: 14px 14px 20px;
+      background: rgba(8, 11, 20, 0.94);
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      overflow-y: auto;
+      pointer-events: auto;
+    }
+
+    #filters-panel h2 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      font-weight: 650;
+      color: var(--text);
+    }
+
+    #filters-panel .filters-panel-hint {
+      margin: 0 0 14px;
+      font-size: 11px;
+      line-height: 1.35;
+      color: var(--muted);
+    }
+
+    .filter-groups {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .filter-group-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .filter-group-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .filter input {
+      cursor: pointer;
+    }
+
+    .badge {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
     #labels-layer {
       position: fixed;
       inset: 0;
@@ -117,9 +213,9 @@
 
     #labels-fallback {
       position: fixed;
-      right: 14px;
+      right: calc(14px + min(300px, calc(100vw - 24px)));
       top: 14px;
-      z-index: 9;
+      z-index: 11;
       max-width: min(34vw, 460px);
       max-height: calc(100vh - 28px);
       overflow: auto;
@@ -136,7 +232,8 @@
     .node-label {
       position: fixed;
       transform: translate(-50%, -50%);
-      color: #fff;
+      color: #e8ecff;
+      /* sovrascritto in JS con lo stesso rgb dei pallini (media dei filtri attivi) */
       background: rgba(8, 12, 20, 0.72);
       border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 6px;
@@ -156,31 +253,22 @@
       z-index: 1;
     }
 
+    .chrono-range {
+      margin: 0 0 10px;
+      font-size: 11px;
+      line-height: 1.35;
+      color: var(--muted);
+    }
+
   </style>
 </head>
 <body>
   <div id="ui">
     <h1>Mappa Concettuale 3D - Fotografia</h1>
     <p class="subtitle">
-      Filtra i nodi per chiave di lettura e osserva gli intrecci tra i contenuti.
+      Ogni punto è un genere (prima colonna del CSV). Una linea unica li collega in ordine cronologico (anno nel CSV). I filtri sono a destra.
     </p>
-    <div class="filters">
-      <label class="filter">
-        <input id="privato" type="checkbox" checked />
-        <span class="badge" style="background: var(--privato)"></span>
-        Privato
-      </label>
-      <label class="filter">
-        <input id="pubblico" type="checkbox" checked />
-        <span class="badge" style="background: var(--pubblico)"></span>
-        Pubblico
-      </label>
-      <label class="filter">
-        <input id="istituzionale" type="checkbox" checked />
-        <span class="badge" style="background: var(--istituzionale)"></span>
-        Istituzionale
-      </label>
-    </div>
+    <p id="chrono-range" class="chrono-range" aria-live="polite"></p>
     <div class="hint">
       Trascina per ruotare. Usa rotella o + / - per zoom.
     </div>
@@ -189,7 +277,23 @@
       <button id="zoom-in" class="zoom-btn" type="button">+</button>
       <span id="zoom-readout" class="zoom-readout">100%</span>
     </div>
+    <div class="chrono-play-row">
+      <button id="chrono-play" type="button" aria-label="Avvia percorso cronologico">
+        <span class="play-icon" aria-hidden="true">▶</span>
+        <span id="chrono-play-label">Percorso</span>
+      </button>
+      <span id="chrono-play-hint" class="chrono-play-hint">Le linee azzurre compaiono dopo Play, in ordine di anno.</span>
+    </div>
   </div>
+
+  <aside id="filters-panel" aria-label="Filtri mappa">
+    <h2>Filtri</h2>
+    <p class="filters-panel-hint">
+      Mostra solo i generi che corrispondono alle combinazioni selezionate (tutte le dimensioni devono corrispondere). La linea azzurra segue l’<strong>Anno indicativo</strong> nel CSV (dal più antico al più recente), anche se i punti sono sparsi nello spazio.
+    </p>
+    <div id="filters-root" class="filter-groups"></div>
+  </aside>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.3/p5.min.js"></script>
   <script>
     let table;
@@ -200,24 +304,42 @@
     let labelsFallback;
     const labelEls = new Map();
     const expandedLabelIds = new Set();
-    const activeScopes = new Set(["privato", "pubblico", "istituzionale"]);
     let viewScale = 1;
 
-    const palette = {
-      privato: [255, 127, 127],
-      pubblico: [116, 209, 255],
-      istituzionale: [255, 209, 102]
+    /** Percorso cronologico: nascosto fino al Play; in animazione; poi tutto visibile. */
+    const CHRONO_SEG_DRAW_MS = 520;
+    const CHRONO_SEG_GAP_MS = 90;
+    let chronoLinesMode = "hidden";
+    let chronoAnimStartMs = 0;
+    let chronoAnimPathSig = "";
+
+    /** @type {{ audience: Set<string>, artistic: Set<string>, professional: Set<string> }} */
+    let filterState = {
+      audience: new Set(),
+      artistic: new Set(),
+      professional: new Set()
+    };
+
+    const CSV_PATH = "Foglio di lavoro senza nome - Generefotografico-PubblicoNessunoPrivato-Artistico.csv";
+
+    const paletteAudience = {
+      Pubblico: [116, 209, 255],
+      Privato: [255, 127, 127],
+      Nessuno: [168, 176, 200]
+    };
+    const paletteArtistic = {
+      Artistico: [201, 156, 255],
+      Scientifico: [110, 231, 183],
+      Nessuno: [140, 148, 168]
+    };
+    const palettePro = {
+      Professionale: [255, 209, 102],
+      Amatoriale: [251, 191, 119],
+      Nessuno: [130, 138, 158]
     };
 
     const layoutConfig = {
-      categoryRadiusX: 360,
-      categoryRadiusZ: 340,
-      categoryJitterY: 120,
-      subOffsetRadius: 240,
-      subJitterY: 120,
-      detailMinRadius: 320,
-      detailRadiusSpread: 180,
-      detailJitterY: 200
+      sphereRadius: 420
     };
 
     function setup() {
@@ -234,17 +356,22 @@
       attachLabelToggleEvents();
       attachFilterEvents();
       attachZoomControls(cnv);
+      attachChronoPlayButton();
       updateZoomReadout();
+      updateChronoPlayUi();
       graph = {
         categories: [],
         subcategories: [],
         details: [],
         links: [],
-        detailInterweaves: []
+        detailInterweaves: [],
+        chronoOrder: [],
+        filterMeta: { audience: [], artistic: [], professional: [] },
+        filterTitles: { audience: "", artistic: "", professional: "" }
       };
 
       loadTable(
-        "Mappa Fotografia.csv",
+        CSV_PATH,
         "csv",
         "header",
         (loadedTable) => {
@@ -252,6 +379,9 @@
           graph = buildGraph(table);
           rowsLoaded = graph.details.length;
           loadError = "";
+          mountFiltersFromGraph(graph);
+          updateChronoRangeHint();
+          resetChronoLineAnimationForNewPath();
         },
         () => {
           loadError = "Errore CSV: apri con server locale (non file://).";
@@ -266,6 +396,7 @@
       directionalLight(220, 230, 255, -0.4, -0.6, -1);
       pointLight(200, 200, 220, 0, -220, 260);
 
+      updateChronoLineAnimation();
       drawGridSphere(980, 22);
       drawConnections();
       drawNodes();
@@ -277,14 +408,210 @@
       resizeCanvas(windowWidth, windowHeight);
     }
 
-    function attachFilterEvents() {
-      ["privato", "pubblico", "istituzionale"].forEach((id) => {
-        const el = document.getElementById(id);
-        el.addEventListener("change", () => {
-          if (el.checked) activeScopes.add(id);
-          else activeScopes.delete(id);
+    function mountFiltersFromGraph(g) {
+      const root = document.getElementById("filters-root");
+      if (!root || !g?.filterMeta) return;
+      root.innerHTML = "";
+      const dims = [
+        { key: "audience", title: g.filterTitles.audience, values: g.filterMeta.audience },
+        { key: "artistic", title: g.filterTitles.artistic, values: g.filterMeta.artistic },
+        { key: "professional", title: g.filterTitles.professional, values: g.filterMeta.professional }
+      ];
+      filterState = {
+        audience: new Set(g.filterMeta.audience),
+        artistic: new Set(g.filterMeta.artistic),
+        professional: new Set(g.filterMeta.professional)
+      };
+      dims.forEach(({ key, title, values }) => {
+        const wrap = document.createElement("div");
+        wrap.className = "filter-group";
+        const t = document.createElement("div");
+        t.className = "filter-group-title";
+        t.textContent = title;
+        wrap.appendChild(t);
+        const row = document.createElement("div");
+        row.className = "filter-group-items";
+        values.forEach((val) => {
+          const id = `f-${key}-${hashCode(String(val))}`;
+          const lab = document.createElement("label");
+          lab.className = "filter";
+          const inp = document.createElement("input");
+          inp.type = "checkbox";
+          inp.id = id;
+          inp.checked = true;
+          inp.dataset.dim = key;
+          inp.dataset.filterValue = val;
+          const badge = document.createElement("span");
+          badge.className = "badge";
+          badge.style.background = badgeColorForDim(key, val);
+          lab.appendChild(inp);
+          lab.appendChild(badge);
+          lab.appendChild(document.createTextNode(val));
+          row.appendChild(lab);
         });
+        wrap.appendChild(row);
+        root.appendChild(wrap);
       });
+    }
+
+    function badgeColorForDim(dimKey, val) {
+      const map =
+        dimKey === "audience" ? paletteAudience
+          : dimKey === "artistic" ? paletteArtistic
+            : palettePro;
+      const rgb = map[val];
+      if (rgb) return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+      return "rgb(140, 150, 175)";
+    }
+
+    function attachFilterEvents() {
+      const panel = document.getElementById("filters-panel");
+      if (!panel || panel.dataset.filterBound === "1") return;
+      panel.dataset.filterBound = "1";
+      panel.addEventListener("change", (e) => {
+        const t = e.target;
+        if (t.type !== "checkbox") return;
+        const dim = t.dataset.dim;
+        const val = t.dataset.filterValue;
+        if (!dim || val === undefined) return;
+        const set = filterState[dim];
+        if (!set) return;
+        if (t.checked) set.add(val);
+        else set.delete(val);
+        updateChronoRangeHint();
+        resetChronoLineAnimationForNewPath();
+      });
+    }
+
+    function chronoVisiblePathSig() {
+      if (!graph?.chronoOrder) return "";
+      return graph.chronoOrder.filter(nodeVisible).map((n) => n.id).join("|");
+    }
+
+    function resetChronoLineAnimationForNewPath() {
+      const sig = chronoVisiblePathSig();
+      if (sig === chronoAnimPathSig) return;
+      chronoAnimPathSig = sig;
+      chronoLinesMode = "hidden";
+      chronoAnimStartMs = 0;
+      updateChronoPlayUi();
+    }
+
+    function attachChronoPlayButton() {
+      const btn = document.getElementById("chrono-play");
+      if (!btn || btn.dataset.bound === "1") return;
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", () => {
+        const path = graph?.chronoOrder ? graph.chronoOrder.filter(nodeVisible) : [];
+        if (path.length < 2) return;
+        chronoAnimPathSig = chronoVisiblePathSig();
+        chronoLinesMode = "animating";
+        chronoAnimStartMs = millis();
+        updateChronoPlayUi();
+      });
+    }
+
+    function updateChronoPlayUi() {
+      const btn = document.getElementById("chrono-play");
+      const label = document.getElementById("chrono-play-label");
+      if (!btn) return;
+      const path = graph?.chronoOrder ? graph.chronoOrder.filter(nodeVisible) : [];
+      const canPlay = path.length >= 2 && !loadError;
+      const busy = chronoLinesMode === "animating";
+      btn.disabled = !canPlay || busy;
+      if (label) {
+        if (!canPlay) label.textContent = "Percorso";
+        else if (busy) label.textContent = "In corso…";
+        else if (chronoLinesMode === "full") label.textContent = "Rivedi";
+        else label.textContent = "Play";
+      }
+      btn.setAttribute("aria-busy", busy ? "true" : "false");
+    }
+
+    function chronoAnimationTotalMs(segmentCount) {
+      if (segmentCount <= 0) return 0;
+      return segmentCount * CHRONO_SEG_DRAW_MS + max(0, segmentCount - 1) * CHRONO_SEG_GAP_MS;
+    }
+
+    function updateChronoLineAnimation() {
+      if (chronoLinesMode !== "animating") return;
+      const path = graph?.chronoOrder ? graph.chronoOrder.filter(nodeVisible) : [];
+      if (path.length < 2 || chronoVisiblePathSig() !== chronoAnimPathSig) {
+        chronoLinesMode = "hidden";
+        updateChronoPlayUi();
+        return;
+      }
+      const nSeg = path.length - 1;
+      const total = chronoAnimationTotalMs(nSeg);
+      const elapsed = millis() - chronoAnimStartMs;
+      if (elapsed >= total) {
+        chronoLinesMode = "full";
+        updateChronoPlayUi();
+      }
+    }
+
+    function getChronoAnimationDrawState(path) {
+      const nSeg = path.length - 1;
+      if (nSeg < 1) return { fullThrough: -1, partialFrom: null, partialTo: null, partialT: 0 };
+      if (chronoLinesMode === "full") {
+        return { fullThrough: nSeg - 1, partialFrom: null, partialTo: null, partialT: 1 };
+      }
+      if (chronoLinesMode === "hidden") {
+        return { fullThrough: -1, partialFrom: null, partialTo: null, partialT: 0 };
+      }
+      const elapsed = millis() - chronoAnimStartMs;
+      for (let i = 0; i < nSeg; i++) {
+        const segStart = i * (CHRONO_SEG_DRAW_MS + CHRONO_SEG_GAP_MS);
+        const drawEnd = segStart + CHRONO_SEG_DRAW_MS;
+        if (elapsed < segStart) {
+          return { fullThrough: i - 1, partialFrom: null, partialTo: null, partialT: 0 };
+        }
+        if (elapsed < drawEnd) {
+          const t = constrain((elapsed - segStart) / CHRONO_SEG_DRAW_MS, 0, 1);
+          return { fullThrough: i - 1, partialFrom: path[i], partialTo: path[i + 1], partialT: t };
+        }
+      }
+      return { fullThrough: nSeg - 1, partialFrom: null, partialTo: null, partialT: 1 };
+    }
+
+    function formatYearSuffix(node) {
+      if (node.level !== 2 || node.year == null || !Number.isFinite(node.year)) return "";
+      return ` (${node.year})`;
+    }
+
+    function labelWithYearCollapsed(node) {
+      return `${shortenToThreeWords(node.label)}${formatYearSuffix(node)}`;
+    }
+
+    function labelWithYearExpanded(node) {
+      return `${node.label}${formatYearSuffix(node)}`;
+    }
+
+    function labelWithYearTitle(node) {
+      return `${node.label}${formatYearSuffix(node)}`;
+    }
+
+    function updateChronoRangeHint() {
+      const el = document.getElementById("chrono-range");
+      if (!el || !graph?.chronoOrder?.length) {
+        if (el) el.textContent = "";
+        return;
+      }
+      const path = graph.chronoOrder.filter(nodeVisible);
+      if (path.length === 0) {
+        el.textContent = "Nessun genere visibile: regola i filtri per vedere il percorso.";
+        return;
+      }
+      const first = path[0];
+      const last = path[path.length - 1];
+      const y0 = first.year;
+      const y1 = last.year;
+      const same = path.length === 1;
+      if (same) {
+        el.textContent = `Un solo punto visibile: ${y0} — ${first.label}.`;
+        return;
+      }
+      el.textContent = `Inizio percorso: ${y0} — ${first.label}. Fine: ${y1} — ${last.label}. (${path.length} generi)`;
     }
 
     function attachLabelToggleEvents() {
@@ -306,142 +633,107 @@
       }, true);
     }
 
-    function classifyScopes(categoria, sottocategoria, dettaglio) {
-      const source = `${categoria} ${sottocategoria} ${dettaglio}`.toLowerCase();
-      const scopes = new Set();
-      const categoryScopes = {
-        "Immagini ricordo": ["privato"],
-        "Pratica amatoriale": ["privato"],
-        "La cronaca": ["pubblico"],
-        "La moda": ["pubblico"],
-        "La pubblicità": ["pubblico"],
-        "Il mondo editoriale": ["pubblico"],
-        "Prodotti di stampa": ["pubblico"],
-        "Il fotoromanzo": ["pubblico"],
-        "Immagini scientifiche": ["istituzionale"],
-        "Immagini industriali": ["istituzionale"],
-        "Riprese aeree": ["istituzionale"],
-        "Il ritratto": ["istituzionale", "pubblico"],
-        "Il mondo dell'arte": ["pubblico", "privato"]
-      };
-
-      if (categoryScopes[categoria]) {
-        categoryScopes[categoria].forEach((s) => scopes.add(s));
-      }
-
-      if (/(famiglia|ricorrenze|vacanze|cerimonie|feste|viaggi|tempo libero|ritratto|amatoriale|club|concorsi|hobbistica|cucina)/.test(source)) {
-        scopes.add("privato");
-      }
-      if (/(cronaca|moda|pubblicit|editoriale|stampa|manifesti|riviste|social|sport|turismo|musica|cinema|teatro|danza)/.test(source)) {
-        scopes.add("pubblico");
-      }
-      if (/(istituzionale|scientific|industriali|militare|cartografia|spionaggio|controllo|giudiziari|identit|documenti|schedatura|urbanistica|ricerca)/.test(source)) {
-        scopes.add("istituzionale");
-      }
-
-      if (scopes.size === 0) {
-        scopes.add("pubblico");
-      }
-
-      return scopes;
-    }
-
+    /**
+     * Nodo: etichetta dalla colonna 0; filtri dalle colonne 1–3 (stesso CSV).
+     */
     function buildGraph(csv) {
-      const categories = new Map();
-      const subcategories = new Map();
       const details = [];
       const links = [];
+      const cols = csv.columns || [];
+      const filterTitles = {
+        audience: cols[1] || "Colonna 2",
+        artistic: cols[2] || "Colonna 3",
+        professional: cols[3] || "Colonna 4"
+      };
 
-      const rows = csv.getRows().filter((r) => r.arr.some((c) => String(c).trim().length > 0));
-      const catCount = rows.reduce((m, r) => {
-        const c = r.get("Categoria Principale").trim();
-        m[c] = (m[c] || 0) + 1;
-        return m;
-      }, {});
+      const rows = csv.getRows().filter((r) => String(r.get(0) || "").trim().length > 0);
+      const audienceSet = new Set();
+      const artisticSet = new Set();
+      const professionalSet = new Set();
 
-      const sortedCats = Object.keys(catCount).sort((a, b) => catCount[b] - catCount[a]);
-      const catIndex = new Map(sortedCats.map((c, i) => [c, i]));
-      const catTotal = sortedCats.length;
-
-      rows.forEach((row, idx) => {
-        const categoria = row.get("Categoria Principale").trim();
-        const sottocategoria = row.get("Sottocategoria").trim();
-        const dettaglio = row.get("Dettaglio / Note").trim();
-        const scopes = classifyScopes(categoria, sottocategoria, dettaglio);
-
-        if (!categories.has(categoria)) {
-          const ci = catIndex.get(categoria) ?? 0;
-          const angle = map(ci, 0, max(1, catTotal), 0, TWO_PI);
-          categories.set(categoria, {
-            id: `cat-${ci}`,
-            label: categoria,
-            level: 0,
-            scopes: new Set(scopes),
-            pos: createVector(
-              cos(angle) * layoutConfig.categoryRadiusX,
-              sin(ci * 0.8) * layoutConfig.categoryJitterY,
-              sin(angle) * layoutConfig.categoryRadiusZ
-            )
-          });
-        } else {
-          scopes.forEach((s) => categories.get(categoria).scopes.add(s));
-        }
-
-        const subKey = `${categoria}:::${sottocategoria}`;
-        if (!subcategories.has(subKey)) {
-          const base = categories.get(categoria).pos;
-          const seed = hashCode(subKey);
-          const angle = (seed % 360) * (PI / 180);
-          subcategories.set(subKey, {
-            id: `sub-${subcategories.size}`,
-            label: sottocategoria,
-            level: 1,
-            scopes: new Set(scopes),
-            pos: createVector(
-              base.x + cos(angle) * layoutConfig.subOffsetRadius,
-              base.y + ((seed % (layoutConfig.subJitterY * 2)) - layoutConfig.subJitterY),
-              base.z + sin(angle) * layoutConfig.subOffsetRadius
-            ),
-            parent: categoria
-          });
-          links.push({ from: categories.get(categoria), to: subcategories.get(subKey), type: "hier" });
-        } else {
-          scopes.forEach((s) => subcategories.get(subKey).scopes.add(s));
-        }
-
-        const subNode = subcategories.get(subKey);
-        const dSeed = hashCode(`${subKey}::${dettaglio}::${idx}`);
-        const dAngle = (dSeed % 360) * (PI / 180);
-        const dRadius = layoutConfig.detailMinRadius + (dSeed % layoutConfig.detailRadiusSpread);
-
-        const detailNode = {
-          id: `det-${idx}`,
-          label: dettaglio,
-          level: 2,
-          scopes,
-          words: extractWords(dettaglio),
-          pos: createVector(
-            subNode.pos.x + cos(dAngle) * dRadius,
-            subNode.pos.y + ((dSeed % (layoutConfig.detailJitterY * 2)) - layoutConfig.detailJitterY),
-            subNode.pos.z + sin(dAngle) * dRadius
-          ),
-          parent: subKey
-        };
-
-        details.push(detailNode);
-        links.push({ from: subNode, to: detailNode, type: "hier" });
+      rows.forEach((row) => {
+        const aud = String(row.get(1) || "").trim();
+        const art = String(row.get(2) || "").trim();
+        const pro = String(row.get(3) || "").trim();
+        if (aud) audienceSet.add(aud);
+        if (art) artisticSet.add(art);
+        if (pro) professionalSet.add(pro);
       });
 
-      centerGraphNodes(categories, subcategories, details);
-      const detailInterweaves = buildInterweaves(details);
+      const sortVals = (a, b) => a.localeCompare(b, "it");
+      const filterMeta = {
+        audience: [...audienceSet].sort(sortVals),
+        artistic: [...artisticSet].sort(sortVals),
+        professional: [...professionalSet].sort(sortVals)
+      };
+
+      const dataRows = rows.filter((r) => String(r.get(0) || "").trim().length > 0);
+      const n = max(1, dataRows.length);
+      const R = layoutConfig.sphereRadius;
+      const scatterSlots = deterministicPermutation(n, "fotografia-spazio");
+
+      dataRows.forEach((row, idx) => {
+        const genre = String(row.get(0) || "").trim();
+        const audience = String(row.get(1) || "").trim();
+        const artistic = String(row.get(2) || "").trim();
+        const professional = String(row.get(3) || "").trim();
+        const yearParsed = parseInt(String(row.get(4) || "").replace(/\D/g, ""), 10);
+        const year = Number.isFinite(yearParsed) ? yearParsed : 1800 + idx;
+
+        const slot = scatterSlots[idx];
+        const pos = fibonacciSpherePoint(slot, n, R);
+        details.push({
+          id: `det-${idx}`,
+          label: genre,
+          level: 2,
+          year,
+          tags: { audience, artistic, professional },
+          pos
+        });
+      });
+
+      centerGraphNodes(new Map(), new Map(), details);
+      const chronoOrder = [...details].sort((a, b) => {
+        if (a.year !== b.year) return a.year - b.year;
+        return a.label.localeCompare(b.label, "it");
+      });
 
       return {
-        categories: [...categories.values()],
-        subcategories: [...subcategories.values()],
+        categories: [],
+        subcategories: [],
         details,
         links,
-        detailInterweaves
+        detailInterweaves: [],
+        chronoOrder,
+        filterMeta,
+        filterTitles
       };
+    }
+
+    /** Permutazione fissa: posizioni nello spazio scorrelate dall’ordine cronologico. */
+    function deterministicPermutation(n, salt) {
+      const arr = Array.from({ length: n }, (_, k) => k);
+      for (let i = n - 1; i > 0; i--) {
+        const j = abs(hashCode(`${salt}:${i}`)) % (i + 1);
+        const t = arr[i];
+        arr[i] = arr[j];
+        arr[j] = t;
+      }
+      return arr;
+    }
+
+    function fibonacciSpherePoint(i, n, radius) {
+      if (n <= 0) return createVector(0, 0, 0);
+      if (n === 1) return createVector(0, 0, 0);
+      const inc = PI * (3 - sqrt(5));
+      const y = 1 - (i / (n - 1)) * 2;
+      const rY = sqrt(max(0, 1 - y * y));
+      const theta = inc * i;
+      return createVector(
+        cos(theta) * rY * radius,
+        y * radius * 0.9,
+        sin(theta) * rY * radius
+      );
     }
 
     function centerGraphNodes(categoriesMap, subcategoriesMap, detailsList) {
@@ -483,72 +775,78 @@
 
     function getUiCompensationX() {
       const ui = document.getElementById("ui");
-      if (!ui) return 0;
-      const rect = ui.getBoundingClientRect();
-      // Centra visivamente il grafo compensando il pannello laterale.
-      return rect.width * 0.45;
-    }
-
-    function buildInterweaves(details) {
-      const edges = [];
-      const limit = min(220, details.length * 4);
-      for (let i = 0; i < details.length; i++) {
-        for (let j = i + 1; j < details.length; j++) {
-          const a = details[i];
-          const b = details[j];
-          const shared = intersectionSize(a.words, b.words);
-          if (shared < 1) continue;
-
-          const d = p5.Vector.dist(a.pos, b.pos);
-          if (d > 900) continue;
-
-          edges.push({ from: a, to: b, strength: shared });
-          if (edges.length >= limit) return edges;
-        }
+      const fp = document.getElementById("filters-panel");
+      let shift = 0;
+      if (ui) {
+        const rect = ui.getBoundingClientRect();
+        shift += rect.width * 0.45;
       }
-      return edges;
+      if (fp) {
+        const fr = fp.getBoundingClientRect();
+        shift -= fr.width * 0.45;
+      }
+      return shift;
     }
 
-    function extractWords(txt) {
-      const stop = new Set(["della", "delle", "dello", "dell", "degli", "dalla", "dalla", "dalle", "alla", "alle", "nella", "nelle", "per", "con", "del", "dei", "gli", "una", "uno", "che", "nel", "nei", "dai", "sul", "sui", "allo", "agli", "dall"]);
-      return new Set(
-        txt
-          .toLowerCase()
-          .replace(/[^a-z0-9à-ÿ\s]/gi, " ")
-          .split(/\s+/)
-          .map((w) => w.trim())
-          .filter((w) => w.length >= 5 && !stop.has(w))
-      );
-    }
-
-    function intersectionSize(setA, setB) {
-      let count = 0;
-      setA.forEach((x) => {
-        if (setB.has(x)) count++;
-      });
-      return count;
+    function detailDimsVisible(d) {
+      if (!d.tags || !graph?.filterMeta) return true;
+      const t = d.tags;
+      const fm = graph.filterMeta;
+      if (fm.audience.length && !filterState.audience.has(t.audience)) return false;
+      if (fm.artistic.length && !filterState.artistic.has(t.artistic)) return false;
+      if (fm.professional.length && !filterState.professional.has(t.professional)) return false;
+      return true;
     }
 
     function nodeVisible(node) {
-      for (const s of node.scopes) {
-        if (activeScopes.has(s)) return true;
-      }
-      return false;
+      if (node.level === 2) return detailDimsVisible(node);
+      return true;
     }
 
     function nodeColor(node) {
-      const colors = [];
-      node.scopes.forEach((s) => {
-        if (activeScopes.has(s)) colors.push(palette[s]);
-      });
-      if (colors.length === 0) return [120, 130, 150];
-      const c = [0, 0, 0];
-      colors.forEach((x) => {
-        c[0] += x[0];
-        c[1] += x[1];
-        c[2] += x[2];
-      });
-      return [c[0] / colors.length, c[1] / colors.length, c[2] / colors.length];
+      if (node.level === 2 && node.tags) {
+        const t = node.tags;
+        const colors = [];
+        if (filterState.audience.has(t.audience) && paletteAudience[t.audience]) {
+          colors.push(paletteAudience[t.audience]);
+        }
+        if (filterState.artistic.has(t.artistic) && paletteArtistic[t.artistic]) {
+          colors.push(paletteArtistic[t.artistic]);
+        }
+        if (filterState.professional.has(t.professional) && palettePro[t.professional]) {
+          colors.push(palettePro[t.professional]);
+        }
+        if (colors.length > 0) {
+          const c = [0, 0, 0];
+          colors.forEach((x) => {
+            c[0] += x[0];
+            c[1] += x[1];
+            c[2] += x[2];
+          });
+          const n = colors.length;
+          return [c[0] / n, c[1] / n, c[2] / n];
+        }
+      }
+      return genreHueRgb(node.label || "");
+    }
+
+    function genreHueRgb(label) {
+      const h = ((hashCode(label) % 360) + 360) % 360;
+      const s = 0.58;
+      const v = 0.9;
+      const c = v * s;
+      const x = c * (1 - abs(((h / 60) % 2) - 1));
+      const m = v - c;
+      let rp = 0;
+      let gp = 0;
+      let bp = 0;
+      if (h < 60) { rp = c; gp = x; }
+      else if (h < 120) { rp = x; gp = c; }
+      else if (h < 180) { gp = c; bp = x; }
+      else if (h < 240) { gp = x; bp = c; }
+      else if (h < 300) { rp = x; bp = c; }
+      else { rp = c; bp = x; }
+      return [(rp + m) * 255, (gp + m) * 255, (bp + m) * 255];
     }
 
     function drawGridSphere(radius, count) {
@@ -569,26 +867,38 @@
     }
 
     function drawConnections() {
-      if (!graph) return;
-      strokeWeight(1.2);
-      graph.links.forEach((edge) => {
-        if (!nodeVisible(edge.from) || !nodeVisible(edge.to)) return;
-        stroke(130, 160, 210, 55);
-        line(
-          scaleCoord(edge.from.pos.x), scaleCoord(edge.from.pos.y), scaleCoord(edge.from.pos.z),
-          scaleCoord(edge.to.pos.x), scaleCoord(edge.to.pos.y), scaleCoord(edge.to.pos.z)
-        );
-      });
+      if (!graph?.chronoOrder) return;
+      const path = graph.chronoOrder.filter(nodeVisible);
+      if (path.length < 2) return;
+      if (chronoLinesMode === "hidden") return;
 
-      graph.detailInterweaves.forEach((edge) => {
-        if (!nodeVisible(edge.from) || !nodeVisible(edge.to)) return;
-        const alpha = map(edge.strength, 1, 5, 35, 120, true);
-        stroke(255, 255, 255, alpha);
-        line(
-          scaleCoord(edge.from.pos.x), scaleCoord(edge.from.pos.y), scaleCoord(edge.from.pos.z),
-          scaleCoord(edge.to.pos.x), scaleCoord(edge.to.pos.y), scaleCoord(edge.to.pos.z)
-        );
-      });
+      stroke(130, 200, 255, 200);
+      strokeWeight(2.2);
+      noFill();
+
+      const st = getChronoAnimationDrawState(path);
+      const nSeg = path.length - 1;
+
+      for (let i = 0; i < nSeg; i++) {
+        const a = path[i];
+        const b = path[i + 1];
+        if (i > st.fullThrough + 1) break;
+        if (i <= st.fullThrough) {
+          line(
+            scaleCoord(a.pos.x), scaleCoord(a.pos.y), scaleCoord(a.pos.z),
+            scaleCoord(b.pos.x), scaleCoord(b.pos.y), scaleCoord(b.pos.z)
+          );
+        } else if (st.partialFrom === a && st.partialTo === b) {
+          const u = constrain(st.partialT, 0, 1);
+          const bx = lerp(a.pos.x, b.pos.x, u);
+          const by = lerp(a.pos.y, b.pos.y, u);
+          const bz = lerp(a.pos.z, b.pos.z, u);
+          line(
+            scaleCoord(a.pos.x), scaleCoord(a.pos.y), scaleCoord(a.pos.z),
+            scaleCoord(bx), scaleCoord(by), scaleCoord(bz)
+          );
+        }
+      }
     }
 
     function drawNodes() {
@@ -632,7 +942,6 @@
         const sy = projected.y;
 
         const yOffset = node.level === 0 ? 22 : node.level === 1 ? 18 : 14;
-        const shortLabel = shortenToThreeWords(node.label);
         const id = node.id;
         visibleIds.add(id);
 
@@ -646,12 +955,16 @@
 
         const canExpand = countWords(node.label) > 3;
         const isExpanded = expandedLabelIds.has(id);
-        el.textContent = (canExpand && isExpanded) ? node.label : shortLabel;
-        el.title = node.label;
+        el.textContent = (canExpand && isExpanded)
+          ? labelWithYearExpanded(node)
+          : labelWithYearCollapsed(node);
+        el.title = labelWithYearTitle(node);
         el.dataset.id = id;
         el.dataset.shortable = String(canExpand);
         el.classList.toggle("node-label--expanded", isExpanded);
         el.style.cursor = canExpand ? "pointer" : "default";
+        const labelRgb = nodeColor(node);
+        el.style.color = `rgb(${Math.round(labelRgb[0])}, ${Math.round(labelRgb[1])}, ${Math.round(labelRgb[2])})`;
         el.style.left = `${sx}px`;
         el.style.top = `${sy - yOffset}px`;
         el.style.fontSize = node.level === 2 ? "11px" : "13px";
@@ -672,13 +985,13 @@
       const html = all.map((n) => {
         const c = nodeColor(n);
         const dot = `rgb(${Math.round(c[0])}, ${Math.round(c[1])}, ${Math.round(c[2])})`;
-        const text = (n.label || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        const text = labelWithYearTitle(n).replace(/</g, "&lt;").replace(/>/g, "&gt;");
         return `<div style="display:flex;align-items:center;gap:6px;margin:3px 0;">
           <span style="width:8px;height:8px;border-radius:50%;background:${dot};display:inline-block;"></span>
           <span>${text}</span>
         </div>`;
       }).join("");
-      labelsFallback.innerHTML = html || "<div>Nessuna etichetta visibile con i filtri correnti.</div>";
+      labelsFallback.innerHTML = html || "<div>Nessuna etichetta da mostrare.</div>";
       labelsFallback.style.display = "block";
     }
 
