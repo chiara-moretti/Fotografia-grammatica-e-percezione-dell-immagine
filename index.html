@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mappa Concettuale Fotografia 3D</title>
+  <title>Mappa Concettuale Fotografia — Cerchio generi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -31,7 +31,50 @@
     body > canvas {
       position: fixed !important;
       inset: 0;
+      z-index: 0;
+      opacity: 0;
+      pointer-events: none;
+      width: 1px !important;
+      height: 1px !important;
+    }
+
+    #chord-root {
+      position: fixed;
+      inset: 0;
       z-index: 1;
+      background: #f0f0f2;
+      font-family: "Space Grotesk", system-ui, sans-serif;
+    }
+
+    #chord-root svg {
+      display: block;
+      cursor: grab;
+    }
+
+    #chord-root svg:active {
+      cursor: grabbing;
+    }
+
+    #status-bar {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      left: auto;
+      z-index: 8;
+      max-width: min(360px, calc(100vw - 24px));
+      padding: 8px 12px;
+      background: #fff;
+      border: 2px solid var(--border);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--text);
+      box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.12);
+      pointer-events: none;
+    }
+
+    #status-bar.status-bar--error {
+      color: #b00020;
     }
 
     #ui {
@@ -146,13 +189,27 @@
       box-shadow: none;
     }
 
-    .view-switch-row {
+    #chrono-play .play-icon {
+      font-size: 9px;
+      line-height: 1;
+    }
+
+    .chrono-play-hint {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+      flex: 1;
+      min-width: 0;
+      font-weight: 500;
+    }
+
+    .view-link-row {
       margin-top: 12px;
       padding-top: 12px;
       border-top: 2px solid var(--border);
     }
 
-    .view-switch-btn {
+    .view-link-3d {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -171,23 +228,9 @@
       box-shadow: 4px 4px 0 var(--border);
     }
 
-    .view-switch-btn:hover {
+    .view-link-3d:hover {
       transform: translate(1px, 1px);
       box-shadow: 3px 3px 0 var(--border);
-    }
-
-    #chrono-play .play-icon {
-      font-size: 9px;
-      line-height: 1;
-    }
-
-    .chrono-play-hint {
-      font-size: 11px;
-      color: var(--muted);
-      line-height: 1.4;
-      flex: 1;
-      min-width: 0;
-      font-weight: 500;
     }
 
     #filters-panel {
@@ -272,61 +315,6 @@
       border: 1px solid var(--border);
     }
 
-    #labels-layer {
-      position: fixed;
-      inset: 0;
-      z-index: 30;
-      pointer-events: none;
-      overflow: hidden;
-      font-family: "Space Grotesk", system-ui, sans-serif;
-    }
-
-    #labels-fallback {
-      position: fixed;
-      right: calc(12px + min(320px, calc(100vw - 16px)));
-      top: 12px;
-      z-index: 11;
-      max-width: min(34vw, 460px);
-      max-height: calc(100vh - 24px);
-      overflow: auto;
-      background: #fff;
-      border: 3px solid var(--border);
-      border-radius: 0;
-      padding: 10px 12px;
-      color: var(--text);
-      display: none;
-      font-size: 12px;
-      line-height: 1.35;
-      font-weight: 500;
-      box-shadow: 6px 6px 0 var(--border);
-    }
-
-    .node-label {
-      position: fixed;
-      transform: translate(-50%, -50%);
-      color: var(--text);
-      /* colore testo da JS = rgb nodi */
-      background: #fff;
-      border: 2px solid var(--border);
-      border-radius: 0;
-      padding: 3px 8px;
-      white-space: nowrap;
-      line-height: 1.2;
-      font-weight: 600;
-      font-size: 12px;
-      pointer-events: auto;
-      cursor: pointer;
-      z-index: 31;
-      box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.12);
-    }
-
-    .node-label.node-label--expanded {
-      white-space: normal;
-      max-width: min(340px, 46vw);
-      line-height: 1.3;
-      z-index: 1;
-    }
-
     .chrono-range {
       margin: 0 0 10px;
       font-size: 11px;
@@ -336,10 +324,56 @@
       letter-spacing: 0.02em;
     }
 
+    .chord-legend {
+      margin-top: 12px;
+      padding: 10px 0 0;
+      border-top: 2px solid var(--border);
+      font-size: 10px;
+      line-height: 1.5;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .chord-legend-title {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .chord-legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .chord-legend-swatch {
+      width: 22px;
+      height: 10px;
+      border-radius: 0;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .chord-legend-swatch--theme {
+      background: rgba(22, 108, 92, 0.75);
+    }
+
+    .chord-legend-swatch--tag {
+      background: rgba(155, 95, 48, 0.72);
+    }
+
+    .chord-legend-swatch--cat {
+      background: rgba(88, 52, 168, 0.65);
+    }
+
     #detail-panel {
       position: fixed;
-      left: 0;
-      top: 0;
+      left: 12px;
+      bottom: 12px;
       z-index: 45;
       width: min(380px, calc(100vw - 24px));
       max-height: min(58vh, 520px);
@@ -357,12 +391,6 @@
 
     #detail-panel.detail-panel--open {
       display: block;
-    }
-
-    #detail-panel.detail-panel--obscured {
-      opacity: 0.4;
-      pointer-events: none;
-      transition: opacity 0.15s ease;
     }
 
     #detail-panel #detail-close {
@@ -437,20 +465,120 @@
       font-weight: 500;
     }
 
+    #link-relation-panel {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      z-index: 46;
+      width: min(380px, calc(100vw - 24px));
+      max-height: min(52vh, 440px);
+      box-sizing: border-box;
+      padding: 14px 16px 16px;
+      background: #fff;
+      border: 3px solid var(--border);
+      border-radius: 0;
+      box-shadow: -8px 8px 0 var(--border);
+      overflow-y: auto;
+      display: none;
+      pointer-events: auto;
+      font-family: "Space Grotesk", system-ui, sans-serif;
+    }
+
+    #link-relation-panel.link-relation-panel--open {
+      display: block;
+    }
+
+    #link-relation-panel #link-relation-close {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--border);
+      border: 2px solid var(--border);
+      border-radius: 0;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    #link-relation-panel #link-relation-close:hover {
+      background: #fff;
+      color: var(--text);
+    }
+
+    #link-relation-panel h2 {
+      margin: 0 0 8px;
+      font-family: "Archivo Black", sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--text);
+      line-height: 1.25;
+    }
+
+    #link-relation-panel .link-relation-pair {
+      margin: 0 0 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    #link-relation-panel .link-relation-weight {
+      margin: 0 0 10px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    #link-relation-panel ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    #link-relation-panel li {
+      margin-bottom: 6px;
+    }
   </style>
 </head>
 <body>
+  <div id="chord-root" aria-label="Cerchio generi e percorso cronologico"></div>
+  <div id="status-bar" aria-live="polite"></div>
   <div id="ui">
-    <h1>Mappa Concettuale 3D - Fotografia</h1>
+    <h1>Cerchio — generi e percorso</h1>
     <p class="subtitle">
-      Ogni punto è un genere (prima colonna del CSV). Una linea unica li collega in ordine cronologico (anno nel CSV). I filtri sono a destra.
+      Ogni <strong>pallino</strong> è un genere sul cerchio (ordinati per tema/categoria). Le <strong>curve colorate</strong> collegano generi affini (stessa categoria in Mappa, stesso macro-tema e/o stessi tag del CSV): <strong>clic</strong> su una curva per aprire il riepilogo del legame. Il <strong>raggio</strong> dipende soprattutto dai <strong>sottogruppi</strong> in Mappa, con un contributo da quante righe ha e dalla lunghezza del nome. Una <strong>sola linea nera</strong> segue il cronologico in base all’<strong>Anno indicativo</strong> (Play).
     </p>
     <p id="chrono-range" class="chrono-range" aria-live="polite"></p>
     <div class="hint">
-      Trascina per ruotare. Usa rotella o + / - per zoom. Clic sul pallino o sull’etichetta: i dettagli compaiono sotto il punto. Etichetta lunga: doppio clic per espandere.
+      Trascina sul diagramma per spostarlo, rotella o + / − per zoom. Clic su un pallino per aprire i dettagli del genere. Clic su una <strong>curva colorata</strong> tra due pallini per vedere cosa lega quei generi.
+    </div>
+    <div class="chord-legend" aria-label="Legenda">
+      <div class="chord-legend-title">Lettura del cerchio</div>
+      <div class="chord-legend-row" style="padding-left: 0; border: none; gap: 6px;">
+        <span style="width: 14px; height: 14px; border-radius: 50%; background: #6cf; border: 2px solid #0a0a0a; flex-shrink: 0;" aria-hidden="true"></span>
+        Raggio ≈ sottogruppi (Sottocategoria) + peso delle righe Mappa; se i valori coincidono, i raggi si distanziano comunque lungo l’ordine sul cerchio.
+      </div>
+      <div class="chord-legend-row" style="padding-left: 0; margin-top: 4px;">
+        Linea nera = un solo percorso cronologico (stessi dati del CSV Mappa).
+      </div>
+      <div class="chord-legend-row" style="padding-left: 0; margin-top: 4px;">
+        <span style="width: 22px; height: 3px; background: linear-gradient(90deg, #9aa0b8, #c4c8d4); border-radius: 2px; flex-shrink: 0; opacity: 0.85;" aria-hidden="true"></span>
+        Curve colorate = affinità tra generi (stessa voce in Mappa, stesso macro-tema e/o stessi tag CSV); più il legame è forte, più la linea è visibile. <strong>Clic</strong> sulla curva per il dettaglio del legame.
+      </div>
     </div>
     <div class="zoom-controls">
-      <button id="zoom-out" class="zoom-btn" type="button">-</button>
+      <button id="zoom-out" class="zoom-btn" type="button">−</button>
       <button id="zoom-in" class="zoom-btn" type="button">+</button>
       <span id="zoom-readout" class="zoom-readout">100%</span>
     </div>
@@ -459,15 +587,23 @@
         <span class="play-icon" aria-hidden="true">▶</span>
         <span id="chrono-play-label">Percorso</span>
       </button>
-      <span id="chrono-play-hint" class="chrono-play-hint">Dopo Play compare il percorso cronologico (linea nera), segmento per segmento.</span>
+      <span id="chrono-play-hint" class="chrono-play-hint">Play anima una linea nera all’interno del cerchio che collega i generi in ordine cronologico, segmento per segmento.</span>
     </div>
-    <div class="view-switch-row">
-      <a href="mappa-2d.html" class="view-switch-btn">Visualizzazione 2D</a>
+    <div class="view-link-row">
+      <a href="mappa-3d.html" class="view-link-3d">Vista 3D (assi = filtri CSV)</a>
     </div>
   </div>
 
+  <aside id="link-relation-panel" aria-hidden="true" aria-label="Dettaglio collegamento tra generi">
+    <button id="link-relation-close" type="button">← Chiudi</button>
+    <h2 id="link-relation-heading">Collegamento</h2>
+    <p id="link-relation-pair" class="link-relation-pair"></p>
+    <p id="link-relation-weight" class="link-relation-weight" hidden></p>
+    <ul id="link-relation-reasons"></ul>
+  </aside>
+
   <aside id="detail-panel" aria-hidden="true" aria-label="Dettaglio categoria">
-    <button id="detail-close" type="button">← Torna alla mappa</button>
+    <button id="detail-close" type="button">← Chiudi dettaglio</button>
     <h2 id="detail-category-title"></h2>
     <p id="detail-mappa-source" class="detail-mappa-source"></p>
     <div id="detail-groups"></div>
@@ -477,31 +613,34 @@
   <aside id="filters-panel" aria-label="Filtri mappa">
     <h2>Filtri</h2>
     <p class="filters-panel-hint">
-      Mostra solo i generi che corrispondono alle combinazioni selezionate (tutte le dimensioni devono corrispondere). La linea del tempo segue l’<strong>Anno indicativo</strong> nel CSV (dal più antico al più recente), anche se i punti sono sparsi nello spazio.
+      Combinazioni su tutte le dimensioni del CSV. Sul cerchio, l’ordine è per <strong>tema / categoria</strong>; le <strong>curve interne</strong> mostrano affinità tra generi; il percorso cronologico resta per Play e per il testo sotto.
     </p>
     <div id="filters-root" class="filter-groups"></div>
   </aside>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.3/p5.min.js"></script>
   <script>
     let table;
     let graph;
     let loadError = "";
     let rowsLoaded = 0;
-    let labelsLayer;
-    let labelsFallback;
-    const labelEls = new Map();
-    const expandedLabelIds = new Set();
-    let viewScale = 1;
 
-    /** Percorso cronologico: nascosto fino al Play; in animazione; poi tutto visibile. */
+    /** @type {d3.ZoomBehavior<SVGSVGElement, unknown> | null} */
+    let chordZoomBehavior = null;
+    /** @type {d3.Selection<SVGSVGElement, unknown, HTMLElement, unknown> | null} */
+    let chordSvgD3 = null;
+    let chordResizeTimer = null;
+
+    /** Dati per la linea Play (punti sul raggio interno, stessi angoli degli archi). */
+    let chordChronoPlayCache = null;
+
     const CHRONO_SEG_DRAW_MS = 520;
     const CHRONO_SEG_GAP_MS = 90;
     let chronoLinesMode = "hidden";
     let chronoAnimStartMs = 0;
     let chronoAnimPathSig = "";
 
-    /** @type {{ audience: Set<string>, artistic: Set<string>, professional: Set<string> }} */
     let filterState = {
       audience: new Set(),
       artistic: new Set(),
@@ -511,10 +650,6 @@
     const CSV_PATH = "Foglio di lavoro senza nome - Generefotografico-PubblicoNessunoPrivato-Artistico.csv";
     const MAPPA_CSV_PATH = "Mappa Fotografia.csv";
 
-    /**
-     * Il CSV dei generi usa nomi diversi dalla colonna "Categoria Principale" di Mappa Fotografia.csv:
-     * qui si indica quale categoria della mappa usare per i dettagli.
-     */
     const GENRE_TO_MAPPA_CATEGORY = {
       "Il fotoromanzo": "Il fotoromanzo",
       "La moda": "La moda",
@@ -537,20 +672,49 @@
       "Ritratto/fototessera/segnaletica": "Il ritratto"
     };
 
-    /** @type {Map<string, { sub: string, det: string }[]>} */
+    /**
+     * Macro-temi per collegamenti “concettuali” tra generi (stesso valore => corda dedicata).
+     */
+    const THEMATIC_CLUSTER = {
+      "Il fotoromanzo": "narrazione_e_media",
+      "La moda": "comunicazione_e_mercato",
+      "La pubblicità": "comunicazione_e_mercato",
+      "La cronaca": "realtà_e_inchiesta",
+      "Immagini scientifiche": "sapere_e_tecnica",
+      "Immagini industriali": "sapere_e_tecnica",
+      "Riprese aeree civili": "territorio_e_visione",
+      "Riprese aeree militari": "territorio_e_visione",
+      "Riproduzione opere d'arte": "arte_e_patrimonio",
+      "Documentazione eventi artistici": "arte_e_patrimonio",
+      "Fotografia creativa/artistica": "arte_e_patrimonio",
+      "Immagini editoriali": "editoria_e_divulgazione",
+      "Cartoline": "oggetti_e_collezionismo",
+      "Poster": "oggetti_e_collezionismo",
+      "Calendari": "oggetti_e_collezionismo",
+      "Figurine": "oggetti_e_collezionismo",
+      "Immagini ricordo": "memoria_e_privato",
+      "Fotografia amatoriale (circoli/concorsi)": "pratica_sociale",
+      "Ritratto/fototessera/segnaletica": "identità_e_istituzioni"
+    };
+
+    /** Etichette leggibili per gli id di macro-tema (tooltip / pannello collegamenti). */
+    const MACRO_THEME_LABEL_IT = {
+      narrazione_e_media: "Narrazione e media",
+      comunicazione_e_mercato: "Comunicazione e mercato",
+      realtà_e_inchiesta: "Realtà e inchiesta",
+      sapere_e_tecnica: "Sapere e tecnica",
+      territorio_e_visione: "Territorio e visione",
+      arte_e_patrimonio: "Arte e patrimonio",
+      editoria_e_divulgazione: "Editoria e divulgazione",
+      oggetti_e_collezionismo: "Oggetti e collezionismo",
+      memoria_e_privato: "Memoria e privato",
+      pratica_sociale: "Pratica sociale",
+      identità_e_istituzioni: "Identità e istituzioni"
+    };
+
     let mappaByCategory = new Map();
     let mappaCsvError = "";
-
-    /** Matrici ultimo frame (dopo orbitControl) per picking e profondità. */
-    let lastPickMV = null;
-    let lastPickP = null;
-
-    /** Dettaglio: un solo nodo visibile, animato verso l'origine. */
     let detailFocusId = null;
-    let detailFocusSavedPos = null;
-    let detailAnimPhase = null;
-    let detailAnimStartMs = 0;
-    const DETAIL_ANIM_MS = 480;
 
     const paletteAudience = {
       Pubblico: [116, 209, 255],
@@ -568,28 +732,21 @@
       Nessuno: [130, 138, 158]
     };
 
-    const layoutConfig = {
-      sphereRadius: 420
-    };
-
     function setup() {
-      const cnv = createCanvas(windowWidth, windowHeight, WEBGL);
       textFont("Arial");
       textSize(12);
       textAlign(CENTER, CENTER);
-      labelsLayer = document.createElement("div");
-      labelsLayer.id = "labels-layer";
-      document.body.appendChild(labelsLayer);
-      labelsFallback = document.createElement("div");
-      labelsFallback.id = "labels-fallback";
-      document.body.appendChild(labelsFallback);
-      attachLabelToggleEvents();
+      const cnv = createCanvas(1, 1);
+      if (cnv && cnv.elt) {
+        cnv.elt.style.display = "none";
+      }
       attachFilterEvents();
-      attachZoomControls(cnv);
+      attachZoomControls();
       attachChronoPlayButton();
       attachDetailPanelClose();
+      attachLinkRelationPanelEvents();
       loadMappaFotografiaTable();
-      updateZoomReadout();
+      updateZoomReadout(1);
       updateChronoPlayUi();
       graph = {
         categories: [],
@@ -608,45 +765,571 @@
         "header",
         (loadedTable) => {
           table = loadedTable;
-          clearDomLabels();
-          graph = buildGraph(table);
+          graph = buildGraph2D(table);
           rowsLoaded = graph.details.length;
           loadError = "";
           mountFiltersFromGraph(graph);
           updateChronoRangeHint();
           resetChronoLineAnimationForNewPath();
+          renderChordDiagram();
+          updateStatusBar();
         },
         () => {
           loadError = "Errore CSV: apri con server locale (non file://).";
+          renderChordDiagram();
+          updateStatusBar();
         }
       );
     }
 
     function draw() {
-      background(255);
-      orbitControl(2, 2, 0.8);
-
-      if (_renderer?.uMVMatrix?.mat4 && _renderer?.uPMatrix?.mat4) {
-        lastPickMV = _renderer.uMVMatrix.mat4.slice();
-        lastPickP = _renderer.uPMatrix.mat4.slice();
-      }
-
-      ambientLight(245, 245, 247);
-      directionalLight(55, 55, 58, -0.35, -0.55, -0.85);
-      pointLight(255, 255, 255, 0, -380, 420);
-
       updateChronoLineAnimation();
-      updateDetailFocusAnimation();
-      drawGridSphere(980, 22);
-      drawConnections();
-      drawNodes();
-      drawLabels3D();
-      if (detailFocusId) positionDetailPanelAroundSphere();
-      drawStatusOverlay();
+      updateChordChronoPlayPath();
     }
 
     function windowResized() {
-      resizeCanvas(windowWidth, windowHeight);
+      if (chordResizeTimer) clearTimeout(chordResizeTimer);
+      chordResizeTimer = setTimeout(() => {
+        chordResizeTimer = null;
+        renderChordDiagram();
+      }, 120);
+    }
+
+    function updateStatusBar() {
+      const el = document.getElementById("status-bar");
+      if (!el) return;
+      el.textContent = loadError || `Righe caricate: ${rowsLoaded}`;
+      el.classList.toggle("status-bar--error", Boolean(loadError));
+    }
+
+    function nodeColorRgbString(node) {
+      const c = nodeColor(node);
+      return `rgb(${Math.round(c[0])}, ${Math.round(c[1])}, ${Math.round(c[2])})`;
+    }
+
+    function thematicCluster(genreLabel) {
+      if (Object.prototype.hasOwnProperty.call(THEMATIC_CLUSTER, genreLabel)) {
+        return THEMATIC_CLUSTER[genreLabel];
+      }
+      return null;
+    }
+
+    /** Ordine sul cerchio: categoria Mappa → macro-tema → tag → nome (non cronologia). */
+    function orderedForRelationalChord() {
+      if (!graph?.details) return [];
+      const vis = graph.details.filter((d) => nodeVisible(d));
+      return vis.slice().sort((a, b) => {
+        const ka = genreToMappaCategoryKey(a.label) || "\uffff";
+        const kb = genreToMappaCategoryKey(b.label) || "\uffff";
+        let cmp = ka.localeCompare(kb, "it", { sensitivity: "accent" });
+        if (cmp !== 0) return cmp;
+        const ta = thematicCluster(a.label) || "";
+        const tb = thematicCluster(b.label) || "";
+        cmp = ta.localeCompare(tb, "it");
+        if (cmp !== 0) return cmp;
+        const sa = `${a.tags.audience}|${a.tags.artistic}|${a.tags.professional}`;
+        const sb = `${b.tags.audience}|${b.tags.artistic}|${b.tags.professional}`;
+        cmp = sa.localeCompare(sb, "it");
+        if (cmp !== 0) return cmp;
+        return a.label.localeCompare(b.label, "it");
+      });
+    }
+
+    /** Punteggio legame concettuale tra due generi (come nel chord “relazionale”). */
+    function relationalChordWeight(a, b) {
+      let w = 0;
+      const ka = genreToMappaCategoryKey(a.label);
+      const kb = genreToMappaCategoryKey(b.label);
+      if (ka && kb && ka === kb) w += 4;
+      const ca = thematicCluster(a.label);
+      const cb = thematicCluster(b.label);
+      if (ca && cb && ca === cb) w += 3;
+      const ta = a.tags || {};
+      const tb = b.tags || {};
+      if (ta.audience && ta.audience === tb.audience) w += 1;
+      if (ta.artistic && ta.artistic === tb.artistic) w += 1;
+      if (ta.professional && ta.professional === tb.professional) w += 1;
+      return w;
+    }
+
+    /** Frasi esplicative per il pannello “cosa corrisponde” al collegamento (stessi criteri del peso). */
+    function relationalChordReasonLines(a, b) {
+      const lines = [];
+      const ft = graph?.filterTitles || {
+        audience: "Pubblico / destinatario",
+        artistic: "Artistico / scientifico",
+        professional: "Professionale / amatoriale"
+      };
+      const ka = genreToMappaCategoryKey(a.label);
+      const kb = genreToMappaCategoryKey(b.label);
+      if (ka && kb && ka === kb) {
+        lines.push(`Stessa categoria in Mappa Fotografia.csv: «${ka}».`);
+      }
+      const ca = thematicCluster(a.label);
+      const cb = thematicCluster(b.label);
+      if (ca && cb && ca === cb) {
+        const lab = MACRO_THEME_LABEL_IT[ca] || ca.replace(/_/g, " ");
+        lines.push(`Stesso macro-tema (raggruppamento concettuale): ${lab}.`);
+      }
+      const ta = a.tags || {};
+      const tb = b.tags || {};
+      if (ta.audience && ta.audience === tb.audience) {
+        lines.push(`${ft.audience}: valore condiviso «${ta.audience}».`);
+      }
+      if (ta.artistic && ta.artistic === tb.artistic) {
+        lines.push(`${ft.artistic}: valore condiviso «${ta.artistic}».`);
+      }
+      if (ta.professional && ta.professional === tb.professional) {
+        lines.push(`${ft.professional}: valore condiviso «${ta.professional}».`);
+      }
+      return lines;
+    }
+
+    function closeLinkRelationPanel() {
+      const panel = document.getElementById("link-relation-panel");
+      if (!panel) return;
+      panel.classList.remove("link-relation-panel--open");
+      panel.setAttribute("aria-hidden", "true");
+    }
+
+    function openLinkRelationPanel(linkDatum) {
+      if (!linkDatum?.source || !linkDatum?.target) return;
+      const panel = document.getElementById("link-relation-panel");
+      const pairEl = document.getElementById("link-relation-pair");
+      const listEl = document.getElementById("link-relation-reasons");
+      const weightEl = document.getElementById("link-relation-weight");
+      if (!panel || !pairEl || !listEl) return;
+      const a = linkDatum.source;
+      const b = linkDatum.target;
+      const la = labelWithYearTitle(a);
+      const lb = labelWithYearTitle(b);
+      pairEl.innerHTML = `${la} <span style="color:var(--muted);font-weight:600;">↔</span> ${lb}`;
+      const reasons = relationalChordReasonLines(a, b);
+      listEl.innerHTML = "";
+      reasons.forEach((text) => {
+        const li = document.createElement("li");
+        li.textContent = text;
+        listEl.appendChild(li);
+      });
+      if (weightEl) {
+        const w = relationalChordWeight(a, b);
+        weightEl.hidden = false;
+        weightEl.textContent = `Somma dei criteri (peso visualizzato sulla curva): ${w}.`;
+      }
+      panel.classList.add("link-relation-panel--open");
+      panel.setAttribute("aria-hidden", "false");
+    }
+
+    function attachLinkRelationPanelEvents() {
+      const btn = document.getElementById("link-relation-close");
+      if (!btn || btn.dataset.bound === "1") return;
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", () => closeLinkRelationPanel());
+      window.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape" || detailFocusId) return;
+        const lr = document.getElementById("link-relation-panel");
+        if (lr && lr.classList.contains("link-relation-panel--open")) closeLinkRelationPanel();
+      });
+    }
+
+    /** Archi interni tra coppie con affinità sufficiente (stessa categoria Mappa, macro-tema e/o tag). */
+    function buildRelationalLinksForChord(nodes) {
+      const out = [];
+      const n = nodes.length;
+      for (let i = 0; i < n; i++) {
+        for (let j = i + 1; j < n; j++) {
+          const a = nodes[i];
+          const b = nodes[j];
+          const weight = relationalChordWeight(a, b);
+          if (weight >= 2) out.push({ source: a, target: b, weight });
+        }
+      }
+      out.sort((x, y) => x.weight - y.weight);
+      return out;
+    }
+
+    /** Curva tipo chord: quadratic da punto sul cerchio, controllo verso il centro. */
+    function relationalChordPathD(x0, y0, x1, y1) {
+      const mx = (x0 + x1) * 0.5;
+      const my = (y0 + y1) * 0.5;
+      const inset = 0.3;
+      const cx = mx * inset;
+      const cy = my * inset;
+      return `M${x0},${y0} Q${cx},${cy} ${x1},${y1}`;
+    }
+
+    function blendNodeColorsForChordStroke(a, b) {
+      const ca = nodeColor(a);
+      const cb = nodeColor(b);
+      const m = [(ca[0] + cb[0]) * 0.5, (ca[1] + cb[1]) * 0.5, (ca[2] + cb[2]) * 0.5];
+      const gx = 136;
+      const gy = 138;
+      const gz = 150;
+      const t = 0.52;
+      const o = [
+        m[0] * t + gx * (1 - t),
+        m[1] * t + gy * (1 - t),
+        m[2] * t + gz * (1 - t)
+      ];
+      return `rgb(${Math.round(o[0])},${Math.round(o[1])},${Math.round(o[2])})`;
+    }
+
+    /**
+     * Sottogruppi = valori distinti della colonna «Sottocategoria» in Mappa Fotografia.csv
+     * per le righe associate a quel genere (stesso filtro del pannello dettaglio).
+     * Se non ci sono righe in mappa: 1 (pallino minimo). Se ci sono righe ma «Sottocategoria» vuota ovunque: conta le righe.
+     */
+    function countSubgroupsForGenre(node) {
+      const rows = getMappaRowsForGenre(node.label);
+      if (!rows || rows.length === 0) return 1;
+      const subs = new Set();
+      rows.forEach((r) => {
+        const s = String(r.sub || "").trim();
+        if (s) subs.add(s);
+      });
+      if (subs.size > 0) return subs.size;
+      return Math.max(1, rows.length);
+    }
+
+    /**
+     * Valore continuo per il raggio: combina sottogruppi, quantità di righe Mappa e lunghezza etichetta,
+     * così i pallini non restano tutti uguali quando molti generi hanno lo stesso n. di Sottocategoria.
+     */
+    function dotSizeMetric(node) {
+      const rows = getMappaRowsForGenre(node.label) || [];
+      const subs = new Set();
+      rows.forEach((r) => {
+        const s = String(r.sub || "").trim();
+        if (s) subs.add(s);
+      });
+      const nSub = subs.size > 0 ? subs.size : (rows.length > 0 ? 1 : 0);
+      const lab = String(node.label || "").length;
+      return Math.max(0.5, nSub * 14 + rows.length * 1.05 + lab * 0.22);
+    }
+
+    /** Raggi finali: scala lineare sui punteggi; se tutti uguali, scala per posizione nell’elenco ordinato. */
+    function computeDotRadii(ordered, rMin, rMax) {
+      const n = ordered.length;
+      const counts = ordered.map((d) => countSubgroupsForGenre(d));
+      const scores = ordered.map((d) => dotSizeMetric(d));
+      const minS = Math.min(...scores);
+      const maxS = Math.max(...scores);
+      const radii = scores.map((s, i) => {
+        if (n <= 1) {
+          return rMin + (rMax - rMin) * 0.44;
+        }
+        if (maxS - minS < 1e-6) {
+          return rMin + (rMax - rMin) * (i / Math.max(1, n - 1));
+        }
+        const t = (s - minS) / (maxS - minS);
+        return rMin + (rMax - rMin) * constrain(t, 0, 1);
+      });
+      return { counts, scores, radii };
+    }
+
+    function chronoPlayPointForNode(cache, node) {
+      const ang = cache.angleById.get(node.id);
+      if (ang === undefined || !Number.isFinite(ang)) return null;
+      const R = cache.ringR;
+      return { x: R * Math.cos(ang), y: R * Math.sin(ang) };
+    }
+
+    function buildChronoPlayPathString(pathNodes, st) {
+      if (!pathNodes.length || !chordChronoPlayCache) return "";
+      const cache = chordChronoPlayCache;
+      const pt = (node) => chronoPlayPointForNode(cache, node);
+      const p0 = pt(pathNodes[0]);
+      if (!p0) return "";
+      let d = `M${p0.x},${p0.y}`;
+      for (let k = 1; k <= st.fullThrough + 1 && k < pathNodes.length; k++) {
+        const p = pt(pathNodes[k]);
+        if (p) d += `L${p.x},${p.y}`;
+      }
+      if (st.partialFrom && st.partialTo) {
+        const A = pt(st.partialFrom);
+        const B = pt(st.partialTo);
+        if (A && B) {
+          const t = constrain(st.partialT, 0, 1);
+          d += `L${A.x + (B.x - A.x) * t},${A.y + (B.y - A.y) * t}`;
+        }
+      }
+      return d;
+    }
+
+    function updateChordChronoPlayPath() {
+      const cache = chordChronoPlayCache;
+      if (!cache?.pathMain || !graph?.chronoOrder) return;
+      const pathNodes = graph.chronoOrder.filter(nodeVisible);
+      if (pathNodes.length < 2 || chronoLinesMode === "hidden") {
+        cache.pathHalo.attr("d", "").attr("stroke-opacity", 0);
+        cache.pathMain.attr("d", "").attr("stroke-opacity", 0);
+        return;
+      }
+      const st = getChronoAnimationDrawState(pathNodes);
+      const d = buildChronoPlayPathString(pathNodes, st);
+      if (!d) {
+        cache.pathHalo.attr("d", "").attr("stroke-opacity", 0);
+        cache.pathMain.attr("d", "").attr("stroke-opacity", 0);
+        return;
+      }
+      cache.pathHalo.attr("d", d).attr("stroke-opacity", 1);
+      cache.pathMain.attr("d", d).attr("stroke-opacity", 1);
+    }
+
+    function renderChordDiagram() {
+      closeLinkRelationPanel();
+      const root = document.getElementById("chord-root");
+      if (!root || typeof d3 === "undefined") return;
+      root.innerHTML = "";
+      chordSvgD3 = null;
+      chordZoomBehavior = null;
+      chordChronoPlayCache = null;
+
+      if (loadError) {
+        root.appendChild(Object.assign(document.createElement("p"), {
+          textContent: loadError,
+          style: "padding:28px 20px;font-size:14px;max-width:420px;line-height:1.5;"
+        }));
+        return;
+      }
+      if (!graph?.details?.length) return;
+
+      const ordered = orderedForRelationalChord();
+      const n = ordered.length;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const size = Math.min(w, h);
+      const ringR = size * 0.30;
+
+      const svg = d3.select(root).append("svg")
+        .attr("id", "chord-svg")
+        .attr("width", w)
+        .attr("height", h)
+        .attr("viewBox", `0 0 ${w} ${h}`)
+        .style("touch-action", "none");
+
+      svg.append("defs").append("filter")
+        .attr("id", "dot-shadow")
+        .attr("x", "-40%")
+        .attr("y", "-40%")
+        .attr("width", "180%")
+        .attr("height", "180%")
+        .append("feDropShadow")
+        .attr("dx", 0)
+        .attr("dy", 1.5)
+        .attr("stdDeviation", 1.8)
+        .attr("flood-opacity", 0.18);
+
+      chordSvgD3 = svg;
+      const zoomWrap = svg.append("g").attr("class", "chord-zoom-wrap");
+      const g = zoomWrap.append("g").attr("transform", `translate(${w * 0.5},${h * 0.5})`);
+
+      g.append("circle")
+        .attr("r", ringR + 70)
+        .attr("fill", "#f4f4f6")
+        .attr("stroke", "#dedee2")
+        .attr("stroke-width", 1);
+      g.append("circle")
+        .attr("r", ringR)
+        .attr("fill", "none")
+        .attr("stroke", "#d4d4da")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", "5 8");
+
+      if (n === 0) {
+        g.append("text")
+          .attr("text-anchor", "middle")
+          .attr("dy", "0.35em")
+          .style("font-size", "14px")
+          .style("fill", "#5c5c5c")
+          .text("Nessun genere visibile: regola i filtri.");
+        wireChordZoom(svg, zoomWrap, w, h);
+        return;
+      }
+
+      const rMin = 6;
+      const rMax = 30;
+      const { counts, radii } = computeDotRadii(ordered, rMin, rMax);
+
+      const angleById = new Map();
+      ordered.forEach((node, k) => {
+        const ang = -Math.PI / 2 + (2 * Math.PI * k) / n;
+        angleById.set(node.id, ang);
+      });
+
+      if (n === 1) {
+        const node = ordered[0];
+        const r = radii[0];
+        g.append("circle")
+          .attr("cx", 0)
+          .attr("cy", 0)
+          .attr("r", r)
+          .attr("fill", nodeColorRgbString(node))
+          .attr("stroke", "#0a0a0a")
+          .attr("stroke-width", 2)
+          .attr("filter", "url(#dot-shadow)")
+          .style("cursor", "pointer")
+          .attr("title", () => {
+            const rc = (getMappaRowsForGenre(node.label) || []).length;
+            return `${labelWithYearTitle(node)} — ${counts[0]} sottogruppi (Sottocategoria), ${rc} voci in Mappa`;
+          })
+          .on("click", () => enterDetailView2D(node));
+        g.append("text")
+          .attr("text-anchor", "middle")
+          .attr("y", r + 18)
+          .style("font-size", "12px")
+          .style("font-weight", "700")
+          .style("font-family", '"Space Grotesk", system-ui, sans-serif')
+          .style("fill", "#0a0a0a")
+          .text(shortenToThreeWords(node.label) + formatYearSuffix(node));
+        const playLayer1 = g.append("g")
+          .attr("class", "chrono-play-layer")
+          .style("pointer-events", "none");
+        const pathHalo1 = playLayer1.append("path")
+          .attr("fill", "none")
+          .attr("stroke", "#ffffff")
+          .attr("stroke-width", 6)
+          .attr("stroke-linecap", "round");
+        const pathMain1 = playLayer1.append("path")
+          .attr("fill", "none")
+          .attr("stroke", "#0a0a0a")
+          .attr("stroke-width", 3)
+          .attr("stroke-linecap", "round");
+        chordChronoPlayCache = {
+          angleById,
+          ringR: 0,
+          pathHalo: pathHalo1,
+          pathMain: pathMain1
+        };
+        updateChordChronoPlayPath();
+        wireChordZoom(svg, zoomWrap, w, h);
+        return;
+      }
+
+      const linkList = !detailFocusId ? buildRelationalLinksForChord(ordered) : [];
+      const ptRing = (node) => {
+        const ang = angleById.get(node.id);
+        return { x: ringR * Math.cos(ang), y: ringR * Math.sin(ang) };
+      };
+      const linksG = g.append("g")
+        .attr("class", "relational-chords")
+        .style("pointer-events", "all");
+      const linkWrap = linksG.selectAll("g.relational-chord-wrap")
+        .data(linkList)
+        .join("g")
+        .attr("class", "relational-chord-wrap")
+        .style("cursor", "pointer")
+        .on("click", (event, d) => {
+          event.stopPropagation();
+          openLinkRelationPanel(d);
+        });
+      linkWrap.each(function (d) {
+        const sel = d3.select(this);
+        if (sel.select("path.relational-chord-hit").empty()) {
+          sel.append("path").attr("class", "relational-chord-hit");
+          sel.append("path").attr("class", "relational-chord");
+        }
+        const p0 = ptRing(d.source);
+        const p1 = ptRing(d.target);
+        const pathD = relationalChordPathD(p0.x, p0.y, p1.x, p1.y);
+        sel.select("path.relational-chord-hit")
+          .attr("d", pathD)
+          .attr("fill", "none")
+          .attr("stroke", "transparent")
+          .attr("stroke-width", 18)
+          .attr("pointer-events", "stroke")
+          .attr("stroke-linecap", "round");
+        sel.select("path.relational-chord")
+          .attr("d", pathD)
+          .attr("fill", "none")
+          .attr("stroke", blendNodeColorsForChordStroke(d.source, d.target))
+          .attr("stroke-width", 0.55 + Math.min(d.weight, 10) * 0.16)
+          .attr("stroke-opacity", Math.min(0.44, 0.09 + (d.weight - 2) * 0.035))
+          .attr("stroke-linecap", "round")
+          .style("pointer-events", "none")
+          .style("vector-effect", "non-scaling-stroke");
+      });
+
+      const nodesG = g.append("g").attr("class", "genre-nodes");
+      nodesG.selectAll("circle.genre-dot")
+        .data(ordered)
+        .join("circle")
+        .attr("class", "genre-dot")
+        .attr("cx", (d) => ringR * Math.cos(angleById.get(d.id)))
+        .attr("cy", (d) => ringR * Math.sin(angleById.get(d.id)))
+        .attr("r", (d, i) => radii[i])
+        .attr("fill", (d) => nodeColorRgbString(d))
+        .attr("stroke", "#0a0a0a")
+        .attr("stroke-width", 2)
+        .attr("filter", "url(#dot-shadow)")
+        .style("cursor", "pointer")
+        .attr("title", (d, i) => {
+          const rc = (getMappaRowsForGenre(d.label) || []).length;
+          return `${labelWithYearTitle(d)} — ${counts[i]} sottogruppi (Sottocategoria), ${rc} voci in Mappa`;
+        })
+        .on("click", (event, d) => {
+          event.stopPropagation();
+          enterDetailView2D(d);
+        });
+
+      const labelGap = 14 + rMax * 0.35;
+      nodesG.selectAll("text.genre-dot-label")
+        .data(ordered)
+        .join("text")
+        .attr("class", "genre-dot-label")
+        .attr("text-anchor", "middle")
+        .attr("x", (d) => (ringR + labelGap) * Math.cos(angleById.get(d.id)))
+        .attr("y", (d) => (ringR + labelGap) * Math.sin(angleById.get(d.id)))
+        .attr("dy", "0.35em")
+        .style("font-size", "10px")
+        .style("font-weight", "700")
+        .style("font-family", '"Space Grotesk", system-ui, sans-serif')
+        .style("fill", "#0a0a0a")
+        .style("paint-order", "stroke fill")
+        .style("stroke", "#ffffff")
+        .style("stroke-width", "3px")
+        .style("pointer-events", "none")
+        .text((d) => shortenToThreeWords(d.label) + formatYearSuffix(d));
+
+      const playLayer = g.append("g")
+        .attr("class", "chrono-play-layer")
+        .style("pointer-events", "none");
+      const pathHalo = playLayer.append("path")
+        .attr("class", "chrono-play-halo")
+        .attr("fill", "none")
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 6)
+        .attr("stroke-linecap", "round")
+        .attr("stroke-linejoin", "round");
+      const pathMain = playLayer.append("path")
+        .attr("class", "chrono-play-main")
+        .attr("fill", "none")
+        .attr("stroke", "#0a0a0a")
+        .attr("stroke-width", 3)
+        .attr("stroke-linecap", "round")
+        .attr("stroke-linejoin", "round");
+
+      chordChronoPlayCache = {
+        angleById,
+        ringR,
+        pathHalo,
+        pathMain
+      };
+      updateChordChronoPlayPath();
+
+      wireChordZoom(svg, zoomWrap, w, h);
+    }
+
+    function wireChordZoom(svg, zoomWrap, w, h) {
+      chordZoomBehavior = d3.zoom()
+        .scaleExtent([0.32, 5])
+        .extent([[0, 0], [w, h]])
+        .on("zoom", (event) => {
+          zoomWrap.attr("transform", event.transform);
+          updateZoomReadout(event.transform.k);
+        });
+      svg.call(chordZoomBehavior);
+      svg.on("dblclick.zoom", null);
     }
 
     function mountFiltersFromGraph(g) {
@@ -721,6 +1404,7 @@
         else set.delete(val);
         updateChronoRangeHint();
         resetChronoLineAnimationForNewPath();
+        renderChordDiagram();
       });
     }
 
@@ -820,14 +1504,6 @@
       return ` (${node.year})`;
     }
 
-    function labelWithYearCollapsed(node) {
-      return `${shortenToThreeWords(node.label)}${formatYearSuffix(node)}`;
-    }
-
-    function labelWithYearExpanded(node) {
-      return `${node.label}${formatYearSuffix(node)}`;
-    }
-
     function labelWithYearTitle(node) {
       return `${node.label}${formatYearSuffix(node)}`;
     }
@@ -855,41 +1531,6 @@
       el.textContent = `Inizio percorso: ${y0} — ${first.label}. Fine: ${y1} — ${last.label}. (${path.length} generi)`;
     }
 
-    function attachLabelToggleEvents() {
-      document.addEventListener(
-        "pointerdown",
-        (event) => {
-          const labelEl = event.target.closest(".node-label");
-          if (!labelEl || detailFocusId) return;
-          const id = labelEl.dataset.id;
-          if (!id || !graph || !id.startsWith("det-")) return;
-          const node = graph.details.find((n) => n.id === id);
-          if (!node || !nodeVisible(node)) return;
-          event.preventDefault();
-          event.stopPropagation();
-          enterDetailView(node);
-        },
-        true
-      );
-
-      document.addEventListener(
-        "dblclick",
-        (event) => {
-          const labelEl = event.target.closest(".node-label");
-          if (!labelEl || detailFocusId) return;
-          const id = labelEl.dataset.id;
-          const shortable = labelEl.dataset.shortable === "true";
-          if (!id || !shortable) return;
-          event.preventDefault();
-          event.stopPropagation();
-          if (expandedLabelIds.has(id)) expandedLabelIds.delete(id);
-          else expandedLabelIds.add(id);
-          updateDomLabels();
-        },
-        true
-      );
-    }
-
     function loadMappaFotografiaTable() {
       loadTable(
         MAPPA_CSV_PATH,
@@ -899,11 +1540,13 @@
           mappaByCategory = buildMappaIndex(loaded);
           mappaCsvError = "";
           if (detailFocusId) refreshDetailPanel();
+          renderChordDiagram();
         },
         () => {
           mappaCsvError = "Impossibile caricare Mappa Fotografia.csv (serve un server locale, non file://).";
           mappaByCategory = new Map();
           if (detailFocusId) refreshDetailPanel();
+          renderChordDiagram();
         }
       );
     }
@@ -938,11 +1581,6 @@
       return null;
     }
 
-    /**
-     * Restituisce le righe di Mappa Fotografia.csv pertinenti al genere del pallino.
-     * Per categorie aggregate (stampa, riprese aeree, mondo dell'arte) filtra sulle
-     * colonne Sottocategoria / Dettaglio così ogni pallino mostra solo i dettagli corrispondenti.
-     */
     function refineMappaRowsForGenre(genreLabel, mappaCategoryKey, rows) {
       if (!rows || rows.length === 0) return rows;
       const g = String(genreLabel || "").trim();
@@ -988,92 +1626,33 @@
       return refineMappaRowsForGenre(genreLabel, key, rows);
     }
 
-    /** p5 aggiorna mouseX/mouseY nello spazio del buffer (coerente con worldToScreenStable). */
-    function mousePressed() {
-      if (mouseButton !== LEFT) return true;
-      if (detailFocusId) return true;
-      if (loadError || !graph?.details?.length) return true;
-      const hit = pickDetailNodeFromScreen(mouseX, mouseY);
-      if (!hit) return true;
-      enterDetailView(hit);
-      return false;
-    }
-
     function attachDetailPanelClose() {
       const btn = document.getElementById("detail-close");
       if (!btn || btn.dataset.bound === "1") return;
       btn.dataset.bound = "1";
-      btn.addEventListener("click", () => requestExitDetailView());
+      btn.addEventListener("click", () => exitDetailView2D());
       window.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && detailFocusId) requestExitDetailView();
+        if (e.key === "Escape" && detailFocusId) exitDetailView2D();
       });
     }
 
-    let detailExitFromPos = null;
-
-    function enterDetailView(node) {
+    function enterDetailView2D(node) {
       if (!node || node.level !== 2 || !graph) return;
+      closeLinkRelationPanel();
       detailFocusId = node.id;
-      detailFocusSavedPos = createVector(node.pos.x, node.pos.y, node.pos.z);
-      detailExitFromPos = null;
-      detailAnimPhase = "in";
-      detailAnimStartMs = millis();
       chronoLinesMode = "hidden";
-      expandedLabelIds.clear();
       updateDetailPanelDom(true);
       refreshDetailPanel();
       updateChronoPlayUi();
+      renderChordDiagram();
     }
 
-    function requestExitDetailView() {
-      if (!detailFocusId || !graph) return;
-      if (detailAnimPhase === "out") return;
-      const node = graph.details.find((n) => n.id === detailFocusId);
-      if (!node || !detailFocusSavedPos) {
-        finalizeExitDetailView();
-        return;
-      }
-      detailExitFromPos = createVector(node.pos.x, node.pos.y, node.pos.z);
-      detailAnimPhase = "out";
-      detailAnimStartMs = millis();
-    }
-
-    function finalizeExitDetailView() {
-      if (detailFocusId && graph && detailFocusSavedPos) {
-        const node = graph.details.find((n) => n.id === detailFocusId);
-        if (node) node.pos.set(detailFocusSavedPos);
-      }
+    function exitDetailView2D() {
       detailFocusId = null;
-      detailFocusSavedPos = null;
-      detailExitFromPos = null;
-      detailAnimPhase = null;
       updateDetailPanelDom(false);
       resetChronoLineAnimationForNewPath();
       updateChronoPlayUi();
-    }
-
-    function updateDetailFocusAnimation() {
-      if (!detailFocusId || !graph || detailAnimPhase === null || detailAnimPhase === "hold") return;
-      const node = graph.details.find((n) => n.id === detailFocusId);
-      if (!node || !detailFocusSavedPos) return;
-
-      const rawT = constrain((millis() - detailAnimStartMs) / DETAIL_ANIM_MS, 0, 1);
-      const t = rawT * rawT * (3 - 2 * rawT);
-
-      if (detailAnimPhase === "in") {
-        node.pos.x = lerp(detailFocusSavedPos.x, 0, t);
-        node.pos.y = lerp(detailFocusSavedPos.y, 0, t);
-        node.pos.z = lerp(detailFocusSavedPos.z, 0, t);
-        if (rawT >= 1) {
-          node.pos.set(0, 0, 0);
-          detailAnimPhase = "hold";
-        }
-      } else if (detailAnimPhase === "out" && detailExitFromPos) {
-        node.pos.x = lerp(detailExitFromPos.x, detailFocusSavedPos.x, t);
-        node.pos.y = lerp(detailExitFromPos.y, detailFocusSavedPos.y, t);
-        node.pos.z = lerp(detailExitFromPos.z, detailFocusSavedPos.z, t);
-        if (rawT >= 1) finalizeExitDetailView();
-      }
+      renderChordDiagram();
     }
 
     function updateDetailPanelDom(open) {
@@ -1081,80 +1660,6 @@
       if (!panel) return;
       panel.classList.toggle("detail-panel--open", open);
       panel.setAttribute("aria-hidden", open ? "false" : "true");
-      if (!open) {
-        panel.classList.remove("detail-panel--obscured");
-        panel.style.left = "";
-        panel.style.top = "";
-        panel.style.opacity = "";
-      }
-    }
-
-    /** Da coordinate sketch (worldToScreenStable) a pixel viewport (CSS). */
-    function projectionSketchToClient(proj) {
-      if (!proj || !Number.isFinite(proj.x) || !Number.isFinite(proj.y)) return null;
-      const w = typeof width === "number" ? width : window.innerWidth;
-      const h = typeof height === "number" ? height : window.innerHeight;
-      if (w <= 0 || h <= 0) return null;
-      const el = document.querySelector("body > canvas");
-      if (el) {
-        const r = el.getBoundingClientRect();
-        return {
-          x: r.left + (proj.x / w) * r.width,
-          y: r.top + (proj.y / h) * r.height
-        };
-      }
-      return {
-        x: (proj.x / w) * window.innerWidth,
-        y: (proj.y / h) * window.innerHeight
-      };
-    }
-
-    function positionDetailPanelAroundSphere() {
-      const panel = document.getElementById("detail-panel");
-      if (!panel || !detailFocusId || !graph) return;
-      if (!panel.classList.contains("detail-panel--open")) return;
-
-      const node = graph.details.find((n) => n.id === detailFocusId);
-      if (!node) return;
-
-      const wx = scaleCoord(node.pos.x);
-      const wy = scaleCoord(node.pos.y);
-      const wz = scaleCoord(node.pos.z);
-      const proj = worldToScreenStable(wx, wy, wz);
-      const pt = projectionSketchToClient(proj);
-
-      const margin = 12;
-      const gap = 16;
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-
-      if (!pt) {
-        panel.classList.add("detail-panel--obscured");
-        return;
-      }
-      panel.classList.remove("detail-panel--obscured");
-
-      const pr = panel.getBoundingClientRect();
-      let pw = pr.width;
-      let ph = pr.height;
-      if (pw < 80) pw = min(360, vw - 32);
-      if (ph < 48) ph = min(220, vh * 0.4);
-
-      const sx = pt.x;
-      const sy = pt.y;
-
-      let left = sx - pw * 0.5;
-      let top = sy + gap;
-
-      if (top + ph > vh - margin) {
-        top = sy - gap - ph;
-      }
-
-      left = constrain(left, margin, vw - margin - pw);
-      top = constrain(top, margin, vh - margin - ph);
-
-      panel.style.left = `${left}px`;
-      panel.style.top = `${top}px`;
     }
 
     function refreshDetailPanel() {
@@ -1216,58 +1721,7 @@
       });
     }
 
-    function pickDetailNodeFromScreen(mx, my) {
-      if (!graph?.details?.length || !lastPickMV) return null;
-      const HIT = 72;
-      let best = null;
-      let bestScore = Infinity;
-      for (const node of graph.details) {
-        if (!detailDimsVisible(node)) continue;
-        const wx = scaleCoord(node.pos.x);
-        const wy = scaleCoord(node.pos.y);
-        const wz = scaleCoord(node.pos.z);
-        const p = worldToScreenStable(wx, wy, wz);
-        if (!p) continue;
-        const d = Math.hypot(mx - p.x, my - p.y);
-        if (d > HIT) continue;
-        const eye = mulMat4Vec4(lastPickMV, [wx, wy, wz, 1]);
-        const score = d - 0.02 * eye[2];
-        if (score < bestScore) {
-          bestScore = score;
-          best = node;
-        }
-      }
-      return best;
-    }
-
-    /**
-     * Testo visibile dopo rimozione BOM, zero-width e normalizzazione Unicode
-     * (evita righe CSV che “passano” il trim ma non mostrano nulla).
-     */
-    function normalizeVisibleLabel(s) {
-      let t = String(s ?? "");
-      try {
-        t = t.normalize("NFKC");
-      } catch (e) {
-        /* ignore */
-      }
-      t = t.replace(/^\uFEFF+/, "").replace(/[\u200B-\u200D\uFEFF\u00AD\u2060]/g, "");
-      try {
-        t = t.replace(/\p{Cf}/gu, "");
-      } catch (e) {
-        /* \p{Cf} non supportato */
-      }
-      return t.trim();
-    }
-
-    function hasVisibleLabelText(s) {
-      return normalizeVisibleLabel(s).length > 0;
-    }
-
-    /**
-     * Nodo: etichetta dalla colonna 0; filtri dalle colonne 1–3 (stesso CSV).
-     */
-    function buildGraph(csv) {
+    function buildGraph2D(csv) {
       const details = [];
       const links = [];
       const cols = csv.columns || [];
@@ -1277,7 +1731,7 @@
         professional: cols[3] || "Colonna 4"
       };
 
-      const rows = csv.getRows().filter((r) => hasVisibleLabelText(String(r.get(0) || "")));
+      const rows = csv.getRows().filter((r) => String(r.get(0) || "").trim().length > 0);
       const audienceSet = new Set();
       const artisticSet = new Set();
       const professionalSet = new Set();
@@ -1298,32 +1752,24 @@
         professional: [...professionalSet].sort(sortVals)
       };
 
-      const dataRows = rows.filter((r) => hasVisibleLabelText(String(r.get(0) || "")));
-      const n = max(1, dataRows.length);
-      const R = layoutConfig.sphereRadius;
-      const scatterSlots = deterministicPermutation(n, "fotografia-spazio");
+      const dataRows = rows.filter((r) => String(r.get(0) || "").trim().length > 0);
 
       dataRows.forEach((row, idx) => {
-        const genre = normalizeVisibleLabel(String(row.get(0) || ""));
+        const genre = String(row.get(0) || "").trim();
         const audience = String(row.get(1) || "").trim();
         const artistic = String(row.get(2) || "").trim();
         const professional = String(row.get(3) || "").trim();
         const yearParsed = parseInt(String(row.get(4) || "").replace(/\D/g, ""), 10);
         const year = Number.isFinite(yearParsed) ? yearParsed : 1800 + idx;
-
-        const slot = scatterSlots[idx];
-        const pos = fibonacciSpherePoint(slot, n, R);
         details.push({
           id: `det-${idx}`,
           label: genre,
           level: 2,
           year,
-          tags: { audience, artistic, professional },
-          pos
+          tags: { audience, artistic, professional }
         });
       });
 
-      centerGraphNodes(new Map(), new Map(), details);
       const chronoOrder = [...details].sort((a, b) => {
         if (a.year !== b.year) return a.year - b.year;
         return a.label.localeCompare(b.label, "it");
@@ -1339,84 +1785,6 @@
         filterMeta,
         filterTitles
       };
-    }
-
-    /** Permutazione fissa: posizioni nello spazio scorrelate dall’ordine cronologico. */
-    function deterministicPermutation(n, salt) {
-      const arr = Array.from({ length: n }, (_, k) => k);
-      for (let i = n - 1; i > 0; i--) {
-        const j = abs(hashCode(`${salt}:${i}`)) % (i + 1);
-        const t = arr[i];
-        arr[i] = arr[j];
-        arr[j] = t;
-      }
-      return arr;
-    }
-
-    function fibonacciSpherePoint(i, n, radius) {
-      if (n <= 0) return createVector(0, 0, 0);
-      if (n === 1) return createVector(0, 0, 0);
-      const inc = PI * (3 - sqrt(5));
-      const y = 1 - (i / (n - 1)) * 2;
-      const rY = sqrt(max(0, 1 - y * y));
-      const theta = inc * i;
-      return createVector(
-        cos(theta) * rY * radius,
-        y * radius * 0.9,
-        sin(theta) * rY * radius
-      );
-    }
-
-    function centerGraphNodes(categoriesMap, subcategoriesMap, detailsList) {
-      const allNodes = [
-        ...categoriesMap.values(),
-        ...subcategoriesMap.values(),
-        ...detailsList
-      ];
-      if (allNodes.length === 0) return;
-
-      let minX = Infinity;
-      let minY = Infinity;
-      let minZ = Infinity;
-      let maxX = -Infinity;
-      let maxY = -Infinity;
-      let maxZ = -Infinity;
-
-      allNodes.forEach((node) => {
-        const { x, y, z } = node.pos;
-        if (x < minX) minX = x;
-        if (y < minY) minY = y;
-        if (z < minZ) minZ = z;
-        if (x > maxX) maxX = x;
-        if (y > maxY) maxY = y;
-        if (z > maxZ) maxZ = z;
-      });
-
-      const centerX = (minX + maxX) * 0.5;
-      const centerY = (minY + maxY) * 0.5;
-      const centerZ = (minZ + maxZ) * 0.5;
-      const uiCompensationX = getUiCompensationX();
-
-      allNodes.forEach((node) => {
-        node.pos.x = (node.pos.x - centerX) + uiCompensationX;
-        node.pos.y -= centerY;
-        node.pos.z -= centerZ;
-      });
-    }
-
-    function getUiCompensationX() {
-      const ui = document.getElementById("ui");
-      const fp = document.getElementById("filters-panel");
-      let shift = 0;
-      if (ui) {
-        const rect = ui.getBoundingClientRect();
-        shift += rect.width * 0.45;
-      }
-      if (fp) {
-        const fr = fp.getBoundingClientRect();
-        shift -= fr.width * 0.45;
-      }
-      return shift;
     }
 
     function detailDimsVisible(d) {
@@ -1484,288 +1852,42 @@
       return [(rp + m) * 255, (gp + m) * 255, (bp + m) * 255];
     }
 
-    function drawGridSphere(radius, count) {
-      push();
-      noFill();
-      stroke(210, 210, 214);
-      strokeWeight(1);
-      for (let i = 0; i < count; i++) {
-        const y = map(i, 0, count - 1, -radius * 0.5, radius * 0.5);
-        const r = sqrt(max(0, radius * radius - y * y));
-        push();
-        translate(0, y, 0);
-        rotateX(HALF_PI);
-        ellipse(0, 0, r * 2, r * 2);
-        pop();
-      }
-      pop();
-    }
-
-    function drawConnections() {
-      if (detailFocusId) return;
-      if (!graph?.chronoOrder) return;
-      const path = graph.chronoOrder.filter(nodeVisible);
-      if (path.length < 2) return;
-      if (chronoLinesMode === "hidden") return;
-
-      stroke(12, 12, 14);
-      strokeWeight(3);
-      noFill();
-
-      const st = getChronoAnimationDrawState(path);
-      const nSeg = path.length - 1;
-
-      for (let i = 0; i < nSeg; i++) {
-        const a = path[i];
-        const b = path[i + 1];
-        if (i > st.fullThrough + 1) break;
-        if (i <= st.fullThrough) {
-          line(
-            scaleCoord(a.pos.x), scaleCoord(a.pos.y), scaleCoord(a.pos.z),
-            scaleCoord(b.pos.x), scaleCoord(b.pos.y), scaleCoord(b.pos.z)
-          );
-        } else if (st.partialFrom === a && st.partialTo === b) {
-          const u = constrain(st.partialT, 0, 1);
-          const bx = lerp(a.pos.x, b.pos.x, u);
-          const by = lerp(a.pos.y, b.pos.y, u);
-          const bz = lerp(a.pos.z, b.pos.z, u);
-          line(
-            scaleCoord(a.pos.x), scaleCoord(a.pos.y), scaleCoord(a.pos.z),
-            scaleCoord(bx), scaleCoord(by), scaleCoord(bz)
-          );
+    function attachZoomControls() {
+      const zoomInBtn = document.getElementById("zoom-in");
+      const zoomOutBtn = document.getElementById("zoom-out");
+      zoomInBtn.addEventListener("click", () => {
+        if (chordSvgD3 && chordZoomBehavior) {
+          chordSvgD3.transition().duration(140).call(chordZoomBehavior.scaleBy, 1.14);
         }
-      }
-    }
-
-    function drawNodes() {
-      if (!graph) return;
-      const all = [...graph.categories, ...graph.subcategories, ...graph.details];
-      all.forEach((node) => {
-        if (!nodeVisible(node)) return;
-        const c = nodeColor(node);
-        const diameter = node.level === 0 ? 30 : node.level === 1 ? 22 : 14;
-
-        push();
-        translate(scaleCoord(node.pos.x), scaleCoord(node.pos.y), scaleCoord(node.pos.z));
-        noStroke();
-        ambientMaterial(c[0], c[1], c[2], 255);
-        specularMaterial(40, 40, 42);
-        shininess(12);
-        sphere((diameter * 0.5) * constrain(0.8 + (viewScale * 0.2), 0.8, 1.25), 18, 14);
-        pop();
       });
-    }
-
-    function drawLabels3D() {
-      updateDomLabels();
-    }
-
-    function clearDomLabels() {
-      expandedLabelIds.clear();
-      labelEls.forEach((el) => {
-        if (el.parentNode) el.parentNode.removeChild(el);
-      });
-      labelEls.clear();
-    }
-
-    function updateDomLabels() {
-      if (!graph || !labelsLayer) return;
-      if (labelsFallback) labelsFallback.style.display = "none";
-      const all = [...graph.categories, ...graph.subcategories, ...graph.details];
-      const visibleIds = new Set();
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const edgeMargin = 140;
-
-      all.forEach((node) => {
-        if (!nodeVisible(node)) return;
-
-        const projected = worldToScreenStable(
-          scaleCoord(node.pos.x),
-          scaleCoord(node.pos.y),
-          scaleCoord(node.pos.z)
-        );
-        const pt = projectionSketchToClient(projected);
-        if (!pt || !Number.isFinite(pt.x) || !Number.isFinite(pt.y)) return;
-        const sx = pt.x;
-        const sy = pt.y;
-
-        const yOffset = node.level === 0 ? 22 : node.level === 1 ? 18 : 14;
-        const id = node.id;
-
-        const canExpand = countWords(node.label) > 3;
-        const isExpanded = expandedLabelIds.has(id);
-        const displayText = (canExpand && isExpanded)
-          ? labelWithYearExpanded(node)
-          : labelWithYearCollapsed(node);
-        const body = normalizeVisibleLabel(displayText);
-        if (!hasVisibleLabelText(body)) return;
-
-        if (
-          sx < -edgeMargin || sx > vw + edgeMargin
-          || sy < -edgeMargin || sy > vh + edgeMargin
-        ) {
-          return;
+      zoomOutBtn.addEventListener("click", () => {
+        if (chordSvgD3 && chordZoomBehavior) {
+          chordSvgD3.transition().duration(140).call(chordZoomBehavior.scaleBy, 1 / 1.14);
         }
-
-        visibleIds.add(id);
-
-        let el = labelEls.get(id);
-        if (!el) {
-          el = document.createElement("div");
-          el.className = "node-label";
-          (labelsLayer || document.body).appendChild(el);
-          labelEls.set(id, el);
-        }
-
-        el.textContent = body;
-        el.dataset.id = id;
-        el.dataset.shortable = String(canExpand);
-        el.classList.toggle("node-label--expanded", isExpanded);
-        el.style.cursor = "pointer";
-        el.title = canExpand
-          ? `${labelWithYearTitle(node)} — doppio clic per espandere`
-          : labelWithYearTitle(node);
-        const labelRgb = nodeColor(node);
-        el.style.color = `rgb(${Math.round(labelRgb[0])}, ${Math.round(labelRgb[1])}, ${Math.round(labelRgb[2])})`;
-        el.style.left = `${sx}px`;
-        el.style.top = `${sy - yOffset}px`;
-        el.style.fontSize = node.level === 2 ? "11px" : "13px";
-        el.style.display = "block";
       });
 
-      labelEls.forEach((el, id) => {
-        if (!visibleIds.has(id)) el.style.display = "none";
+      window.addEventListener("keydown", (e) => {
+        if (!chordSvgD3 || !chordZoomBehavior) return;
+        if (e.key === "+" || e.key === "=") {
+          chordSvgD3.transition().duration(100).call(chordZoomBehavior.scaleBy, 1.08);
+        }
+        if (e.key === "-") {
+          chordSvgD3.transition().duration(100).call(chordZoomBehavior.scaleBy, 1 / 1.08);
+        }
       });
     }
 
-    function renderFallbackLabels() {
-      if (!graph || !labelsFallback) return;
-      if (frameCount % 15 !== 0) return;
-      const all = [...graph.categories, ...graph.subcategories, ...graph.details].filter(nodeVisible);
-      const html = all.map((n) => {
-        const c = nodeColor(n);
-        const dot = `rgb(${Math.round(c[0])}, ${Math.round(c[1])}, ${Math.round(c[2])})`;
-        const text = labelWithYearTitle(n).replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        return `<div style="display:flex;align-items:center;gap:8px;margin:4px 0;">
-          <span style="width:10px;height:10px;border-radius:0;border:1px solid #0a0a0a;background:${dot};flex-shrink:0;"></span>
-          <span>${text}</span>
-        </div>`;
-      }).join("");
-      labelsFallback.innerHTML = html || "<div>Nessuna etichetta da mostrare.</div>";
-      labelsFallback.style.display = "block";
+    function updateZoomReadout(scaleK) {
+      const el = document.getElementById("zoom-readout");
+      if (!el) return;
+      const k = typeof scaleK === "number" && Number.isFinite(scaleK) ? scaleK : 1;
+      el.textContent = `${Math.round(k * 100)}%`;
     }
 
     function shortenToThreeWords(label) {
       const words = String(label || "").trim().split(/\s+/).filter(Boolean);
       if (words.length <= 3) return words.join(" ");
       return `${words.slice(0, 3).join(" ")}...`;
-    }
-
-    function countWords(label) {
-      return String(label || "").trim().split(/\s+/).filter(Boolean).length;
-    }
-
-    function worldToScreen(x, y, z) {
-      try {
-        if (typeof screenPosition === "function") {
-          const p = screenPosition(x, y, z);
-          if (p && Number.isFinite(p.x) && Number.isFinite(p.y)) return { x: p.x, y: p.y };
-        }
-        if (typeof screenX === "function" && typeof screenY === "function") {
-          const sx = screenX(x, y, z);
-          const sy = screenY(x, y, z);
-          if (Number.isFinite(sx) && Number.isFinite(sy)) return { x: sx, y: sy };
-        }
-      } catch (e) {
-        return null;
-      }
-      return null;
-    }
-
-    function worldToScreenStable(x, y, z) {
-      const r = _renderer;
-      if (!r || !r.uMVMatrix || !r.uPMatrix) return worldToScreen(x, y, z);
-      const mv = r.uMVMatrix.mat4;
-      const p = r.uPMatrix.mat4;
-      if (!mv || !p) return worldToScreen(x, y, z);
-
-      const eye = mulMat4Vec4(mv, [x, y, z, 1]);
-      const clip = mulMat4Vec4(p, eye);
-      const w = clip[3];
-      if (!Number.isFinite(w) || abs(w) < 1e-6) return null;
-
-      const ndcX = clip[0] / w;
-      const ndcY = clip[1] / w;
-      const ndcZ = clip[2] / w;
-      if (!Number.isFinite(ndcX) || !Number.isFinite(ndcY) || !Number.isFinite(ndcZ)) return null;
-      if (ndcZ < -1.1 || ndcZ > 1.1) return null;
-
-      return {
-        x: (ndcX * 0.5 + 0.5) * width,
-        y: (1 - (ndcY * 0.5 + 0.5)) * height
-      };
-    }
-
-    function mulMat4Vec4(m, v) {
-      return [
-        m[0] * v[0] + m[4] * v[1] + m[8] * v[2] + m[12] * v[3],
-        m[1] * v[0] + m[5] * v[1] + m[9] * v[2] + m[13] * v[3],
-        m[2] * v[0] + m[6] * v[1] + m[10] * v[2] + m[14] * v[3],
-        m[3] * v[0] + m[7] * v[1] + m[11] * v[2] + m[15] * v[3]
-      ];
-    }
-
-    function attachZoomControls(canvasElt) {
-      const zoomInBtn = document.getElementById("zoom-in");
-      const zoomOutBtn = document.getElementById("zoom-out");
-      zoomInBtn.addEventListener("click", () => setViewScale(viewScale * 1.14));
-      zoomOutBtn.addEventListener("click", () => setViewScale(viewScale / 1.14));
-
-      // Wheel zoom works anywhere on canvas, independent from orbit internals.
-      const wheelTarget = canvasElt?.elt || document;
-      wheelTarget.addEventListener("wheel", (e) => {
-        if (e.deltaY < 0) setViewScale(viewScale * 1.06);
-        else setViewScale(viewScale / 1.06);
-      }, { passive: true });
-
-      window.addEventListener("keydown", (e) => {
-        if (e.key === "+" || e.key === "=") setViewScale(viewScale * 1.08);
-        if (e.key === "-") setViewScale(viewScale / 1.08);
-      });
-    }
-
-    function setViewScale(next) {
-      viewScale = constrain(next, 0.35, 3.5);
-      updateZoomReadout();
-    }
-
-    function updateZoomReadout() {
-      const el = document.getElementById("zoom-readout");
-      if (!el) return;
-      el.textContent = `${Math.round(viewScale * 100)}%`;
-    }
-
-    function scaleCoord(v) {
-      return v * viewScale;
-    }
-
-    function drawStatusOverlay() {
-      resetMatrix();
-      translate(-width / 2, -height / 2);
-      const msg = loadError || `Righe caricate: ${rowsLoaded}`;
-      stroke(10, 10, 12);
-      strokeWeight(2);
-      fill(255);
-      rect(12, height - 42, 336, 28, 0);
-      noStroke();
-      fill(loadError ? color(200, 0, 0) : color(10, 10, 12));
-      textAlign(LEFT, CENTER);
-      textSize(11);
-      textStyle(BOLD);
-      text(msg, 22, height - 28);
-      textStyle(NORMAL);
-      textAlign(CENTER, CENTER);
     }
 
     function hashCode(str) {
