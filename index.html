@@ -6,6 +6,8 @@
   <title>Mappa Concettuale Fotografia — Quadrato generi</title>
   <style>
     :root {
+      /** Spazio sotto il pulsante Aiuto (fisso in alto) prima dei tre riquadri. */
+      --app-below-help: 68px;
       --bg: #f5f5f7;
       --panel: rgba(255, 255, 255, 0.78);
       --panel-solid: #ffffff;
@@ -36,6 +38,7 @@
       font-weight: 400;
       letter-spacing: -0.022em;
       -webkit-font-smoothing: antialiased;
+      height: 100%;
     }
 
     body > canvas {
@@ -48,12 +51,65 @@
       height: 1px !important;
     }
 
+    .app-shell {
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: minmax(240px, min(30vw, 360px)) minmax(0, 1fr) minmax(240px, min(30vw, 360px));
+      grid-template-rows: 1fr;
+      align-items: stretch;
+      gap: 12px;
+      padding: 12px 16px 14px;
+      padding-top: var(--app-below-help);
+      width: 100%;
+      height: 100%;
+      max-height: 100vh;
+      max-height: 100dvh;
+      min-height: 0;
+      background: var(--bg);
+    }
+
+    @media (max-width: 900px) {
+      html, body {
+        overflow-x: hidden;
+        overflow-y: auto;
+        height: auto;
+        min-height: 100%;
+      }
+
+      .app-shell {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, auto) minmax(200px, 36vh) minmax(0, auto);
+        max-height: none;
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding-top: var(--app-below-help);
+      }
+
+      #left-column,
+      #filters-panel {
+        max-height: min(44vh, 420px);
+      }
+
+      #chord-root {
+        min-height: 180px;
+      }
+    }
+
     #chord-root {
-      position: fixed;
-      inset: 0;
+      position: relative;
+      display: block;
+      margin: 0;
       z-index: 1;
+      min-width: 0;
+      min-height: min(220px, 40vh);
+      height: 100%;
       background: var(--bg);
       font-family: var(--font-body);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
     }
 
     #chord-root svg {
@@ -110,6 +166,10 @@
       letter-spacing: -0.03em;
     }
 
+    .genre-dot-halos {
+      pointer-events: none;
+    }
+
     #status-bar {
       position: fixed;
       right: 16px;
@@ -136,34 +196,37 @@
     }
 
     #left-column {
-      position: fixed;
-      top: 16px;
-      left: 16px;
-      bottom: 16px;
+      position: relative;
       z-index: 12;
-      width: min(380px, calc(100vw - 32px));
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 0;
       min-height: 0;
-    }
-
-    #ui {
-      position: relative;
-      flex: 0 1 auto;
-      min-height: 0;
-      max-height: min(52vh, 480px);
-      overflow-y: auto;
+      height: 100%;
+      padding: 14px 18px 16px;
       background: var(--panel);
       backdrop-filter: var(--blur);
       -webkit-backdrop-filter: var(--blur);
       border: 1px solid var(--border-strong);
       border-radius: var(--radius-xl);
-      padding: 18px 20px 20px;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    #ui {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
       width: 100%;
       box-sizing: border-box;
-      box-shadow: var(--shadow-md);
+      box-shadow: none;
     }
 
     #ui h1 {
@@ -208,26 +271,27 @@
       display: block;
     }
 
-    body.help-mode #ui {
-      max-height: min(62vh, 600px);
+    body.help-mode #left-column {
+      overflow-y: auto;
     }
 
     #chord-legend-panel.chord-legend {
       display: none;
       flex: 0 1 auto;
       min-height: 0;
-      max-height: min(32vh, 320px);
+      max-height: min(48%, 420px);
       overflow-y: auto;
       width: 100%;
       box-sizing: border-box;
-      margin: 0;
-      padding: 14px 16px 16px;
-      background: var(--panel);
-      backdrop-filter: var(--blur);
-      -webkit-backdrop-filter: var(--blur);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-md);
+      margin: 12px 0 0;
+      padding: 14px 0 0;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: none;
+      border-top: 1px solid var(--border);
+      border-radius: 0;
+      box-shadow: none;
       font-size: 12px;
       line-height: 1.5;
       color: var(--muted);
@@ -284,109 +348,43 @@
       text-align: center;
     }
 
-    .chrono-play-row {
-      margin-top: 14px;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-    }
-
-    #chrono-play {
+    #toggle-relational-chords {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      margin-top: 14px;
       padding: 8px 18px;
       font-size: 14px;
       font-weight: 500;
       letter-spacing: -0.01em;
-      text-transform: none;
-      color: #fff;
-      background: var(--accent);
-      border: none;
+      color: var(--text);
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border-strong);
       border-radius: var(--radius-pill);
       cursor: pointer;
       font-family: inherit;
-      flex-shrink: 0;
-      box-shadow: none;
-      transition: background 0.2s ease, opacity 0.2s ease, transform 0.15s ease;
+      transition: background 0.2s ease, border-color 0.2s ease;
     }
 
-    #chrono-play:hover:not(:disabled) {
-      background: var(--accent-hover);
-      transform: scale(1.02);
-    }
-
-    #chrono-play:active:not(:disabled) {
-      transform: scale(0.98);
-    }
-
-    #chrono-play:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    #chrono-play .play-icon {
-      font-size: 9px;
-      line-height: 1;
-    }
-
-    .chrono-play-hint {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.4;
-      flex: 1;
-      min-width: 0;
-      font-weight: 400;
-    }
-
-    .view-link-row {
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-    }
-
-    .view-link-3d {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px 18px;
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: -0.01em;
-      text-transform: none;
-      color: var(--accent);
-      background: transparent;
-      border: none;
-      border-radius: var(--radius-pill);
-      cursor: pointer;
-      font-family: inherit;
-      text-decoration: none;
-      box-shadow: none;
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    .view-link-3d:hover {
-      background: rgba(0, 113, 227, 0.08);
-      color: var(--accent-hover);
+    #toggle-relational-chords:hover {
+      background: rgba(0, 0, 0, 0.07);
     }
 
     #filters-panel {
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      bottom: 16px;
+      position: relative;
+      margin: 0;
       z-index: 12;
-      width: min(300px, calc(100vw - 32px));
-      max-height: calc(100vh - 32px);
       box-sizing: border-box;
-      padding: 20px 18px 22px;
+      height: 100%;
+      min-height: 0;
+      padding: 16px 18px 18px;
       background: var(--panel);
       backdrop-filter: var(--blur);
       -webkit-backdrop-filter: var(--blur);
       border: 1px solid var(--border-strong);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-md);
+      overflow-x: hidden;
       overflow-y: auto;
       pointer-events: auto;
     }
@@ -394,7 +392,7 @@
     #filters-panel h2 {
       margin: 0 0 14px;
       font-family: var(--font-display);
-      font-size: 28px;
+      font-size: 22px;
       font-weight: 600;
       letter-spacing: -0.03em;
       text-transform: none;
@@ -628,19 +626,19 @@
     }
 
     #link-relation-panel {
-      position: fixed;
-      right: 16px;
-      bottom: 16px;
-      z-index: 46;
-      width: min(380px, calc(100vw - 32px));
-      max-height: min(52vh, 440px);
+      position: static;
+      z-index: auto;
+      width: 100%;
+      max-height: none;
       box-sizing: border-box;
-      padding: 18px 20px 20px;
-      background: var(--panel-solid);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-md);
-      overflow-y: auto;
+      margin: 14px 0 0;
+      padding: 14px 0 0;
+      background: transparent;
+      border: none;
+      border-top: 1px solid var(--border);
+      border-radius: 0;
+      box-shadow: none;
+      overflow: visible;
       display: none;
       pointer-events: auto;
       font-family: var(--font-body);
@@ -654,7 +652,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
       padding: 6px 14px;
       font-size: 14px;
       font-weight: 500;
@@ -675,9 +673,9 @@
     }
 
     #link-relation-panel h2 {
-      margin: 0 0 8px;
+      margin: 0 0 6px;
       font-family: var(--font-display);
-      font-size: 20px;
+      font-size: 16px;
       font-weight: 600;
       letter-spacing: -0.03em;
       text-transform: none;
@@ -822,7 +820,7 @@
 
     body.help-mode #chord-root,
     body.help-mode #filters-panel,
-    body.help-mode #ui-interactive,
+    body.help-mode #left-column,
     body.help-mode #status-bar,
     body.help-mode #detail-panel.detail-panel--open,
     body.help-mode #link-relation-panel.link-relation-panel--open {
@@ -840,16 +838,22 @@
       z-index: 5;
     }
 
-    body.help-mode #ui-interactive {
+    body.help-mode #left-column {
       filter: brightness(0.42);
       opacity: 0.88;
       position: relative;
     }
 
-    body.help-mode #ui-interactive.help-spotlight-target {
+    body.help-mode #left-column.help-spotlight-target {
       filter: none;
       opacity: 1;
-      box-shadow: none;
+      box-shadow: var(--shadow-md);
+    }
+
+    body.help-mode #left-column:has(#link-relation-panel.help-spotlight-target) {
+      filter: none;
+      opacity: 1;
+      box-shadow: var(--shadow-md);
     }
 
     body.help-mode #filters-panel {
@@ -910,10 +914,11 @@
     }
 
     body.help-mode #link-relation-panel.link-relation-panel--open {
-      filter: brightness(0.42);
-      opacity: 0.88;
+      filter: brightness(0.92);
+      opacity: 0.95;
     }
 
+    body.help-mode #chord-legend-panel.chord-legend-panel--visible.help-spotlight-target #link-relation-panel.link-relation-panel--open,
     body.help-mode #link-relation-panel.link-relation-panel--open.help-spotlight-target {
       filter: none;
       opacity: 1;
@@ -922,11 +927,10 @@
   </style>
 </head>
 <body>
-  <div id="chord-root" aria-label="Quadrato generi e percorso cronologico"></div>
-  <div id="status-bar" aria-live="polite"></div>
+  <div id="app-shell" class="app-shell">
   <div id="left-column">
   <div id="ui">
-    <h1>Quadrato — generi e percorso</h1>
+    <h1>Quadrato — generi</h1>
     <p id="subtitle-diagram" class="subtitle-diagram" aria-label="Lettura del quadrato e dei pallini"></p>
     <p id="subtitle-diagram-hint" class="subtitle-diagram-hint" aria-label="Suggerimento sul diagramma"></p>
     <div id="ui-interactive">
@@ -936,15 +940,9 @@
       <button id="zoom-in" class="zoom-btn" type="button" aria-label="Aumenta zoom">+</button>
       <span id="zoom-readout" class="zoom-readout" aria-hidden="true">100%</span>
     </div>
-    <div class="chrono-play-row">
-      <button id="chrono-play" type="button" aria-label="Avvia percorso cronologico">
-        <span class="play-icon" aria-hidden="true">▶</span>
-        <span id="chrono-play-label">Percorso</span>
-      </button>
-    </div>
-    <div class="view-link-row">
-      <a href="mappa-3d.html" class="view-link-3d">Vista 3D (assi = filtri CSV)</a>
-    </div>
+    <button id="toggle-relational-chords" type="button" aria-label="Nascondi le curve di affinità tra i generi">
+      Nascondi collegamenti
+    </button>
     </div>
   </div>
 
@@ -963,8 +961,17 @@
       <span class="chord-legend-swatch chord-legend-swatch--tag" aria-hidden="true"></span>
       <span>Stesso valore su una colonna <strong>tag</strong> del CSV (Dominio / Scopo / Ambito)</span>
     </div>
+    <aside id="link-relation-panel" aria-hidden="true" aria-label="Dettaglio collegamento tra generi">
+      <button id="link-relation-close" type="button">← Chiudi</button>
+      <h2 id="link-relation-heading">Collegamento</h2>
+      <p id="link-relation-pair" class="link-relation-pair"></p>
+      <p id="link-relation-weight" class="link-relation-weight" hidden></p>
+      <ul id="link-relation-reasons"></ul>
+    </aside>
   </div>
   </div>
+
+  <main id="chord-root" aria-label="Quadrato generi e collegamenti"></main>
 
   <aside id="filters-panel" aria-label="Filtri mappa">
     <h2>Filtri</h2>
@@ -974,14 +981,9 @@
     <div id="filters-root" class="filter-groups"></div>
     <p id="help-filters-hint" class="help-filters-hint"></p>
   </aside>
+  </div>
 
-  <aside id="link-relation-panel" aria-hidden="true" aria-label="Dettaglio collegamento tra generi">
-    <button id="link-relation-close" type="button">← Chiudi</button>
-    <h2 id="link-relation-heading">Collegamento</h2>
-    <p id="link-relation-pair" class="link-relation-pair"></p>
-    <p id="link-relation-weight" class="link-relation-weight" hidden></p>
-    <ul id="link-relation-reasons"></ul>
-  </aside>
+  <div id="status-bar" aria-live="polite"></div>
 
   <aside id="detail-panel" aria-hidden="true" aria-label="Dettaglio categoria">
     <button id="detail-close" type="button">← Chiudi dettaglio</button>
@@ -1012,19 +1014,15 @@
     let chordSvgD3 = null;
     let chordResizeTimer = null;
 
-    /** Dati per la linea Play (coordinate dei pallini nel layout a bussola 2D). */
-    let chordChronoPlayCache = null;
-
-    const CHRONO_SEG_DRAW_MS = 520;
-    const CHRONO_SEG_GAP_MS = 90;
-    let chronoLinesMode = "hidden";
-    let chronoAnimStartMs = 0;
-    let chronoAnimPathSig = "";
-
     let filterState = {
       audience: new Set(),
       artistic: new Set()
     };
+
+    /** Visibilità delle curve di affinità (toggle pannello sinistro). */
+    let relationalChordsUserVisible = true;
+    let chordHoverTimer = null;
+    let chordHoverNodeId = null;
 
     const CSV_PATH = "Foglio di lavoro senza nome - Generefotografico-PubblicoNessunoPrivato-Artistico.csv";
     const MAPPA_CSV_PATH = "Mappa Fotografia.csv";
@@ -1116,16 +1114,16 @@
     let helpHotspotSyncTimer = null;
 
     const HELP_COPY = {
-      diagram: "Clic su un pallino per aprire i dettagli del genere. Clic su una curva colorata tra due pallini per vedere cosa lega quei generi.\n\nLettura del quadrato — Ogni angolo corrisponde a un valore di tag: in alto a sinistra Privato, in alto a destra Pubblico (Dominio); in basso a sinistra Scientifico, in basso a destra Artistico (Scopo). La posizione di ogni genere è la media pesata verso gli angoli coerenti con i suoi tag; «Nessuno» su un asse tende al centro tra i due angoli di quella riga o colonna. L’Ambito (Professionale / Amatoriale) resta nel colore del punto e nei collegamenti, non nei filtri. Raggio dei pallini: sottogruppi Mappa e peso righe.\n\nLinea grigia (Play): percorso cronologico tra i generi visibili.\n\nCurve colorate: affinità tra generi (Mappa, macro-tema, tag CSV). Clic sulla curva per il dettaglio del legame.",
+      diagram: "Clic su un pallino per aprire i dettagli del genere. Clic su una curva colorata tra due pallini per vedere cosa lega quei generi.\n\nLettura del quadrato — Ogni angolo corrisponde a un valore di tag: in alto a sinistra Privato, in alto a destra Pubblico (Dominio); in basso a sinistra Scientifico, in basso a destra Artistico (Scopo). Gli aloni colorati sono centrati su ogni pallino e usano lo stesso colore del genere (media dei tag Dominio / Scopo / Ambito), così la tinta segue dove stanno i generi sul quadrato. La posizione di ogni genere è la media pesata verso gli angoli coerenti con i suoi tag; «Nessuno» su un asse tende al centro tra i due angoli di quella riga o colonna. L’Ambito resta nel colore del punto e nei collegamenti, non nei filtri. Raggio dei pallini: sottogruppi Mappa e peso righe.\n\nCurve colorate: affinità tra generi (Mappa, macro-tema, tag CSV). Clic sulla curva: il riepilogo del legame compare nella legenda del pannello sinistro, sotto le righe della legenda.",
       diagramTooltip:
-        "Clic su un pallino o su una curva colorata per aprire il dettaglio del genere o il riepilogo del legame.",
-      left: "Percorso: Play anima una linea grigia che collega i generi in ordine cronologico, segmento per segmento.\n\nZoom sulla mappa: rotellina del mouse o pinch (touch) per ingrandire l’area del diagramma; trascina per spostare. Pulsanti + e − per zoom a step. Doppio clic sullo sfondo chiaro o sul quadrato tratteggiato ripristina zoom e posizione.\n\nVista 3D: apre la mappa sugli assi cartesiani legati ai tre filtri del CSV.",
-      filters: "Combinazioni su Dominio e Scopo del CSV. Con filtri attivi, i generi visibili sul quadrato seguono l’ordine cronologico (come il percorso Play). Senza filtri, l’ordine è per tema / categoria; le curve interne mostrano affinità tra generi.",
+        "Clic su un pallino o su una curva colorata per aprire il dettaglio del genere o il riepilogo del legame. Passaggio del mouse sul pallino: si vedono solo le curve collegate a quel genere (se le curve sono visibili; altrimenti usa il pulsante «Mostra collegamenti»).",
+      left: "Collegamenti: il pulsante sotto i controlli zoom nasconde o mostra tutte le curve di affinità tra i pallini.\n\nZoom sulla mappa: rotellina del mouse o pinch (touch) per ingrandire l’area del diagramma; trascina per spostare. Pulsanti + e − per zoom a step. Doppio clic sullo sfondo chiaro o sul quadrato tratteggiato ripristina zoom e posizione.",
+      filters: "Combinazioni su Dominio e Scopo del CSV. Con filtri attivi, i generi visibili sul quadrato seguono l’ordine cronologico. Senza filtri, l’ordine è per tema / categoria; le curve interne mostrano affinità tra generi.",
       status: "Indica quante righe del CSV principale sono state caricate oppure un messaggio di errore se il file non è raggiungibile (serve un server locale, non file://).",
-      link: "Riepiloga perché due generi risultano collegati (categoria Mappa, macro-tema, tag) e la somma dei criteri usata per lo spessore e l’opacità della curva."
+      link: "Riepiloga perché due generi risultano collegati (categoria Mappa, macro-tema, tag) e la somma dei criteri usata per lo spessore e l’opacità della curva. Il blocco si apre nella legenda del pannello sinistro, sotto le righe della legenda, dopo un clic sulla curva."
     };
 
-    const HELP_SPOTLIGHT_IDS = ["chord-root", "ui-interactive", "filters-panel", "status-bar", "detail-panel", "link-relation-panel"];
+    const HELP_SPOTLIGHT_IDS = ["chord-root", "left-column", "filters-panel", "status-bar", "detail-panel", "link-relation-panel"];
 
     function helpTextForKey(key) {
       if (key === "detail") {
@@ -1135,7 +1133,7 @@
       if (key === "left") {
         const cr = document.getElementById("chrono-range");
         const extra = (cr && cr.textContent && cr.textContent.trim())
-          ? `\n\nPercorso attuale (sintesi): ${cr.textContent.trim()}`
+          ? `\n\nOrdine cronologico (sintesi): ${cr.textContent.trim()}`
           : "";
         return HELP_COPY.left + extra;
       }
@@ -1196,7 +1194,10 @@
         const pad2 = 8;
         const left = Math.min(ur.right + pad2, window.innerWidth - 140);
         const right = Math.max(fr.left - pad2, left + 100);
-        const top = 52;
+        const crEl = document.getElementById("chord-root");
+        const top = crEl
+          ? Math.max(8, crEl.getBoundingClientRect().top - 6)
+          : 52;
         const bot = window.innerHeight - 64;
         if (right - left >= 72 && bot - top >= 72) {
           hsDiag.hidden = false;
@@ -1345,10 +1346,32 @@
         });
       }
 
-      bindRegion(document.getElementById("ui-interactive"), "left", "ui-interactive");
+      bindRegion(document.getElementById("left-column"), "left", "left-column");
       bindRegion(document.getElementById("status-bar"), "status", "status-bar");
       bindRegion(document.getElementById("detail-panel"), "detail", "detail-panel");
       bindRegion(document.getElementById("link-relation-panel"), "link", "link-relation-panel");
+    }
+
+    function attachChordRootResizeObserver() {
+      const el = document.getElementById("chord-root");
+      if (!el || el.dataset.resizeObsBound === "1" || typeof ResizeObserver === "undefined") return;
+      el.dataset.resizeObsBound = "1";
+      let timer = null;
+      let lastW = -1;
+      let lastH = -1;
+      new ResizeObserver(() => {
+        const cw = Math.round(el.clientWidth);
+        const ch = Math.round(el.clientHeight);
+        if (cw < 12 || ch < 12) return;
+        if (lastW >= 0 && Math.abs(cw - lastW) < 2 && Math.abs(ch - lastH) < 2) return;
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          timer = null;
+          lastW = Math.round(el.clientWidth);
+          lastH = Math.round(el.clientHeight);
+          if (graph?.details?.length) renderChordDiagram();
+        }, 100);
+      }).observe(el);
     }
 
     function setup() {
@@ -1361,13 +1384,13 @@
       }
       attachFilterEvents();
       attachZoomControls();
-      attachChronoPlayButton();
+      attachToggleRelationalChordsButton();
+      attachChordRootResizeObserver();
       attachHelpMode();
       attachDetailPanelClose();
       attachLinkRelationPanelEvents();
       loadMappaFotografiaTable();
       updateZoomReadout(1);
-      updateChronoPlayUi();
       graph = {
         categories: [],
         subcategories: [],
@@ -1390,7 +1413,6 @@
           loadError = "";
           mountFiltersFromGraph(graph);
           updateChronoRangeHint();
-          resetChronoLineAnimationForNewPath();
           renderChordDiagram();
           updateStatusBar();
         },
@@ -1402,10 +1424,7 @@
       );
     }
 
-    function draw() {
-      updateChronoLineAnimation();
-      updateChordChronoPlayPath();
-    }
+    function draw() {}
 
     function windowResized() {
       if (chordResizeTimer) clearTimeout(chordResizeTimer);
@@ -1495,27 +1514,45 @@
       return { x: x * scale + jx, y: y * scale + jy };
     }
 
+    /** Dimensioni e rettangolo schermo del contenitore del diagramma (centro = metà area SVG). */
+    function chordRootViewportPx() {
+      const root = document.getElementById("chord-root");
+      if (!root || root.clientWidth < 12 || root.clientHeight < 12) {
+        const w = typeof window !== "undefined" ? window.innerWidth : 800;
+        const h = typeof window !== "undefined" ? window.innerHeight : 600;
+        return {
+          w,
+          h,
+          rootRect: { left: 0, top: 0, right: w, bottom: h, width: w, height: h }
+        };
+      }
+      const w = root.clientWidth;
+      const h = root.clientHeight;
+      return { w, h, rootRect: root.getBoundingClientRect() };
+    }
+
     /**
-     * Area in coordinate del diagramma (origine al centro finestra) dove le etichette angoli
+     * Area in coordinate del diagramma (origine al centro dell’area quadrato) dove le etichette angoli
      * non finiscono sotto #left-column o #filters-panel.
      */
     function chartBoundsForCornerLabels() {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const cx = w * 0.5;
-      const cy = h * 0.5;
+      const { w, h, rootRect } = chordRootViewportPx();
+      const cxView = w * 0.5;
+      const cyView = h * 0.5;
+      const screenCx = rootRect.left + cxView;
+      const screenCy = rootRect.top + cyView;
       const lc = document.getElementById("left-column");
       const fp = document.getElementById("filters-panel");
       const pad = 16;
-      const leftEdge = lc ? lc.getBoundingClientRect().right + pad : pad;
-      const rightEdge = fp ? fp.getBoundingClientRect().left - pad : w - pad;
-      const topEdge = 18;
-      const bottomEdge = h - 22;
+      const leftEdge = lc ? lc.getBoundingClientRect().right + pad : rootRect.left + pad;
+      const rightEdge = fp ? fp.getBoundingClientRect().left - pad : rootRect.right - pad;
+      const topEdge = rootRect.top + 18;
+      const bottomEdge = rootRect.bottom - 22;
       return {
-        minX: leftEdge - cx,
-        maxX: rightEdge - cx,
-        minY: topEdge - cy,
-        maxY: bottomEdge - cy
+        minX: leftEdge - screenCx,
+        maxX: rightEdge - screenCx,
+        minY: topEdge - screenCy,
+        maxY: bottomEdge - screenCy
       };
     }
 
@@ -1553,7 +1590,7 @@
         const p = ptRing(d);
         const h = hashCode(String(d.id || d.label || `${i}`));
         const stampSlot = STAMPA_LABEL_ORDER.indexOf(String(d.label || ""));
-        const extraR = stampSlot >= 0 ? 18 : 0;
+        const extraR = stampSlot >= 0 ? 11 : 0;
         const rr = radii[i] + labelGap + extraR;
         let ang;
         if (stampSlot >= 0) {
@@ -1573,7 +1610,7 @@
         let c = clampView(lx, ly);
         lx = c.x;
         ly = c.y;
-        const need = radii[i] + 13;
+        const need = radii[i] + 7;
         let dx = lx - p.x;
         let dy = ly - p.y;
         let dist = Math.hypot(dx, dy) || 1;
@@ -1586,7 +1623,7 @@
         }
         return { lx, ly, p, r: radii[i] };
       });
-      const minPair = 48;
+      const minPair = 40;
       for (let it = 0; it < 22; it++) {
         for (let a = 0; a < pos.length; a++) {
           for (let b = a + 1; b < pos.length; b++) {
@@ -1611,7 +1648,7 @@
         let dx = o.lx - o.p.x;
         let dy = o.ly - o.p.y;
         let dist = Math.hypot(dx, dy) || 1;
-        const need = o.r + 12;
+        const need = o.r + 6;
         if (dist < need) {
           o.lx = o.p.x + (dx / dist) * need;
           o.ly = o.p.y + (dy / dist) * need;
@@ -1621,6 +1658,57 @@
         o.ly = c.y;
       });
       return pos;
+    }
+
+    /**
+     * Aloni colorati centrati su ogni pallino (dopo il rilassamento): colore = media dei tag come il pallino,
+     * così la nuvola cromatica segue la forma / “linea” dei generi sul quadrato.
+     */
+    function drawGenreDotHalos(gRoot, half, ordered, ptRing, radii) {
+      if (!ordered?.length || !ptRing || !radii) return;
+      const uid = `gdh-${Math.round(half * 1000)}`;
+      const defs = gRoot.append("defs");
+      const clipId = `${uid}-clip`;
+      defs
+        .append("clipPath")
+        .attr("id", clipId)
+        .append("rect")
+        .attr("x", -half)
+        .attr("y", -half)
+        .attr("width", half * 2)
+        .attr("height", half * 2)
+        .attr("rx", 6)
+        .attr("ry", 6);
+
+      const haloG = gRoot
+        .append("g")
+        .attr("class", "genre-dot-halos")
+        .attr("clip-path", `url(#${clipId})`)
+        .style("pointer-events", "none");
+
+      ordered.forEach((d, i) => {
+        const p = ptRing(d);
+        if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) return;
+        const c = nodeColor(d);
+        const r0 = Math.round(c[0]);
+        const g0 = Math.round(c[1]);
+        const b0 = Math.round(c[2]);
+        const gid = `${uid}_n_${String(d.id || i).replace(/[^a-zA-Z0-9_-]/g, "_")}`;
+        const rGlow = Math.max(24, radii[i] * 7.5 + 20);
+        const rg = defs
+          .append("radialGradient")
+          .attr("id", gid)
+          .attr("gradientUnits", "userSpaceOnUse")
+          .attr("cx", p.x)
+          .attr("cy", p.y)
+          .attr("r", rGlow)
+          .attr("fx", p.x)
+          .attr("fy", p.y);
+        rg.append("stop").attr("offset", "0%").attr("stop-color", `rgb(${r0},${g0},${b0})`).attr("stop-opacity", 0.36);
+        rg.append("stop").attr("offset", "38%").attr("stop-color", `rgb(${r0},${g0},${b0})`).attr("stop-opacity", 0.14);
+        rg.append("stop").attr("offset", "100%").attr("stop-color", `rgb(${r0},${g0},${b0})`).attr("stop-opacity", 0);
+        haloG.append("circle").attr("cx", p.x).attr("cy", p.y).attr("r", rGlow).attr("fill", `url(#${gid})`);
+      });
     }
 
     /** Etichette ai quattro angoli: Privato, Pubblico, Artistico, Scientifico — sempre dentro l’area utile. */
@@ -1840,6 +1928,10 @@
       panel.setAttribute("aria-hidden", "false");
       setChordLinkLegendVisible(true);
       notifyHelpLayout();
+      requestAnimationFrame(() => {
+        const leg = document.getElementById("chord-legend-panel");
+        if (leg) leg.scrollTop = leg.scrollHeight;
+      });
     }
 
     function attachLinkRelationPanelEvents() {
@@ -2167,55 +2259,6 @@
       });
     }
 
-    function chronoPlayPointForNode(cache, node) {
-      if (!cache?.positionById) return null;
-      const p = cache.positionById.get(node.id);
-      if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) return null;
-      return { x: p.x, y: p.y };
-    }
-
-    function buildChronoPlayPathString(pathNodes, st) {
-      if (!pathNodes.length || !chordChronoPlayCache) return "";
-      const cache = chordChronoPlayCache;
-      const pt = (node) => chronoPlayPointForNode(cache, node);
-      const p0 = pt(pathNodes[0]);
-      if (!p0) return "";
-      let d = `M${p0.x},${p0.y}`;
-      for (let k = 1; k <= st.fullThrough + 1 && k < pathNodes.length; k++) {
-        const p = pt(pathNodes[k]);
-        if (p) d += `L${p.x},${p.y}`;
-      }
-      if (st.partialFrom && st.partialTo) {
-        const A = pt(st.partialFrom);
-        const B = pt(st.partialTo);
-        if (A && B) {
-          const t = constrain(st.partialT, 0, 1);
-          d += `L${A.x + (B.x - A.x) * t},${A.y + (B.y - A.y) * t}`;
-        }
-      }
-      return d;
-    }
-
-    function updateChordChronoPlayPath() {
-      const cache = chordChronoPlayCache;
-      if (!cache?.pathMain || !graph?.chronoOrder) return;
-      const pathNodes = graph.chronoOrder.filter(nodeVisible);
-      if (pathNodes.length < 2 || chronoLinesMode === "hidden") {
-        cache.pathHalo.attr("d", "").attr("stroke-opacity", 0);
-        cache.pathMain.attr("d", "").attr("stroke-opacity", 0);
-        return;
-      }
-      const st = getChronoAnimationDrawState(pathNodes);
-      const d = buildChronoPlayPathString(pathNodes, st);
-      if (!d) {
-        cache.pathHalo.attr("d", "").attr("stroke-opacity", 0);
-        cache.pathMain.attr("d", "").attr("stroke-opacity", 0);
-        return;
-      }
-      cache.pathHalo.attr("d", d).attr("stroke-opacity", 1);
-      cache.pathMain.attr("d", d).attr("stroke-opacity", 1);
-    }
-
     function renderChordDiagram() {
       closeLinkRelationPanel();
       const root = document.getElementById("chord-root");
@@ -2223,7 +2266,6 @@
       root.innerHTML = "";
       chordSvgD3 = null;
       chordZoomBehavior = null;
-      chordChronoPlayCache = null;
 
       if (loadError) {
         root.appendChild(Object.assign(document.createElement("p"), {
@@ -2240,8 +2282,8 @@
 
       const ordered = orderedForRelationalChord();
       const n = ordered.length;
-      const w = window.innerWidth;
-      const h = window.innerHeight;
+      const w = Math.max(1, root.clientWidth);
+      const h = Math.max(1, root.clientHeight);
       const size = Math.min(w, h);
       const ringR = size * 0.285;
 
@@ -2301,8 +2343,6 @@
       const rMax = 5.85;
       const { counts, radii } = computeDotRadii(ordered, rMin, rMax);
 
-      drawCompassSquareDecor(g, ringR, graph.filterTitles);
-
       const positionById = new Map();
       ordered.forEach((node) => {
         positionById.set(node.id, genrePositionFromFourAngles(node, ringR));
@@ -2312,6 +2352,9 @@
         const p = positionById.get(node.id);
         return p && Number.isFinite(p.x) && Number.isFinite(p.y) ? p : { x: 0, y: 0 };
       };
+
+      drawGenreDotHalos(g, ringR, ordered, ptRing, radii);
+      drawCompassSquareDecor(g, ringR, graph.filterTitles);
 
       if (n === 1) {
         const node = ordered[0];
@@ -2345,26 +2388,6 @@
           .style("font-family", 'var(--font-body)')
           .style("fill", "#424245")
           .text(shortenToThreeWords(node.label) + formatYearSuffix(node));
-        const playLayer1 = g.append("g")
-          .attr("class", "chrono-play-layer")
-          .style("pointer-events", "none");
-        const pathHalo1 = playLayer1.append("path")
-          .attr("fill", "none")
-          .attr("stroke", "#ffffff")
-          .attr("stroke-width", 5)
-          .attr("stroke-linecap", "round");
-        const pathMain1 = playLayer1.append("path")
-          .attr("fill", "none")
-          .attr("stroke", "#636366")
-          .attr("stroke-width", 2.25)
-          .attr("stroke-linecap", "round");
-        chordChronoPlayCache = {
-          positionById,
-          ringR: 0,
-          pathHalo: pathHalo1,
-          pathMain: pathMain1
-        };
-        updateChordChronoPlayPath();
         wireChordZoom(svg, zoomWrap, w, h);
         notifyHelpLayout();
         return;
@@ -2374,6 +2397,7 @@
       const linksG = g.append("g")
         .attr("class", "relational-chords")
         .style("pointer-events", "all");
+
       const linkWrap = linksG.selectAll("g.relational-chord-wrap")
         .data(linkList)
         .join("g")
@@ -2382,6 +2406,18 @@
         .on("click", (event, d) => {
           event.stopPropagation();
           openLinkRelationPanel(d);
+        })
+        .on("mouseenter", function (event, d) {
+          chordHoverCancelClear();
+          if (
+            chordHoverNodeId != null &&
+            (d.source.id === chordHoverNodeId || d.target.id === chordHoverNodeId)
+          ) {
+            chordHoverSet(chordHoverNodeId);
+          }
+        })
+        .on("mouseleave", () => {
+          chordHoverScheduleClear();
         });
       linkWrap.each(function (d) {
         const sel = d3.select(this);
@@ -2392,8 +2428,8 @@
         const p0 = ptRing(d.source);
         const p1 = ptRing(d.target);
         const pathD = relationalChordPathD(p0.x, p0.y, p1.x, p1.y, ringR);
-        const w = d.weight;
-        const baseW = 0.95 + Math.min(w, 10) * 0.22;
+        const linkW = d.weight;
+        const baseW = 0.95 + Math.min(linkW, 10) * 0.22;
         const tip = `${shortenToThreeWords(d.source.label)} ↔ ${shortenToThreeWords(d.target.label)} — legame in base a Mappa / macro-tema / tag (clic per il dettaglio)`;
         sel.select("path.relational-chord-hit")
           .attr("d", pathD)
@@ -2415,23 +2451,7 @@
           .style("vector-effect", "non-scaling-stroke");
       });
 
-      const playLayer = g.append("g")
-        .attr("class", "chrono-play-layer")
-        .style("pointer-events", "none");
-      const pathHalo = playLayer.append("path")
-        .attr("class", "chrono-play-halo")
-        .attr("fill", "none")
-        .attr("stroke", "#ffffff")
-        .attr("stroke-width", 5)
-        .attr("stroke-linecap", "round")
-        .attr("stroke-linejoin", "round");
-      const pathMain = playLayer.append("path")
-        .attr("class", "chrono-play-main")
-        .attr("fill", "none")
-        .attr("stroke", "#636366")
-        .attr("stroke-width", 2.25)
-        .attr("stroke-linecap", "round")
-        .attr("stroke-linejoin", "round");
+      applyRelationalChordsDisplay();
 
       const nodesG = g.append("g").attr("class", "genre-nodes");
       nodesG.selectAll("circle.genre-dot")
@@ -2452,10 +2472,16 @@
         .on("click", (event, d) => {
           event.stopPropagation();
           enterDetailView2D(d);
+        })
+        .on("mouseenter", (event, d) => {
+          chordHoverSet(d.id);
+        })
+        .on("mouseleave", () => {
+          chordHoverScheduleClear();
         });
 
       const nLabels = ordered.length;
-      const labelGap = 28 + rMax * 0.95 + Math.min(24, Math.max(0, nLabels - 9) * 0.78);
+      const labelGap = 16 + rMax * 0.68 + Math.min(16, Math.max(0, nLabels - 9) * 0.55);
       const labelTitlePx = nLabels > 24 ? 10 : nLabels > 18 ? 10.75 : 11.5;
       const labelYearPx = Math.max(8.75, labelTitlePx - 1.1);
       const labelAnchors = genreLabelAnchors(ordered, ptRing, radii, labelGap);
@@ -2504,14 +2530,6 @@
           }
         });
       labelsG.raise();
-
-      chordChronoPlayCache = {
-        positionById,
-        ringR,
-        pathHalo,
-        pathMain
-      };
-      updateChordChronoPlayPath();
 
       wireChordZoom(svg, zoomWrap, w, h);
       notifyHelpLayout();
@@ -2640,100 +2658,88 @@
         if (t.checked) set.add(val);
         else set.delete(val);
         updateChronoRangeHint();
-        resetChronoLineAnimationForNewPath();
         renderChordDiagram();
       });
     }
 
-    function chronoVisiblePathSig() {
-      if (!graph?.chronoOrder) return "";
-      return graph.chronoOrder.filter(nodeVisible).map((n) => n.id).join("|");
+    function chordLinksSelection() {
+      return d3.select("#chord-svg g.relational-chords");
     }
 
-    function resetChronoLineAnimationForNewPath() {
-      const sig = chronoVisiblePathSig();
-      if (sig === chronoAnimPathSig) return;
-      chronoAnimPathSig = sig;
-      chronoLinesMode = "hidden";
-      chronoAnimStartMs = 0;
-      updateChronoPlayUi();
+    function chordHoverCancelClear() {
+      if (chordHoverTimer) {
+        clearTimeout(chordHoverTimer);
+        chordHoverTimer = null;
+      }
     }
 
-    function attachChronoPlayButton() {
-      const btn = document.getElementById("chrono-play");
-      if (!btn || btn.dataset.bound === "1") return;
-      btn.dataset.bound = "1";
-      btn.addEventListener("click", () => {
-        const path = graph?.chronoOrder ? graph.chronoOrder.filter(nodeVisible) : [];
-        if (path.length < 2) return;
-        chronoAnimPathSig = chronoVisiblePathSig();
-        chronoLinesMode = "animating";
-        chronoAnimStartMs = millis();
-        updateChronoPlayUi();
+    function chordHoverClear() {
+      chordHoverNodeId = null;
+      const sel = chordLinksSelection();
+      if (!sel.empty()) {
+        sel.selectAll("g.relational-chord-wrap")
+          .style("opacity", 1)
+          .style("pointer-events", "all");
+      }
+    }
+
+    function chordHoverScheduleClear() {
+      chordHoverCancelClear();
+      chordHoverTimer = setTimeout(() => {
+        chordHoverTimer = null;
+        chordHoverClear();
+      }, 120);
+    }
+
+    function chordHoverSet(nodeId) {
+      if (!relationalChordsUserVisible) return;
+      chordHoverNodeId = nodeId;
+      chordHoverCancelClear();
+      const sel = chordLinksSelection();
+      if (sel.empty()) return;
+      sel.selectAll("g.relational-chord-wrap").each(function (d) {
+        const show = !nodeId || d.source.id === nodeId || d.target.id === nodeId;
+        d3.select(this)
+          .style("opacity", show ? 1 : 0)
+          .style("pointer-events", show ? "all" : "none");
       });
     }
 
-    function updateChronoPlayUi() {
-      const btn = document.getElementById("chrono-play");
-      const label = document.getElementById("chrono-play-label");
+    function updateToggleRelationalChordsButton() {
+      const btn = document.getElementById("toggle-relational-chords");
       if (!btn) return;
-      const path = graph?.chronoOrder ? graph.chronoOrder.filter(nodeVisible) : [];
-      const canPlay = path.length >= 2 && !loadError;
-      const busy = chronoLinesMode === "animating";
-      btn.disabled = !canPlay || busy;
-      if (label) {
-        if (!canPlay) label.textContent = "Percorso";
-        else if (busy) label.textContent = "In corso…";
-        else if (chronoLinesMode === "full") label.textContent = "Rivedi";
-        else label.textContent = "Play";
-      }
-      btn.setAttribute("aria-busy", busy ? "true" : "false");
+      btn.textContent = relationalChordsUserVisible ? "Nascondi collegamenti" : "Mostra collegamenti";
+      btn.setAttribute(
+        "aria-label",
+        relationalChordsUserVisible
+          ? "Nascondi le curve di affinità tra i generi"
+          : "Mostra le curve di affinità tra i generi"
+      );
+      btn.setAttribute("aria-pressed", relationalChordsUserVisible ? "true" : "false");
     }
 
-    function chronoAnimationTotalMs(segmentCount) {
-      if (segmentCount <= 0) return 0;
-      return segmentCount * CHRONO_SEG_DRAW_MS + max(0, segmentCount - 1) * CHRONO_SEG_GAP_MS;
-    }
-
-    function updateChronoLineAnimation() {
-      if (chronoLinesMode !== "animating") return;
-      const path = graph?.chronoOrder ? graph.chronoOrder.filter(nodeVisible) : [];
-      if (path.length < 2 || chronoVisiblePathSig() !== chronoAnimPathSig) {
-        chronoLinesMode = "hidden";
-        updateChronoPlayUi();
-        return;
-      }
-      const nSeg = path.length - 1;
-      const total = chronoAnimationTotalMs(nSeg);
-      const elapsed = millis() - chronoAnimStartMs;
-      if (elapsed >= total) {
-        chronoLinesMode = "full";
-        updateChronoPlayUi();
-      }
-    }
-
-    function getChronoAnimationDrawState(path) {
-      const nSeg = path.length - 1;
-      if (nSeg < 1) return { fullThrough: -1, partialFrom: null, partialTo: null, partialT: 0 };
-      if (chronoLinesMode === "full") {
-        return { fullThrough: nSeg - 1, partialFrom: null, partialTo: null, partialT: 1 };
-      }
-      if (chronoLinesMode === "hidden") {
-        return { fullThrough: -1, partialFrom: null, partialTo: null, partialT: 0 };
-      }
-      const elapsed = millis() - chronoAnimStartMs;
-      for (let i = 0; i < nSeg; i++) {
-        const segStart = i * (CHRONO_SEG_DRAW_MS + CHRONO_SEG_GAP_MS);
-        const drawEnd = segStart + CHRONO_SEG_DRAW_MS;
-        if (elapsed < segStart) {
-          return { fullThrough: i - 1, partialFrom: null, partialTo: null, partialT: 0 };
+    function applyRelationalChordsDisplay() {
+      chordHoverCancelClear();
+      chordHoverNodeId = null;
+      const sel = chordLinksSelection();
+      if (!sel.empty()) {
+        if (!relationalChordsUserVisible) {
+          sel.selectAll("g.relational-chord-wrap").style("opacity", 1).style("pointer-events", "all");
         }
-        if (elapsed < drawEnd) {
-          const t = constrain((elapsed - segStart) / CHRONO_SEG_DRAW_MS, 0, 1);
-          return { fullThrough: i - 1, partialFrom: path[i], partialTo: path[i + 1], partialT: t };
-        }
+        sel.style("display", relationalChordsUserVisible ? null : "none");
       }
-      return { fullThrough: nSeg - 1, partialFrom: null, partialTo: null, partialT: 1 };
+      updateToggleRelationalChordsButton();
+    }
+
+    function attachToggleRelationalChordsButton() {
+      const btn = document.getElementById("toggle-relational-chords");
+      if (!btn || btn.dataset.bound === "1") return;
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", () => {
+        relationalChordsUserVisible = !relationalChordsUserVisible;
+        applyRelationalChordsDisplay();
+      });
+      updateToggleRelationalChordsButton();
     }
 
     function formatYearSuffix(node) {
@@ -2754,7 +2760,7 @@
         }
         const path = graph.chronoOrder.filter(nodeVisible);
         if (path.length === 0) {
-          el.textContent = "Nessun genere visibile: regola i filtri per vedere il percorso.";
+          el.textContent = "Nessun genere visibile: regola i filtri per aggiornare la sintesi cronologica.";
           return;
         }
         const first = path[0];
@@ -2763,10 +2769,10 @@
         const y1 = last.year;
         const same = path.length === 1;
         if (same) {
-          el.textContent = `Un solo punto visibile: ${y0} — ${first.label}.`;
+          el.textContent = `Un solo genere visibile in sintesi cronologica: ${y0} — ${first.label}.`;
           return;
         }
-        el.textContent = `Inizio percorso: ${y0} — ${first.label}. Fine: ${y1} — ${last.label}. (${path.length} generi)`;
+        el.textContent = `Ordine cronologico (generi visibili): da ${y0} — ${first.label} a ${y1} — ${last.label}. (${path.length} generi)`;
       } finally {
         notifyHelpLayout();
       }
@@ -2881,18 +2887,14 @@
       if (!node || node.level !== 2 || !graph) return;
       closeLinkRelationPanel();
       detailFocusId = node.id;
-      chronoLinesMode = "hidden";
       updateDetailPanelDom(true);
       refreshDetailPanel();
-      updateChronoPlayUi();
       renderChordDiagram();
     }
 
     function exitDetailView2D() {
       detailFocusId = null;
       updateDetailPanelDom(false);
-      resetChronoLineAnimationForNewPath();
-      updateChronoPlayUi();
       renderChordDiagram();
     }
 
