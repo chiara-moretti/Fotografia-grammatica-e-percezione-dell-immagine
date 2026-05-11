@@ -3,18 +3,27 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mappa Concettuale Fotografia — Cerchio generi</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <title>Mappa Concettuale Fotografia — Quadrato generi</title>
   <style>
     :root {
-      --bg: #ffffff;
-      --panel: #ffffff;
-      --text: #0a0a0a;
-      --muted: #5c5c5c;
-      --border: #0a0a0a;
-      --accent: #0a0a0a;
+      --bg: #f5f5f7;
+      --panel: rgba(255, 255, 255, 0.78);
+      --panel-solid: #ffffff;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --border: rgba(0, 0, 0, 0.08);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --accent: #0071e3;
+      --accent-hover: #0077ed;
+      --radius-xl: 22px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-pill: 980px;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.08);
+      --blur: saturate(180%) blur(20px);
+      --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
     html, body {
@@ -23,9 +32,10 @@
       overflow: hidden;
       background: var(--bg);
       color: var(--text);
-      font-family: "Space Grotesk", system-ui, sans-serif;
-      font-weight: 500;
-      letter-spacing: -0.01em;
+      font-family: var(--font-body);
+      font-weight: 400;
+      letter-spacing: -0.022em;
+      -webkit-font-smoothing: antialiased;
     }
 
     body > canvas {
@@ -42,117 +52,240 @@
       position: fixed;
       inset: 0;
       z-index: 1;
-      background: #f0f0f2;
-      font-family: "Space Grotesk", system-ui, sans-serif;
+      background: var(--bg);
+      font-family: var(--font-body);
     }
 
     #chord-root svg {
       display: block;
-      cursor: grab;
+      cursor: default;
+      -webkit-font-smoothing: antialiased;
     }
 
-    #chord-root svg:active {
-      cursor: grabbing;
+    /* Titoli sui pallini: gerarchia nome / anno, alone leggero, allineato al tema UI */
+    .genre-node-labels .genre-dot-label {
+      font-family: var(--font-body);
+      letter-spacing: -0.028em;
+      paint-order: stroke fill;
+      stroke: rgba(255, 255, 255, 0.97);
+      stroke-width: 2.15px;
+      stroke-linejoin: round;
+    }
+
+    .genre-node-labels .genre-dot-label__title {
+      fill: var(--text);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+
+    .genre-node-labels .genre-dot-label__year {
+      fill: var(--muted);
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Etichette angoli quadrato: alto contrasto e alone per restare leggibili su zoom / sfondo */
+    .filter-hex-anchors .filter-rim-label {
+      font-family: var(--font-body);
+      dominant-baseline: middle;
+      text-anchor: middle;
+      paint-order: stroke fill;
+      stroke: rgba(255, 255, 255, 0.98);
+      stroke-width: 2.35px;
+      stroke-linejoin: round;
+    }
+
+    .filter-hex-anchors .filter-rim-label--axis {
+      fill: var(--muted);
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    .filter-hex-anchors .filter-rim-label--value {
+      fill: var(--text);
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: -0.03em;
     }
 
     #status-bar {
       position: fixed;
-      right: 12px;
-      bottom: 12px;
+      right: 16px;
+      bottom: 16px;
       left: auto;
       z-index: 8;
-      max-width: min(360px, calc(100vw - 24px));
-      padding: 8px 12px;
-      background: #fff;
-      border: 2px solid var(--border);
-      font-size: 11px;
-      font-weight: 700;
+      max-width: min(360px, calc(100vw - 32px));
+      padding: 10px 14px;
+      background: var(--panel);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 500;
       line-height: 1.35;
-      color: var(--text);
-      box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.12);
+      color: var(--muted);
+      box-shadow: var(--shadow-sm);
       pointer-events: none;
     }
 
     #status-bar.status-bar--error {
-      color: #b00020;
+      color: #ff3b30;
+    }
+
+    #left-column {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      bottom: 16px;
+      z-index: 12;
+      width: min(380px, calc(100vw - 32px));
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
     }
 
     #ui {
-      position: fixed;
-      top: 12px;
-      left: 12px;
-      z-index: 12;
+      position: relative;
+      flex: 0 1 auto;
+      min-height: 0;
+      max-height: min(52vh, 480px);
+      overflow-y: auto;
       background: var(--panel);
-      border: 3px solid var(--border);
-      border-radius: 0;
-      padding: 14px 16px 16px;
-      width: min(380px, calc(100vw - 24px));
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-xl);
+      padding: 18px 20px 20px;
+      width: 100%;
       box-sizing: border-box;
-      box-shadow: 6px 6px 0 var(--border);
+      box-shadow: var(--shadow-md);
     }
 
     #ui h1 {
-      margin: 0 0 10px;
-      font-family: "Archivo Black", "Space Grotesk", sans-serif;
-      font-size: 15px;
-      font-weight: 400;
-      letter-spacing: 0.02em;
-      line-height: 1.15;
-      text-transform: uppercase;
+      margin: 0 0 8px;
+      font-family: var(--font-display);
+      font-size: 21px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      text-transform: none;
+      color: var(--text);
     }
 
-    #ui .subtitle {
-      margin: 0 0 12px;
+    #ui .subtitle-diagram {
+      display: none;
+      margin: 0 0 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
+      line-height: 1.47;
+      font-weight: 400;
+      white-space: pre-line;
+    }
+
+    body.help-mode #ui .subtitle-diagram {
+      display: block;
+    }
+
+    #ui .subtitle-diagram-hint {
+      display: none;
+      margin: 0 0 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
       line-height: 1.45;
-      font-weight: 500;
+      font-weight: 400;
+    }
+
+    body.help-mode #ui .subtitle-diagram-hint {
+      display: block;
+    }
+
+    body.help-mode #ui {
+      max-height: min(62vh, 600px);
+    }
+
+    #chord-legend-panel.chord-legend {
+      display: none;
+      flex: 0 1 auto;
+      min-height: 0;
+      max-height: min(32vh, 320px);
+      overflow-y: auto;
+      width: 100%;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 14px 16px 16px;
+      background: var(--panel);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    #chord-legend-panel.chord-legend.chord-legend-panel--visible {
+      display: block;
+    }
+
+    #chord-legend-panel .chord-legend-title {
+      margin-top: 0;
     }
 
     .hint {
       margin-top: 10px;
-      font-size: 11px;
+      font-size: 12px;
       color: var(--muted);
       line-height: 1.45;
-      border-top: 2px solid var(--border);
-      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
     }
 
     .zoom-controls {
-      margin-top: 12px;
+      margin-top: 14px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
     .zoom-btn {
-      background: #fff;
+      background: rgba(0, 0, 0, 0.05);
       color: var(--text);
-      border: 2px solid var(--border);
-      border-radius: 0;
-      width: 32px;
-      height: 28px;
-      font-size: 18px;
-      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-md);
+      width: 36px;
+      height: 32px;
+      font-size: 17px;
+      font-weight: 500;
       line-height: 1;
       cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease;
     }
 
     .zoom-btn:hover {
-      background: var(--border);
-      color: #fff;
+      background: rgba(0, 0, 0, 0.08);
     }
 
     .zoom-readout {
-      font-size: 12px;
-      color: var(--text);
-      font-weight: 600;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
       min-width: 52px;
       text-align: center;
     }
 
     .chrono-play-row {
-      margin-top: 12px;
+      margin-top: 14px;
       display: flex;
       align-items: flex-start;
       gap: 10px;
@@ -162,31 +295,35 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 8px 14px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      gap: 6px;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      text-transform: none;
       color: #fff;
       background: var(--accent);
-      border: 2px solid var(--border);
-      border-radius: 0;
+      border: none;
+      border-radius: var(--radius-pill);
       cursor: pointer;
       font-family: inherit;
       flex-shrink: 0;
-      box-shadow: 4px 4px 0 var(--border);
+      box-shadow: none;
+      transition: background 0.2s ease, opacity 0.2s ease, transform 0.15s ease;
     }
 
     #chrono-play:hover:not(:disabled) {
-      transform: translate(1px, 1px);
-      box-shadow: 3px 3px 0 var(--border);
+      background: var(--accent-hover);
+      transform: scale(1.02);
+    }
+
+    #chrono-play:active:not(:disabled) {
+      transform: scale(0.98);
     }
 
     #chrono-play:disabled {
-      opacity: 0.35;
+      opacity: 0.4;
       cursor: not-allowed;
-      box-shadow: none;
     }
 
     #chrono-play .play-icon {
@@ -195,93 +332,99 @@
     }
 
     .chrono-play-hint {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--muted);
       line-height: 1.4;
       flex: 1;
       min-width: 0;
-      font-weight: 500;
+      font-weight: 400;
     }
 
     .view-link-row {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 2px solid var(--border);
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
     }
 
     .view-link-3d {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 8px 14px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--text);
-      background: #fff;
-      border: 2px solid var(--border);
-      border-radius: 0;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      text-transform: none;
+      color: var(--accent);
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-pill);
       cursor: pointer;
       font-family: inherit;
       text-decoration: none;
-      box-shadow: 4px 4px 0 var(--border);
+      box-shadow: none;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     .view-link-3d:hover {
-      transform: translate(1px, 1px);
-      box-shadow: 3px 3px 0 var(--border);
+      background: rgba(0, 113, 227, 0.08);
+      color: var(--accent-hover);
     }
 
     #filters-panel {
       position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
+      top: 16px;
+      right: 16px;
+      bottom: 16px;
       z-index: 12;
-      width: min(320px, calc(100vw - 16px));
+      width: min(300px, calc(100vw - 32px));
+      max-height: calc(100vh - 32px);
       box-sizing: border-box;
-      padding: 16px 16px 24px;
+      padding: 20px 18px 22px;
       background: var(--panel);
-      border-left: 3px solid var(--border);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
       overflow-y: auto;
       pointer-events: auto;
     }
 
     #filters-panel h2 {
-      margin: 0 0 12px;
-      font-family: "Archivo Black", sans-serif;
-      font-size: 13px;
-      font-weight: 400;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      margin: 0 0 14px;
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      text-transform: none;
       color: var(--text);
     }
 
     #filters-panel .filters-panel-hint {
       margin: 0 0 16px;
-      font-size: 11px;
+      font-size: 13px;
       line-height: 1.45;
       color: var(--muted);
-      font-weight: 500;
+      font-weight: 400;
     }
 
     .filter-groups {
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 22px;
     }
 
     .filter-group-title {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-transform: none;
       color: var(--text);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       line-height: 1.3;
-      border-bottom: 2px solid var(--border);
-      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
     }
 
     .filter-group-items {
@@ -294,53 +437,64 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 12px;
-      font-weight: 500;
+      font-size: 14px;
+      font-weight: 400;
       user-select: none;
       cursor: pointer;
+      color: var(--text);
     }
 
     .filter input {
       cursor: pointer;
-      width: 14px;
-      height: 14px;
-      accent-color: var(--border);
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
     }
 
     .badge {
       width: 10px;
       height: 10px;
-      border-radius: 0;
+      border-radius: 50%;
       flex-shrink: 0;
-      border: 1px solid var(--border);
+      border: 1px solid rgba(0, 0, 0, 0.12);
     }
 
     .chrono-range {
       margin: 0 0 10px;
-      font-size: 11px;
+      font-size: 12px;
       line-height: 1.4;
       color: var(--muted);
-      font-weight: 600;
-      letter-spacing: 0.02em;
+      font-weight: 500;
+      letter-spacing: -0.01em;
     }
 
     .chord-legend {
-      margin-top: 12px;
-      padding: 10px 0 0;
-      border-top: 2px solid var(--border);
-      font-size: 10px;
+      font-size: 12px;
       line-height: 1.5;
       color: var(--muted);
-      font-weight: 500;
+      font-weight: 400;
     }
 
     .chord-legend-title {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-transform: none;
       color: var(--text);
       margin-bottom: 8px;
+    }
+
+    .chord-legend-intro {
+      margin: 0 0 12px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .chord-legend-intro strong {
+      color: var(--text);
+      font-weight: 600;
     }
 
     .chord-legend-row {
@@ -353,8 +507,8 @@
     .chord-legend-swatch {
       width: 22px;
       height: 10px;
-      border-radius: 0;
-      border: 1px solid var(--border);
+      border-radius: 4px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
       flex-shrink: 0;
     }
 
@@ -372,21 +526,21 @@
 
     #detail-panel {
       position: fixed;
-      left: 12px;
-      bottom: 12px;
+      left: 16px;
+      bottom: 16px;
       z-index: 45;
-      width: min(380px, calc(100vw - 24px));
+      width: min(380px, calc(100vw - 32px));
       max-height: min(58vh, 520px);
       box-sizing: border-box;
-      padding: 14px 16px 16px;
-      background: #fff;
-      border: 3px solid var(--border);
-      border-radius: 0;
-      box-shadow: 8px 8px 0 var(--border);
+      padding: 18px 20px 20px;
+      background: var(--panel-solid);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
       overflow-y: auto;
       display: none;
       pointer-events: auto;
-      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-family: var(--font-body);
     }
 
     #detail-panel.detail-panel--open {
@@ -396,33 +550,34 @@
     #detail-panel #detail-close {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-      padding: 8px 12px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: #fff;
-      background: var(--border);
-      border: 2px solid var(--border);
-      border-radius: 0;
+      gap: 6px;
+      margin-bottom: 14px;
+      padding: 6px 14px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      text-transform: none;
+      color: var(--accent);
+      background: rgba(0, 113, 227, 0.08);
+      border: none;
+      border-radius: var(--radius-pill);
       cursor: pointer;
       font-family: inherit;
+      transition: background 0.2s ease;
     }
 
     #detail-panel #detail-close:hover {
-      background: #fff;
-      color: var(--text);
+      background: rgba(0, 113, 227, 0.14);
+      color: var(--accent-hover);
     }
 
     #detail-panel h2 {
       margin: 0 0 10px;
-      font-family: "Archivo Black", sans-serif;
-      font-size: 16px;
-      font-weight: 400;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      text-transform: none;
       color: var(--text);
       line-height: 1.2;
     }
@@ -433,6 +588,13 @@
       color: var(--muted);
       line-height: 1.45;
       font-weight: 500;
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     #detail-panel .detail-subgroup {
@@ -441,11 +603,11 @@
 
     #detail-panel .detail-subtitle {
       margin: 0 0 8px;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      color: var(--text);
-      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--muted);
+      text-transform: none;
     }
 
     #detail-panel ul {
@@ -467,21 +629,21 @@
 
     #link-relation-panel {
       position: fixed;
-      right: 12px;
-      bottom: 12px;
+      right: 16px;
+      bottom: 16px;
       z-index: 46;
-      width: min(380px, calc(100vw - 24px));
+      width: min(380px, calc(100vw - 32px));
       max-height: min(52vh, 440px);
       box-sizing: border-box;
-      padding: 14px 16px 16px;
-      background: #fff;
-      border: 3px solid var(--border);
-      border-radius: 0;
-      box-shadow: -8px 8px 0 var(--border);
+      padding: 18px 20px 20px;
+      background: var(--panel-solid);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
       overflow-y: auto;
       display: none;
       pointer-events: auto;
-      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-family: var(--font-body);
     }
 
     #link-relation-panel.link-relation-panel--open {
@@ -491,33 +653,34 @@
     #link-relation-panel #link-relation-close {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-      padding: 8px 12px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: #fff;
-      background: var(--border);
-      border: 2px solid var(--border);
-      border-radius: 0;
+      gap: 6px;
+      margin-bottom: 14px;
+      padding: 6px 14px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      text-transform: none;
+      color: var(--accent);
+      background: rgba(0, 113, 227, 0.08);
+      border: none;
+      border-radius: var(--radius-pill);
       cursor: pointer;
       font-family: inherit;
+      transition: background 0.2s ease;
     }
 
     #link-relation-panel #link-relation-close:hover {
-      background: #fff;
-      color: var(--text);
+      background: rgba(0, 113, 227, 0.14);
+      color: var(--accent-hover);
     }
 
     #link-relation-panel h2 {
       margin: 0 0 8px;
-      font-family: "Archivo Black", sans-serif;
-      font-size: 14px;
-      font-weight: 400;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      text-transform: none;
       color: var(--text);
       line-height: 1.25;
     }
@@ -549,50 +712,268 @@
     #link-relation-panel li {
       margin-bottom: 6px;
     }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    #help-toggle {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20020;
+      padding: 8px 20px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      text-transform: none;
+      color: var(--text);
+      background: var(--panel);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    #help-toggle:hover {
+      background: var(--panel-solid);
+      transform: translateX(-50%) scale(1.02);
+    }
+
+    #help-dim {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 4;
+      background: rgba(0, 0, 0, 0.36);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      pointer-events: auto;
+    }
+
+    body.help-mode #help-dim {
+      display: block;
+    }
+
+    #help-hotspot-layer {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 6;
+      pointer-events: none;
+    }
+
+    body.help-mode #help-hotspot-layer {
+      display: block;
+    }
+
+    .help-hotspot {
+      position: absolute;
+      border-radius: var(--radius-md);
+      box-sizing: border-box;
+      border: 1px solid transparent;
+      background: transparent;
+      pointer-events: auto;
+      transition: border-color 0.2s ease, background 0.2s ease;
+      z-index: 1;
+    }
+
+    .help-hotspot:hover {
+      border-color: transparent;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    #help-tooltip {
+      position: fixed;
+      z-index: 20030;
+      max-width: min(420px, calc(100vw - 32px));
+      padding: 16px 18px;
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.47;
+      font-weight: 400;
+      color: var(--text);
+      background: var(--panel-solid);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      pointer-events: none;
+      display: none;
+      white-space: pre-wrap;
+    }
+
+    #help-tooltip.help-tooltip--visible {
+      display: block;
+    }
+
+    body.help-mode #chord-root,
+    body.help-mode #filters-panel,
+    body.help-mode #ui-interactive,
+    body.help-mode #status-bar,
+    body.help-mode #detail-panel.detail-panel--open,
+    body.help-mode #link-relation-panel.link-relation-panel--open {
+      transition: none !important;
+    }
+
+    body.help-mode #chord-root {
+      filter: brightness(0.55);
+      opacity: 0.92;
+    }
+
+    body.help-mode #chord-root.help-spotlight-target {
+      filter: none;
+      opacity: 1;
+      z-index: 5;
+    }
+
+    body.help-mode #ui-interactive {
+      filter: brightness(0.42);
+      opacity: 0.88;
+      position: relative;
+    }
+
+    body.help-mode #ui-interactive.help-spotlight-target {
+      filter: none;
+      opacity: 1;
+      box-shadow: none;
+    }
+
+    body.help-mode #filters-panel {
+      filter: brightness(0.4);
+      opacity: 0.88;
+    }
+
+    body.help-mode #filters-panel.help-spotlight-target {
+      filter: none;
+      opacity: 1;
+      position: relative;
+      box-shadow: var(--shadow-md);
+    }
+
+    body.help-mode #filters-panel:hover {
+      background: var(--panel-solid) !important;
+      filter: none !important;
+      opacity: 1 !important;
+    }
+
+    .help-filters-hint {
+      display: none;
+      margin: 0;
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    body.help-mode #filters-panel:hover .help-filters-hint {
+      display: block;
+    }
+
+    body.help-mode #status-bar {
+      filter: brightness(0.45);
+      opacity: 0.85;
+    }
+
+    body.help-mode #status-bar.help-spotlight-target {
+      filter: none;
+      opacity: 1;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+    }
+
+    body.help-mode #detail-panel.detail-panel--open {
+      filter: brightness(0.42);
+      opacity: 0.88;
+    }
+
+    body.help-mode #detail-panel.detail-panel--open.help-spotlight-target {
+      filter: none;
+      opacity: 1;
+      position: relative;
+    }
+
+    body.help-mode #link-relation-panel.link-relation-panel--open {
+      filter: brightness(0.42);
+      opacity: 0.88;
+    }
+
+    body.help-mode #link-relation-panel.link-relation-panel--open.help-spotlight-target {
+      filter: none;
+      opacity: 1;
+      position: relative;
+    }
   </style>
 </head>
 <body>
-  <div id="chord-root" aria-label="Cerchio generi e percorso cronologico"></div>
+  <div id="chord-root" aria-label="Quadrato generi e percorso cronologico"></div>
   <div id="status-bar" aria-live="polite"></div>
+  <div id="left-column">
   <div id="ui">
-    <h1>Cerchio — generi e percorso</h1>
-    <p class="subtitle">
-      Ogni <strong>pallino</strong> è un genere sul cerchio (ordinati per tema/categoria). Le <strong>curve colorate</strong> collegano generi affini (stessa categoria in Mappa, stesso macro-tema e/o stessi tag del CSV): <strong>clic</strong> su una curva per aprire il riepilogo del legame. Il <strong>raggio</strong> dipende soprattutto dai <strong>sottogruppi</strong> in Mappa, con un contributo da quante righe ha e dalla lunghezza del nome. Una <strong>sola linea nera</strong> segue il cronologico in base all’<strong>Anno indicativo</strong> (Play).
-    </p>
-    <p id="chrono-range" class="chrono-range" aria-live="polite"></p>
-    <div class="hint">
-      Trascina sul diagramma per spostarlo, rotella o + / − per zoom. Clic su un pallino per aprire i dettagli del genere. Clic su una <strong>curva colorata</strong> tra due pallini per vedere cosa lega quei generi.
-    </div>
-    <div class="chord-legend" aria-label="Legenda">
-      <div class="chord-legend-title">Lettura del cerchio</div>
-      <div class="chord-legend-row" style="padding-left: 0; border: none; gap: 6px;">
-        <span style="width: 14px; height: 14px; border-radius: 50%; background: #6cf; border: 2px solid #0a0a0a; flex-shrink: 0;" aria-hidden="true"></span>
-        Raggio ≈ sottogruppi (Sottocategoria) + peso delle righe Mappa; se i valori coincidono, i raggi si distanziano comunque lungo l’ordine sul cerchio.
-      </div>
-      <div class="chord-legend-row" style="padding-left: 0; margin-top: 4px;">
-        Linea nera = un solo percorso cronologico (stessi dati del CSV Mappa).
-      </div>
-      <div class="chord-legend-row" style="padding-left: 0; margin-top: 4px;">
-        <span style="width: 22px; height: 3px; background: linear-gradient(90deg, #9aa0b8, #c4c8d4); border-radius: 2px; flex-shrink: 0; opacity: 0.85;" aria-hidden="true"></span>
-        Curve colorate = affinità tra generi (stessa voce in Mappa, stesso macro-tema e/o stessi tag CSV); più il legame è forte, più la linea è visibile. <strong>Clic</strong> sulla curva per il dettaglio del legame.
-      </div>
-    </div>
+    <h1>Quadrato — generi e percorso</h1>
+    <p id="subtitle-diagram" class="subtitle-diagram" aria-label="Lettura del quadrato e dei pallini"></p>
+    <p id="subtitle-diagram-hint" class="subtitle-diagram-hint" aria-label="Suggerimento sul diagramma"></p>
+    <div id="ui-interactive">
+    <p id="chrono-range" class="chrono-range sr-only" aria-live="polite"></p>
     <div class="zoom-controls">
-      <button id="zoom-out" class="zoom-btn" type="button">−</button>
-      <button id="zoom-in" class="zoom-btn" type="button">+</button>
-      <span id="zoom-readout" class="zoom-readout">100%</span>
+      <button id="zoom-out" class="zoom-btn" type="button" aria-label="Riduci zoom">−</button>
+      <button id="zoom-in" class="zoom-btn" type="button" aria-label="Aumenta zoom">+</button>
+      <span id="zoom-readout" class="zoom-readout" aria-hidden="true">100%</span>
     </div>
     <div class="chrono-play-row">
       <button id="chrono-play" type="button" aria-label="Avvia percorso cronologico">
         <span class="play-icon" aria-hidden="true">▶</span>
         <span id="chrono-play-label">Percorso</span>
       </button>
-      <span id="chrono-play-hint" class="chrono-play-hint">Play anima una linea nera all’interno del cerchio che collega i generi in ordine cronologico, segmento per segmento.</span>
     </div>
     <div class="view-link-row">
       <a href="mappa-3d.html" class="view-link-3d">Vista 3D (assi = filtri CSV)</a>
     </div>
+    </div>
   </div>
+
+  <div id="chord-legend-panel" class="chord-legend" aria-label="Legenda curve tra generi" aria-hidden="true">
+    <p class="chord-legend-title">Legenda collegamenti</p>
+    <p class="chord-legend-intro">Le curve tra due pallini indicano affinità (categoria in Mappa, macro-tema e/o stessi tag del CSV). Più criteri coincidono, più la linea è spessa e scura. Clic sulla curva per il riepilogo.</p>
+    <div class="chord-legend-row">
+      <span class="chord-legend-swatch chord-legend-swatch--cat" aria-hidden="true"></span>
+      <span>Stessa voce in <strong>Mappa Fotografia.csv</strong> (categoria)</span>
+    </div>
+    <div class="chord-legend-row">
+      <span class="chord-legend-swatch chord-legend-swatch--theme" aria-hidden="true"></span>
+      <span>Stesso <strong>macro-tema</strong> (raggruppamento concettuale)</span>
+    </div>
+    <div class="chord-legend-row">
+      <span class="chord-legend-swatch chord-legend-swatch--tag" aria-hidden="true"></span>
+      <span>Stesso valore su una colonna <strong>tag</strong> del CSV (Dominio / Scopo / Ambito)</span>
+    </div>
+  </div>
+  </div>
+
+  <aside id="filters-panel" aria-label="Filtri mappa">
+    <h2>Filtri</h2>
+    <p class="filters-panel-hint">
+      Combinazioni su <strong>Dominio</strong> e <strong>Scopo</strong>. Sul quadrato: in alto Privato (sinistra) e Pubblico (destra); in basso Scientifico (sinistra) e Artistico (destra). La posizione segue questi quattro angoli. <strong>Ambito</strong> non è filtrabile ma resta nel colore dei punti e nei collegamenti.
+    </p>
+    <div id="filters-root" class="filter-groups"></div>
+    <p id="help-filters-hint" class="help-filters-hint"></p>
+  </aside>
 
   <aside id="link-relation-panel" aria-hidden="true" aria-label="Dettaglio collegamento tra generi">
     <button id="link-relation-close" type="button">← Chiudi</button>
@@ -610,13 +991,12 @@
     <p id="detail-empty" class="detail-empty" hidden></p>
   </aside>
 
-  <aside id="filters-panel" aria-label="Filtri mappa">
-    <h2>Filtri</h2>
-    <p class="filters-panel-hint">
-      Combinazioni su tutte le dimensioni del CSV. Sul cerchio, l’ordine è per <strong>tema / categoria</strong>; le <strong>curve interne</strong> mostrano affinità tra generi; il percorso cronologico resta per Play e per il testo sotto.
-    </p>
-    <div id="filters-root" class="filter-groups"></div>
-  </aside>
+  <button type="button" id="help-toggle" aria-expanded="false" aria-controls="help-hotspot-layer">Aiuto</button>
+  <div id="help-dim" aria-hidden="true"></div>
+  <div id="help-hotspot-layer" aria-hidden="true" role="dialog" aria-label="Modalità aiuto">
+    <div id="help-hs-diagram" class="help-hotspot" data-help-key="diagram" data-spotlight-target="chord-root" hidden></div>
+    <p id="help-tooltip"></p>
+  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.3/p5.min.js"></script>
@@ -632,7 +1012,7 @@
     let chordSvgD3 = null;
     let chordResizeTimer = null;
 
-    /** Dati per la linea Play (punti sul raggio interno, stessi angoli degli archi). */
+    /** Dati per la linea Play (coordinate dei pallini nel layout a bussola 2D). */
     let chordChronoPlayCache = null;
 
     const CHRONO_SEG_DRAW_MS = 520;
@@ -643,8 +1023,7 @@
 
     let filterState = {
       audience: new Set(),
-      artistic: new Set(),
-      professional: new Set()
+      artistic: new Set()
     };
 
     const CSV_PATH = "Foglio di lavoro senza nome - Generefotografico-PubblicoNessunoPrivato-Artistico.csv";
@@ -717,23 +1096,263 @@
     let detailFocusId = null;
 
     const paletteAudience = {
-      Pubblico: [116, 209, 255],
-      Privato: [255, 127, 127],
-      Nessuno: [168, 176, 200]
+      Pubblico: [9, 129, 74],
+      Privato: [128, 152, 60],
+      Nessuno: [0, 52, 89]
     };
     const paletteArtistic = {
-      Artistico: [201, 156, 255],
-      Scientifico: [110, 231, 183],
-      Nessuno: [140, 148, 168]
+      Artistico: [229, 68, 109],
+      Scientifico: [115, 60, 99],
+      Nessuno: [0, 52, 89]
     };
     const palettePro = {
-      Professionale: [255, 209, 102],
-      Amatoriale: [251, 191, 119],
-      Nessuno: [130, 138, 158]
+      Professionale: [0, 126, 167],
+      Amatoriale: [246, 174, 45],
+      Nessuno: [0, 52, 89]
     };
 
+    let helpModeActive = false;
+    let lastDetailMappaSourceText = "";
+    let helpHotspotSyncTimer = null;
+
+    const HELP_COPY = {
+      diagram: "Clic su un pallino per aprire i dettagli del genere. Clic su una curva colorata tra due pallini per vedere cosa lega quei generi.\n\nLettura del quadrato — Ogni angolo corrisponde a un valore di tag: in alto a sinistra Privato, in alto a destra Pubblico (Dominio); in basso a sinistra Scientifico, in basso a destra Artistico (Scopo). La posizione di ogni genere è la media pesata verso gli angoli coerenti con i suoi tag; «Nessuno» su un asse tende al centro tra i due angoli di quella riga o colonna. L’Ambito (Professionale / Amatoriale) resta nel colore del punto e nei collegamenti, non nei filtri. Raggio dei pallini: sottogruppi Mappa e peso righe.\n\nLinea grigia (Play): percorso cronologico tra i generi visibili.\n\nCurve colorate: affinità tra generi (Mappa, macro-tema, tag CSV). Clic sulla curva per il dettaglio del legame.",
+      diagramTooltip:
+        "Clic su un pallino o su una curva colorata per aprire il dettaglio del genere o il riepilogo del legame.",
+      left: "Percorso: Play anima una linea grigia che collega i generi in ordine cronologico, segmento per segmento.\n\nZoom sulla mappa: rotellina del mouse o pinch (touch) per ingrandire l’area del diagramma; trascina per spostare. Pulsanti + e − per zoom a step. Doppio clic sullo sfondo chiaro o sul quadrato tratteggiato ripristina zoom e posizione.\n\nVista 3D: apre la mappa sugli assi cartesiani legati ai tre filtri del CSV.",
+      filters: "Combinazioni su Dominio e Scopo del CSV. Con filtri attivi, i generi visibili sul quadrato seguono l’ordine cronologico (come il percorso Play). Senza filtri, l’ordine è per tema / categoria; le curve interne mostrano affinità tra generi.",
+      status: "Indica quante righe del CSV principale sono state caricate oppure un messaggio di errore se il file non è raggiungibile (serve un server locale, non file://).",
+      link: "Riepiloga perché due generi risultano collegati (categoria Mappa, macro-tema, tag) e la somma dei criteri usata per lo spessore e l’opacità della curva."
+    };
+
+    const HELP_SPOTLIGHT_IDS = ["chord-root", "ui-interactive", "filters-panel", "status-bar", "detail-panel", "link-relation-panel"];
+
+    function helpTextForKey(key) {
+      if (key === "detail") {
+        return lastDetailMappaSourceText
+          || "Apri un genere con un clic sul pallino per vedere qui i sottogruppi dalla Mappa Fotografia.csv.";
+      }
+      if (key === "left") {
+        const cr = document.getElementById("chrono-range");
+        const extra = (cr && cr.textContent && cr.textContent.trim())
+          ? `\n\nPercorso attuale (sintesi): ${cr.textContent.trim()}`
+          : "";
+        return HELP_COPY.left + extra;
+      }
+      if (key === "diagram") {
+        return "";
+      }
+      return HELP_COPY[key] || "";
+    }
+
+    (function initSubtitleDiagram() {
+      const el = document.getElementById("subtitle-diagram");
+      if (el) el.textContent = HELP_COPY.diagram;
+      const hint = document.getElementById("subtitle-diagram-hint");
+      if (hint) hint.textContent = HELP_COPY.diagramTooltip || "";
+    })();
+
+    function clearHelpSpotlight() {
+      HELP_SPOTLIGHT_IDS.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("help-spotlight-target");
+      });
+    }
+
+    function setHelpSpotlight(targetId) {
+      if (!targetId) return;
+      const el = document.getElementById(targetId);
+      if (el) el.classList.add("help-spotlight-target");
+    }
+
+    function positionHelpHotspot(hs, el, pad) {
+      const p = typeof pad === "number" ? pad : 10;
+      if (!hs) return;
+      if (!el) {
+        hs.hidden = true;
+        return;
+      }
+      const r = el.getBoundingClientRect();
+      if (r.width < 2 && r.height < 2) {
+        hs.hidden = true;
+        return;
+      }
+      hs.hidden = false;
+      hs.style.left = `${r.left - p}px`;
+      hs.style.top = `${r.top - p}px`;
+      hs.style.width = `${r.width + p * 2}px`;
+      hs.style.height = `${r.height + p * 2}px`;
+    }
+
+    function syncHelpHotspots() {
+      if (!helpModeActive) return;
+      const pad = 10;
+      const hsDiag = document.getElementById("help-hs-diagram");
+      const col = document.getElementById("left-column");
+      const fpEl = document.getElementById("filters-panel");
+      if (hsDiag && col && fpEl) {
+        const ur = col.getBoundingClientRect();
+        const fr = fpEl.getBoundingClientRect();
+        const pad2 = 8;
+        const left = Math.min(ur.right + pad2, window.innerWidth - 140);
+        const right = Math.max(fr.left - pad2, left + 100);
+        const top = 52;
+        const bot = window.innerHeight - 64;
+        if (right - left >= 72 && bot - top >= 72) {
+          hsDiag.hidden = false;
+          hsDiag.style.left = `${left}px`;
+          hsDiag.style.top = `${top}px`;
+          hsDiag.style.width = `${right - left}px`;
+          hsDiag.style.height = `${bot - top}px`;
+        } else {
+          const svg = document.querySelector("#chord-svg");
+          positionHelpHotspot(hsDiag, svg || document.getElementById("chord-root"), pad);
+        }
+      } else if (hsDiag) {
+        const svg = document.querySelector("#chord-svg");
+        positionHelpHotspot(hsDiag, svg || document.getElementById("chord-root"), pad);
+      }
+    }
+
+    function notifyHelpLayout() {
+      if (!helpModeActive) return;
+      if (helpHotspotSyncTimer) clearTimeout(helpHotspotSyncTimer);
+      helpHotspotSyncTimer = setTimeout(() => {
+        helpHotspotSyncTimer = null;
+        syncHelpHotspots();
+      }, 40);
+    }
+
+    function hideHelpTooltip() {
+      const tt = document.getElementById("help-tooltip");
+      if (tt) {
+        tt.classList.remove("help-tooltip--visible");
+        tt.textContent = "";
+      }
+    }
+
+    function showHelpTooltip(text, clientX, clientY) {
+      const tt = document.getElementById("help-tooltip");
+      if (!tt) return;
+      if (!text) {
+        hideHelpTooltip();
+        return;
+      }
+      tt.textContent = text;
+      tt.classList.add("help-tooltip--visible");
+      const margin = 16;
+      requestAnimationFrame(() => {
+        const tw = tt.offsetWidth;
+        const th = tt.offsetHeight;
+        let x = clientX + 18;
+        let y = clientY + 18;
+        if (x + tw > window.innerWidth - margin) x = window.innerWidth - tw - margin;
+        if (y + th > window.innerHeight - margin) y = window.innerHeight - th - margin;
+        tt.style.left = `${Math.max(margin, x)}px`;
+        tt.style.top = `${Math.max(margin, y)}px`;
+      });
+    }
+
+    function setHelpMode(on) {
+      helpModeActive = on;
+      document.body.classList.toggle("help-mode", on);
+      const layer = document.getElementById("help-hotspot-layer");
+      const dim = document.getElementById("help-dim");
+      const btn = document.getElementById("help-toggle");
+      if (layer) layer.setAttribute("aria-hidden", on ? "false" : "true");
+      if (dim) dim.setAttribute("aria-hidden", on ? "false" : "true");
+      if (btn) {
+        btn.setAttribute("aria-expanded", on ? "true" : "false");
+        btn.textContent = on ? "Chiudi aiuto" : "Aiuto";
+      }
+      if (!on) {
+        if (helpHotspotSyncTimer) {
+          clearTimeout(helpHotspotSyncTimer);
+          helpHotspotSyncTimer = null;
+        }
+        clearHelpSpotlight();
+        hideHelpTooltip();
+        const fhOff = document.getElementById("help-filters-hint");
+        if (fhOff) fhOff.textContent = "";
+        document.querySelectorAll(".help-hotspot").forEach((h) => {
+          h.hidden = true;
+        });
+      } else {
+        const fhOn = document.getElementById("help-filters-hint");
+        if (fhOn) fhOn.textContent = HELP_COPY.filters;
+        document.querySelectorAll(".help-hotspot").forEach((h) => {
+          h.hidden = false;
+        });
+        syncHelpHotspots();
+      }
+    }
+
+    function attachHelpMode() {
+      const btn = document.getElementById("help-toggle");
+      if (!btn || btn.dataset.bound === "1") return;
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", () => setHelpMode(!helpModeActive));
+
+      const layer = document.getElementById("help-hotspot-layer");
+      if (layer && layer.dataset.helpBound !== "1") {
+        layer.dataset.helpBound = "1";
+        layer.querySelectorAll(".help-hotspot").forEach((hs) => {
+          hs.addEventListener("mouseenter", (ev) => {
+            const key = hs.dataset.helpKey;
+            const target = hs.dataset.spotlightTarget;
+            clearHelpSpotlight();
+            setHelpSpotlight(target);
+            showHelpTooltip(helpTextForKey(key), ev.clientX, ev.clientY);
+          });
+          hs.addEventListener("mouseleave", () => {
+            clearHelpSpotlight();
+            hideHelpTooltip();
+          });
+        });
+      }
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && helpModeActive) {
+          setHelpMode(false);
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+
+      window.addEventListener("resize", () => {
+        if (helpModeActive) notifyHelpLayout();
+      });
+
+      attachHelpDirectRegions();
+    }
+
+    function attachHelpDirectRegions() {
+      if (document.body.dataset.helpDirectBound === "1") return;
+      document.body.dataset.helpDirectBound = "1";
+
+      function bindRegion(el, key, spotlightId) {
+        if (!el) return;
+        el.addEventListener("mouseenter", (ev) => {
+          if (!helpModeActive) return;
+          clearHelpSpotlight();
+          setHelpSpotlight(spotlightId);
+          showHelpTooltip(helpTextForKey(key), ev.clientX, ev.clientY);
+        });
+        el.addEventListener("mouseleave", () => {
+          if (!helpModeActive) return;
+          clearHelpSpotlight();
+          hideHelpTooltip();
+        });
+      }
+
+      bindRegion(document.getElementById("ui-interactive"), "left", "ui-interactive");
+      bindRegion(document.getElementById("status-bar"), "status", "status-bar");
+      bindRegion(document.getElementById("detail-panel"), "detail", "detail-panel");
+      bindRegion(document.getElementById("link-relation-panel"), "link", "link-relation-panel");
+    }
+
     function setup() {
-      textFont("Arial");
+      textFont("sans-serif");
       textSize(12);
       textAlign(CENTER, CENTER);
       const cnv = createCanvas(1, 1);
@@ -743,6 +1362,7 @@
       attachFilterEvents();
       attachZoomControls();
       attachChronoPlayButton();
+      attachHelpMode();
       attachDetailPanelClose();
       attachLinkRelationPanelEvents();
       loadMappaFotografiaTable();
@@ -814,10 +1434,301 @@
       return null;
     }
 
-    /** Ordine sul cerchio: categoria Mappa → macro-tema → tag → nome (non cronologia). */
+    /** Valori mostrati nei filtri (esclude «Nessuno»). */
+    function filterUiValues(metaList) {
+      return (metaList || []).filter((v) => String(v).trim() !== "Nessuno");
+    }
+
+    /** Scopo (colonna «Artistico» nel CSV) = Scientifico: in rilassamento serve un po’ più di separazione. */
+    function isScientificoScopo(node) {
+      return String(node?.tags?.artistic || "").trim().toLowerCase() === "scientifico";
+    }
+
+    /** Ambito (colonna Professionale / Amatoriale): piccolo offset visivo, non è più filtro. */
+    function isProfessionaleAmbito(node) {
+      return String(node?.tags?.professional || "").trim().toLowerCase() === "professionale";
+    }
+
+    /**
+     * Quattro angoli del quadrato (in alto Privato / Pubblico, in basso Scientifico / Artistico):
+     * posizione = media pesata dei quattro angoli in base ai tag Dominio e Scopo.
+     * NW = Privato, NE = Pubblico, SE = Artistico, SW = Scientifico.
+     */
+    function fourCornerWeights(node) {
+      const aud = String(node.tags?.audience || "").trim();
+      const art = String(node.tags?.artistic || "").trim();
+      const spread = 0.22;
+      let wNW = 0;
+      let wNE = 0;
+      let wSE = 0;
+      let wSW = 0;
+      if (aud === "Privato") wNW = 1;
+      else if (aud === "Pubblico") wNE = 1;
+      else {
+        wNW = spread;
+        wNE = spread;
+      }
+      if (art === "Artistico") wSE = 1;
+      else if (art === "Scientifico") wSW = 1;
+      else {
+        wSE = spread;
+        wSW = spread;
+      }
+      const s = wNW + wNE + wSE + wSW;
+      if (s < 1e-9) {
+        return { wNW: 0.25, wNE: 0.25, wSE: 0.25, wSW: 0.25 };
+      }
+      return { wNW: wNW / s, wNE: wNE / s, wSE: wSE / s, wSW: wSW / s };
+    }
+
+    function genrePositionFromFourAngles(node, half) {
+      const hSeed = hashCode(String(node.id || node.label || "x"));
+      const u01 = (hSeed % 10001) / 10000;
+      const u02 = ((hSeed >> 9) % 10001) / 10000;
+      const w = fourCornerWeights(node);
+      const x = half * (-w.wNW + w.wNE + w.wSE - w.wSW);
+      const y = half * (-w.wNW - w.wNE + w.wSE - w.wSW);
+      const jitter = half * 0.038;
+      const jx = (u01 - 0.5) * 2 * jitter;
+      const jy = (u02 - 0.5) * 2 * jitter;
+      const scale = 0.9;
+      return { x: x * scale + jx, y: y * scale + jy };
+    }
+
+    /**
+     * Area in coordinate del diagramma (origine al centro finestra) dove le etichette angoli
+     * non finiscono sotto #left-column o #filters-panel.
+     */
+    function chartBoundsForCornerLabels() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const cx = w * 0.5;
+      const cy = h * 0.5;
+      const lc = document.getElementById("left-column");
+      const fp = document.getElementById("filters-panel");
+      const pad = 16;
+      const leftEdge = lc ? lc.getBoundingClientRect().right + pad : pad;
+      const rightEdge = fp ? fp.getBoundingClientRect().left - pad : w - pad;
+      const topEdge = 18;
+      const bottomEdge = h - 22;
+      return {
+        minX: leftEdge - cx,
+        maxX: rightEdge - cx,
+        minY: topEdge - cy,
+        maxY: bottomEdge - cy
+      };
+    }
+
+    /** Margini coerenti con `chartBoundsForCornerLabels` per le etichette dei generi. */
+    function chartBoundsForGenreLabels() {
+      let { minX, maxX, minY, maxY } = chartBoundsForCornerLabels();
+      if (maxX - minX < 160) {
+        minX = -170;
+        maxX = 170;
+      }
+      if (maxY - minY < 120) {
+        minY = -130;
+        maxY = 130;
+      }
+      return { minX, maxX, minY, maxY };
+    }
+
+    /** Stessi generi «Prodotti di stampa» in CSV: etichette disperse verso il centro mappa (lontano dal pannello filtri). */
+    const STAMPA_LABEL_ORDER = ["Cartoline", "Poster", "Calendari", "Figurine"];
+
+    /**
+     * Ancore etichette generi: ventaglio, clamp con margine destro largo (#filters-panel ha z-index sopra l’SVG),
+     * cluster stampa con angoli verso il centro, rilassamento coppie.
+     */
+    function genreLabelAnchors(ordered, ptRing, radii, labelGap) {
+      const bounds = chartBoundsForGenreLabels();
+      const padXL = 76;
+      const padXR = 122;
+      const padY = 34;
+      const clampView = (x, y) => ({
+        x: Math.max(bounds.minX + padXL, Math.min(bounds.maxX - padXR, x)),
+        y: Math.max(bounds.minY + padY, Math.min(bounds.maxY - padY, y))
+      });
+      const pos = ordered.map((d, i) => {
+        const p = ptRing(d);
+        const h = hashCode(String(d.id || d.label || `${i}`));
+        const stampSlot = STAMPA_LABEL_ORDER.indexOf(String(d.label || ""));
+        const extraR = stampSlot >= 0 ? 18 : 0;
+        const rr = radii[i] + labelGap + extraR;
+        let ang;
+        if (stampSlot >= 0) {
+          const towardCenter = Math.atan2(-p.y, -p.x);
+          ang = towardCenter + (stampSlot - 1.5) * 0.78;
+        } else {
+          const baseAng = Math.atan2(p.y, p.x);
+          const spread = ((h % 53) - 26) * 0.0145;
+          ang = baseAng + spread;
+        }
+        const ux = Math.cos(ang);
+        const uy = Math.sin(ang);
+        const jSpan = stampSlot >= 0 ? 13 : 35;
+        const j = (((h >> 8) % jSpan) - (jSpan - 1) / 2) * (stampSlot >= 0 ? 0.38 : 0.68);
+        let lx = p.x + ux * rr - uy * j;
+        let ly = p.y + uy * rr + ux * j;
+        let c = clampView(lx, ly);
+        lx = c.x;
+        ly = c.y;
+        const need = radii[i] + 13;
+        let dx = lx - p.x;
+        let dy = ly - p.y;
+        let dist = Math.hypot(dx, dy) || 1;
+        if (dist < need) {
+          lx = p.x + (dx / dist) * need;
+          ly = p.y + (dy / dist) * need;
+          c = clampView(lx, ly);
+          lx = c.x;
+          ly = c.y;
+        }
+        return { lx, ly, p, r: radii[i] };
+      });
+      const minPair = 48;
+      for (let it = 0; it < 22; it++) {
+        for (let a = 0; a < pos.length; a++) {
+          for (let b = a + 1; b < pos.length; b++) {
+            const va = pos[a];
+            const vb = pos[b];
+            let dx = vb.lx - va.lx;
+            let dy = vb.ly - va.ly;
+            const dist = Math.hypot(dx, dy) || 1e-6;
+            if (dist < minPair) {
+              const push = (minPair - dist) * 0.52;
+              dx /= dist;
+              dy /= dist;
+              va.lx -= dx * push;
+              va.ly -= dy * push;
+              vb.lx += dx * push;
+              vb.ly += dy * push;
+            }
+          }
+        }
+      }
+      pos.forEach((o) => {
+        let dx = o.lx - o.p.x;
+        let dy = o.ly - o.p.y;
+        let dist = Math.hypot(dx, dy) || 1;
+        const need = o.r + 12;
+        if (dist < need) {
+          o.lx = o.p.x + (dx / dist) * need;
+          o.ly = o.p.y + (dy / dist) * need;
+        }
+        const c = clampView(o.lx, o.ly);
+        o.lx = c.x;
+        o.ly = c.y;
+      });
+      return pos;
+    }
+
+    /** Etichette ai quattro angoli: Privato, Pubblico, Artistico, Scientifico — sempre dentro l’area utile. */
+    function drawCompassSquareDecor(gRoot, half, filterTitles) {
+      const ft = filterTitles || { audience: "Dominio", artistic: "Scopo", professional: "Ambito" };
+      const ag = gRoot.append("g").attr("class", "filter-hex-anchors").style("pointer-events", "none");
+      ag.append("line")
+        .attr("x1", -half)
+        .attr("y1", 0)
+        .attr("x2", half)
+        .attr("y2", 0)
+        .attr("stroke", "rgba(0, 0, 0, 0.06)")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", "3 7");
+      ag.append("line")
+        .attr("x1", 0)
+        .attr("y1", -half)
+        .attr("x2", 0)
+        .attr("y2", half)
+        .attr("stroke", "rgba(0, 0, 0, 0.06)")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", "3 7");
+
+      let { minX, maxX, minY, maxY } = chartBoundsForCornerLabels();
+      if (maxX - minX < 160) {
+        minX = -170;
+        maxX = 170;
+      }
+      if (maxY - minY < 120) {
+        minY = -130;
+        maxY = 130;
+      }
+      const b = { minX, maxX, minY, maxY };
+      const dimA = ft.audience || "Dominio";
+      const dimS = ft.artistic || "Scopo";
+      /** Stima larghezza/altezza blocco due righe (anchor end = testo a sinistra di x). */
+      const estWEnd = 118;
+      const estWStart = 128;
+      const estH = 40;
+      const padBase = Math.max(52, half * 0.2);
+
+      let nwX = -half - padBase;
+      let nwY = -half - padBase;
+      let neX = half + padBase;
+      let neY = -half - padBase;
+      let seX = half + padBase;
+      let seY = half + padBase;
+      let swX = -half - padBase;
+      let swY = half + padBase;
+
+      if (nwX - estWEnd < b.minX) nwX = b.minX + estWEnd + 2;
+      if (nwY - estH * 0.55 < b.minY) nwY = b.minY + estH * 0.55 + 2;
+      if (neX + estWStart > b.maxX) neX = b.maxX - estWStart - 2;
+      if (neY - estH * 0.55 < b.minY) neY = b.minY + estH * 0.55 + 2;
+      if (seX + estWStart > b.maxX) seX = b.maxX - estWStart - 2;
+      if (seY + estH * 0.55 > b.maxY) seY = b.maxY - estH * 0.55 - 2;
+      if (swX - estWEnd < b.minX) swX = b.minX + estWEnd + 2;
+      if (swY + estH * 0.55 > b.maxY) swY = b.maxY - estH * 0.55 - 2;
+
+      const cornerBlocks = [
+        { x: nwX, y: nwY, anchor: "end", value: "Privato", dim: dimA },
+        { x: neX, y: neY, anchor: "start", value: "Pubblico", dim: dimA },
+        { x: seX, y: seY, anchor: "start", value: "Artistico", dim: dimS },
+        { x: swX, y: swY, anchor: "end", value: "Scientifico", dim: dimS }
+      ];
+      const lh = 16;
+      cornerBlocks.forEach((c) => {
+        const gCorner = ag.append("g").attr("class", "compass-corner-label");
+        gCorner
+          .append("text")
+          .attr("class", "filter-rim-label filter-rim-label--value")
+          .attr("x", c.x)
+          .attr("y", c.y - lh * 0.22)
+          .attr("text-anchor", c.anchor)
+          .attr("dominant-baseline", "middle")
+          .text(c.value);
+        gCorner
+          .append("text")
+          .attr("class", "filter-rim-label filter-rim-label--axis")
+          .attr("x", c.x)
+          .attr("y", c.y + lh * 0.78)
+          .attr("text-anchor", c.anchor)
+          .attr("dominant-baseline", "middle")
+          .text(c.dim);
+      });
+    }
+
+    /** True se almeno un valore di filtro è escluso (sottoinsieme rispetto ai valori mostrati). */
+    function filtersNarrowed() {
+      if (!graph?.filterMeta) return false;
+      for (const key of ["audience", "artistic"]) {
+        const all = filterUiValues(graph.filterMeta[key]);
+        if (!all.length) continue;
+        if (filterState[key].size < all.length) return true;
+      }
+      return false;
+    }
+
+    /**
+     * Ordine per legami sul quadrato: con filtri attivi coincide col cronologico;
+     * altrimenti categoria Mappa → macro-tema → tag → nome. La posizione segue i quattro angoli (Dominio in alto, Scopo in basso).
+     */
     function orderedForRelationalChord() {
       if (!graph?.details) return [];
       const vis = graph.details.filter((d) => nodeVisible(d));
+      if (filtersNarrowed() && graph.chronoOrder?.length) {
+        return graph.chronoOrder.filter((d) => nodeVisible(d));
+      }
       return vis.slice().sort((a, b) => {
         const ka = genreToMappaCategoryKey(a.label) || "\uffff";
         const kb = genreToMappaCategoryKey(b.label) || "\uffff";
@@ -846,9 +1757,9 @@
       if (ca && cb && ca === cb) w += 3;
       const ta = a.tags || {};
       const tb = b.tags || {};
-      if (ta.audience && ta.audience === tb.audience) w += 1;
-      if (ta.artistic && ta.artistic === tb.artistic) w += 1;
-      if (ta.professional && ta.professional === tb.professional) w += 1;
+      if (ta.audience && ta.audience === tb.audience && ta.audience !== "Nessuno") w += 1;
+      if (ta.artistic && ta.artistic === tb.artistic && ta.artistic !== "Nessuno") w += 1;
+      if (ta.professional && ta.professional === tb.professional && ta.professional !== "Nessuno") w += 1;
       return w;
     }
 
@@ -856,9 +1767,9 @@
     function relationalChordReasonLines(a, b) {
       const lines = [];
       const ft = graph?.filterTitles || {
-        audience: "Pubblico / destinatario",
-        artistic: "Artistico / scientifico",
-        professional: "Professionale / amatoriale"
+        audience: "Dominio",
+        artistic: "Scopo",
+        professional: "Ambito"
       };
       const ka = genreToMappaCategoryKey(a.label);
       const kb = genreToMappaCategoryKey(b.label);
@@ -873,16 +1784,23 @@
       }
       const ta = a.tags || {};
       const tb = b.tags || {};
-      if (ta.audience && ta.audience === tb.audience) {
+      if (ta.audience && ta.audience === tb.audience && ta.audience !== "Nessuno") {
         lines.push(`${ft.audience}: valore condiviso «${ta.audience}».`);
       }
-      if (ta.artistic && ta.artistic === tb.artistic) {
+      if (ta.artistic && ta.artistic === tb.artistic && ta.artistic !== "Nessuno") {
         lines.push(`${ft.artistic}: valore condiviso «${ta.artistic}».`);
       }
-      if (ta.professional && ta.professional === tb.professional) {
+      if (ta.professional && ta.professional === tb.professional && ta.professional !== "Nessuno") {
         lines.push(`${ft.professional}: valore condiviso «${ta.professional}».`);
       }
       return lines;
+    }
+
+    function setChordLinkLegendVisible(visible) {
+      const leg = document.getElementById("chord-legend-panel");
+      if (!leg) return;
+      leg.classList.toggle("chord-legend-panel--visible", Boolean(visible));
+      leg.setAttribute("aria-hidden", visible ? "false" : "true");
     }
 
     function closeLinkRelationPanel() {
@@ -890,6 +1808,8 @@
       if (!panel) return;
       panel.classList.remove("link-relation-panel--open");
       panel.setAttribute("aria-hidden", "true");
+      setChordLinkLegendVisible(false);
+      notifyHelpLayout();
     }
 
     function openLinkRelationPanel(linkDatum) {
@@ -918,6 +1838,8 @@
       }
       panel.classList.add("link-relation-panel--open");
       panel.setAttribute("aria-hidden", "false");
+      setChordLinkLegendVisible(true);
+      notifyHelpLayout();
     }
 
     function attachLinkRelationPanelEvents() {
@@ -926,7 +1848,7 @@
       btn.dataset.bound = "1";
       btn.addEventListener("click", () => closeLinkRelationPanel());
       window.addEventListener("keydown", (e) => {
-        if (e.key !== "Escape" || detailFocusId) return;
+        if (e.key !== "Escape" || detailFocusId || helpModeActive) return;
         const lr = document.getElementById("link-relation-panel");
         if (lr && lr.classList.contains("link-relation-panel--open")) closeLinkRelationPanel();
       });
@@ -948,28 +1870,34 @@
       return out;
     }
 
-    /** Curva tipo chord: quadratic da punto sul cerchio, controllo verso il centro. */
-    function relationalChordPathD(x0, y0, x1, y1) {
+    /** Curva tra due punti sul quadrato: cubic smooth (stile diagrammi puliti). */
+    function relationalChordPathD(x0, y0, x1, y1, ringRef) {
+      const rr = typeof ringRef === "number" && ringRef > 0 ? ringRef : 200;
       const mx = (x0 + x1) * 0.5;
       const my = (y0 + y1) * 0.5;
-      const inset = 0.3;
-      const cx = mx * inset;
-      const cy = my * inset;
-      return `M${x0},${y0} Q${cx},${cy} ${x1},${y1}`;
+      const dx = x1 - x0;
+      const dy = y1 - y0;
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len;
+      const ny = dx / len;
+      const bend = Math.min(rr * 0.4, len * 0.26);
+      const c1x = x0 + (mx - x0) * 0.52 + nx * bend;
+      const c1y = y0 + (my - y0) * 0.52 + ny * bend;
+      const c2x = x1 + (mx - x1) * 0.52 - nx * bend;
+      const c2y = y1 + (my - y1) * 0.52 - ny * bend;
+      return `M${x0},${y0} C${c1x},${c1y} ${c2x},${c2y} ${x1},${y1}`;
     }
 
     function blendNodeColorsForChordStroke(a, b) {
       const ca = nodeColor(a);
       const cb = nodeColor(b);
       const m = [(ca[0] + cb[0]) * 0.5, (ca[1] + cb[1]) * 0.5, (ca[2] + cb[2]) * 0.5];
-      const gx = 136;
-      const gy = 138;
-      const gz = 150;
-      const t = 0.52;
+      const ink = [32, 34, 40];
+      const t = 0.62;
       const o = [
-        m[0] * t + gx * (1 - t),
-        m[1] * t + gy * (1 - t),
-        m[2] * t + gz * (1 - t)
+        m[0] * t + ink[0] * (1 - t),
+        m[1] * t + ink[1] * (1 - t),
+        m[2] * t + ink[2] * (1 - t)
       ];
       return `rgb(${Math.round(o[0])},${Math.round(o[1])},${Math.round(o[2])})`;
     }
@@ -1027,11 +1955,223 @@
       return { counts, scores, radii };
     }
 
+    /**
+     * Dopo il posizionamento per attributi: respinge i centri se i pallini si sovrappongono,
+     * con richiamo verso la posizione iniziale così la mappa resta leggibile.
+     * La separazione è fortemente favorita in orizzontale (spinta anisotropa + extra gap se quasi in colonna).
+     * Coppie con entrambi Scopo «Scientifico»: distanza minima ancora maggiore.
+     * Coppie con Scopo «Scientifico» su un genere e Ambito «Professionale» sull’altro: distanza ancora maggiore.
+     * È previsto spazio extra tra i centri (`labelClearance`) così titoli radiali e pallini restano leggibili.
+     */
+    function relaxDotCollisionPreserving(ordered, positionById, radii, ringR) {
+      if (!ordered || ordered.length <= 1 || !positionById || !radii) return;
+      const n = ordered.length;
+      /** Spazio minimo tra i bordi dei pallini (oltre ai raggi). */
+      const minGap = 28;
+      /** Extra tra i centri per etichette radiali leggibili (testo + alone attorno al titolo). */
+      const labelClearance = 52;
+      const maxXY = ringR * 0.96;
+      /** Quanto “stringere” in X la direzione di respingimento (>1 = molto più spinta orizzontale). */
+      const pushHoriz = 3.25;
+      const pushVert = 0.34;
+      /** Se i due centri sono quasi allineati in verticale, esige più distanza euclidea (si separano meglio in orizzontale). */
+      const vertStackBonus = 24;
+      /** Extra distanza tra due generi con Scopo «Scientifico» (stesso polo verticale). */
+      const scientificoPairExtra = 44;
+      /** Extra tra un genere con Scopo «Scientifico» e uno con Ambito «Professionale» (due vertici distinti). */
+      const sciProfCrossExtra = 62;
+      const anchors = ordered.map((node) => {
+        const p = positionById.get(node.id);
+        return { x: p.x, y: p.y };
+      });
+      const pts = anchors.map((p) => ({ x: p.x, y: p.y }));
+      const iter = 230;
+      for (let t = 0; t < iter; t++) {
+        const anchorW = t < iter * 0.68 ? 0.028 : 0.078;
+        const anchorVertMul = 0.38;
+        for (let i = 0; i < n; i++) {
+          for (let j = i + 1; j < n; j++) {
+            let dx = pts[j].x - pts[i].x;
+            let dy = pts[j].y - pts[i].y;
+            let dist = Math.hypot(dx, dy);
+            if (dist < 1e-7) {
+              const ang = ((i * 47 + j * 13 + t * 5) % 628) * 0.01;
+              dx = Math.cos(ang) * 0.03;
+              dy = Math.sin(ang) * 0.03;
+              dist = Math.hypot(dx, dy);
+            }
+            const ux0 = dx / dist;
+            const uy0 = dy / dist;
+            const bothScientifico =
+              isScientificoScopo(ordered[i]) && isScientificoScopo(ordered[j]);
+            const sciProfCross =
+              (isScientificoScopo(ordered[i]) && isProfessionaleAmbito(ordered[j])) ||
+              (isProfessionaleAmbito(ordered[i]) && isScientificoScopo(ordered[j]));
+            const want =
+              radii[i] +
+              radii[j] +
+              minGap +
+              labelClearance +
+              (bothScientifico ? scientificoPairExtra : 0) +
+              (sciProfCross ? sciProfCrossExtra : 0) +
+              vertStackBonus * Math.min(1, Math.abs(uy0) * 1.15);
+            if (dist < want) {
+              const push =
+                (want - dist) *
+                0.9 *
+                (bothScientifico ? 1.12 : 1) *
+                (sciProfCross ? 1.14 : 1);
+              let ux = ux0 * pushHoriz;
+              let uy = uy0 * pushVert;
+              const nh = Math.hypot(ux, uy) || 1;
+              ux /= nh;
+              uy /= nh;
+              pts[i].x -= ux * push;
+              pts[i].y -= uy * push;
+              pts[j].x += ux * push;
+              pts[j].y += uy * push;
+            }
+          }
+        }
+        for (let i = 0; i < n; i++) {
+          const an = anchors[i];
+          pts[i].x += (an.x - pts[i].x) * anchorW;
+          pts[i].y += (an.y - pts[i].y) * anchorW * anchorVertMul;
+        }
+        for (let i = 0; i < n; i++) {
+          const ax = Math.abs(pts[i].x);
+          const ay = Math.abs(pts[i].y);
+          if (ax > maxXY || ay > maxXY) {
+            const sx = ax > maxXY ? maxXY / ax : 1;
+            const sy = ay > maxXY ? maxXY / ay : 1;
+            const s = Math.min(sx, sy);
+            pts[i].x *= s;
+            pts[i].y *= s;
+          }
+        }
+      }
+      ordered.forEach((node, i) => {
+        positionById.set(node.id, { x: pts[i].x, y: pts[i].y });
+      });
+    }
+
+    function subgroupDataForGenre(genreLabel) {
+      const rows = getMappaRowsForGenre(genreLabel) || [];
+      const bySub = new Map();
+      rows.forEach((r) => {
+        const s = String(r.sub || "").trim();
+        const d = String(r.det || "").trim();
+        const key = s || "—";
+        if (!bySub.has(key)) bySub.set(key, []);
+        if (d) bySub.get(key).push(d);
+      });
+      const out = [];
+      if (bySub.size > 0) {
+        bySub.forEach((details, name) => out.push({ name, details }));
+        return out;
+      }
+      if (rows.length > 0) return rows.map((r, i) => ({
+        name: `Voce ${i + 1}`,
+        details: r.det ? [String(r.det)] : []
+      }));
+      return out;
+    }
+
+    function renderDetailSubgroupOrbit(gRoot, centerNode, centerRadius, ringRadius) {
+      const items = subgroupDataForGenre(centerNode.label);
+      if (!items.length) return;
+      const n = items.length;
+      const orbitR = Math.max(74, Math.min(130, ringRadius * 0.72));
+      const descOrbitR = orbitR + 46;
+      const subgroupG = gRoot.append("g").attr("class", "detail-subgroup-orbit");
+      subgroupG.append("circle")
+        .attr("r", orbitR)
+        .attr("fill", "none")
+        .attr("stroke", "#d8d8dc")
+        .attr("stroke-width", 0.85)
+        .attr("stroke-dasharray", "3 10")
+        .attr("stroke-opacity", 0.85);
+      subgroupG.append("circle")
+        .attr("r", descOrbitR)
+        .attr("fill", "none")
+        .attr("stroke", "#e0e0e4")
+        .attr("stroke-width", 0.75)
+        .attr("stroke-dasharray", "2 9")
+        .attr("stroke-opacity", 0.8);
+      items.forEach((item, i) => {
+        const ang = -Math.PI / 2 + (2 * Math.PI * i) / n;
+        const x = orbitR * Math.cos(ang);
+        const y = orbitR * Math.sin(ang);
+        const dx = descOrbitR * Math.cos(ang);
+        const dy = descOrbitR * Math.sin(ang);
+        const dotR = Math.max(6, Math.min(12, centerRadius * 0.45));
+        const description = (item.details && item.details.length)
+          ? item.details[0]
+          : "";
+        subgroupG.append("line")
+          .attr("x1", 0)
+          .attr("y1", 0)
+          .attr("x2", x)
+          .attr("y2", y)
+          .attr("stroke", "#d2d2d7")
+          .attr("stroke-width", 0.9)
+          .attr("stroke-opacity", 0.85);
+        subgroupG.append("circle")
+          .attr("cx", x)
+          .attr("cy", y)
+          .attr("r", dotR)
+          .attr("fill", "#ffffff")
+          .attr("stroke", "rgba(0, 0, 0, 0.1)")
+          .attr("stroke-width", 1.25);
+        subgroupG.append("text")
+          .attr("text-anchor", "middle")
+          .attr("x", x)
+          .attr("y", y + dotR + 12)
+          .style("font-size", "11px")
+          .style("font-weight", "500")
+          .style("font-family", 'var(--font-body)')
+          .style("fill", "#636366")
+          .style("paint-order", "stroke fill")
+          .style("stroke", "#fafafa")
+          .style("stroke-width", "2px")
+          .text(shortenToThreeWords(item.name));
+        if (description) {
+          subgroupG.append("line")
+            .attr("x1", x)
+            .attr("y1", y)
+            .attr("x2", dx)
+            .attr("y2", dy)
+            .attr("stroke", "#d2d2d7")
+            .attr("stroke-width", 0.85)
+            .attr("stroke-opacity", 0.88);
+          subgroupG.append("circle")
+            .attr("cx", dx)
+            .attr("cy", dy)
+            .attr("r", 3.2)
+            .attr("fill", "#636366")
+            .attr("stroke", "#ffffff")
+            .attr("stroke-width", 1);
+          subgroupG.append("text")
+            .attr("text-anchor", "middle")
+            .attr("x", dx)
+            .attr("y", dy - 8)
+            .style("font-size", "10px")
+            .style("font-weight", "400")
+            .style("font-family", 'var(--font-body)')
+            .style("fill", "#86868b")
+            .style("paint-order", "stroke fill")
+            .style("stroke", "#fafafa")
+            .style("stroke-width", "2px")
+            .text(shortenToThreeWords(description));
+        }
+      });
+    }
+
     function chronoPlayPointForNode(cache, node) {
-      const ang = cache.angleById.get(node.id);
-      if (ang === undefined || !Number.isFinite(ang)) return null;
-      const R = cache.ringR;
-      return { x: R * Math.cos(ang), y: R * Math.sin(ang) };
+      if (!cache?.positionById) return null;
+      const p = cache.positionById.get(node.id);
+      if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) return null;
+      return { x: p.x, y: p.y };
     }
 
     function buildChronoPlayPathString(pathNodes, st) {
@@ -1088,99 +2228,122 @@
       if (loadError) {
         root.appendChild(Object.assign(document.createElement("p"), {
           textContent: loadError,
-          style: "padding:28px 20px;font-size:14px;max-width:420px;line-height:1.5;"
+          style: "padding:32px 24px;font-size:17px;max-width:420px;line-height:1.47;font-weight:400;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"
         }));
+        notifyHelpLayout();
         return;
       }
-      if (!graph?.details?.length) return;
+      if (!graph?.details?.length) {
+        notifyHelpLayout();
+        return;
+      }
 
       const ordered = orderedForRelationalChord();
       const n = ordered.length;
       const w = window.innerWidth;
       const h = window.innerHeight;
       const size = Math.min(w, h);
-      const ringR = size * 0.30;
+      const ringR = size * 0.285;
 
       const svg = d3.select(root).append("svg")
         .attr("id", "chord-svg")
         .attr("width", w)
         .attr("height", h)
         .attr("viewBox", `0 0 ${w} ${h}`)
-        .style("touch-action", "none");
-
-      svg.append("defs").append("filter")
-        .attr("id", "dot-shadow")
-        .attr("x", "-40%")
-        .attr("y", "-40%")
-        .attr("width", "180%")
-        .attr("height", "180%")
-        .append("feDropShadow")
-        .attr("dx", 0)
-        .attr("dy", 1.5)
-        .attr("stdDeviation", 1.8)
-        .attr("flood-opacity", 0.18);
+        .style("touch-action", "none")
+        .style("font-family", 'var(--font-body), -apple-system, BlinkMacSystemFont, sans-serif');
 
       chordSvgD3 = svg;
       const zoomWrap = svg.append("g").attr("class", "chord-zoom-wrap");
-      const g = zoomWrap.append("g").attr("transform", `translate(${w * 0.5},${h * 0.5})`);
+      const g = zoomWrap.append("g").attr("class", "chord-chart-pane");
 
-      g.append("circle")
-        .attr("r", ringR + 70)
-        .attr("fill", "#f4f4f6")
-        .attr("stroke", "#dedee2")
-        .attr("stroke-width", 1);
-      g.append("circle")
-        .attr("r", ringR)
+      const bgHalf = ringR + 108;
+      g.append("rect")
+        .attr("class", "chord-map-bg")
+        .attr("x", -bgHalf)
+        .attr("y", -bgHalf)
+        .attr("width", bgHalf * 2)
+        .attr("height", bgHalf * 2)
+        .attr("rx", 28)
+        .attr("ry", 28)
+        .attr("fill", "#fafafa")
+        .attr("stroke", "rgba(0, 0, 0, 0.06)")
+        .attr("stroke-width", 0.75);
+      g.append("rect")
+        .attr("class", "chord-map-ring")
+        .attr("x", -ringR)
+        .attr("y", -ringR)
+        .attr("width", ringR * 2)
+        .attr("height", ringR * 2)
+        .attr("rx", 6)
+        .attr("ry", 6)
         .attr("fill", "none")
-        .attr("stroke", "#d4d4da")
-        .attr("stroke-width", 1)
-        .attr("stroke-dasharray", "5 8");
+        .attr("stroke", "#d1d1d6")
+        .attr("stroke-width", 0.85)
+        .attr("stroke-dasharray", "4 11")
+        .attr("stroke-opacity", 0.88);
 
       if (n === 0) {
         g.append("text")
           .attr("text-anchor", "middle")
           .attr("dy", "0.35em")
-          .style("font-size", "14px")
-          .style("fill", "#5c5c5c")
+          .style("font-size", "15px")
+          .style("font-weight", "400")
+          .style("font-family", 'var(--font-body)')
+          .style("fill", "#86868b")
           .text("Nessun genere visibile: regola i filtri.");
         wireChordZoom(svg, zoomWrap, w, h);
+        notifyHelpLayout();
         return;
       }
 
-      const rMin = 6;
-      const rMax = 30;
+      const rMin = 2.1;
+      const rMax = 5.85;
       const { counts, radii } = computeDotRadii(ordered, rMin, rMax);
 
-      const angleById = new Map();
-      ordered.forEach((node, k) => {
-        const ang = -Math.PI / 2 + (2 * Math.PI * k) / n;
-        angleById.set(node.id, ang);
+      drawCompassSquareDecor(g, ringR, graph.filterTitles);
+
+      const positionById = new Map();
+      ordered.forEach((node) => {
+        positionById.set(node.id, genrePositionFromFourAngles(node, ringR));
       });
+      relaxDotCollisionPreserving(ordered, positionById, radii, ringR);
+      const ptRing = (node) => {
+        const p = positionById.get(node.id);
+        return p && Number.isFinite(p.x) && Number.isFinite(p.y) ? p : { x: 0, y: 0 };
+      };
 
       if (n === 1) {
         const node = ordered[0];
         const r = radii[0];
-        g.append("circle")
+        const pc = ptRing(node);
+        const focusG = g.append("g")
+          .attr("class", "single-genre-focus")
+          .attr("transform", `translate(${pc.x},${pc.y})`);
+        if (detailFocusId) {
+          renderDetailSubgroupOrbit(focusG, node, r, ringR);
+        }
+        focusG.append("circle")
           .attr("cx", 0)
           .attr("cy", 0)
           .attr("r", r)
           .attr("fill", nodeColorRgbString(node))
-          .attr("stroke", "#0a0a0a")
-          .attr("stroke-width", 2)
-          .attr("filter", "url(#dot-shadow)")
+          .attr("stroke", "rgba(0, 0, 0, 0.11)")
+          .attr("stroke-width", 1.35)
           .style("cursor", "pointer")
           .attr("title", () => {
             const rc = (getMappaRowsForGenre(node.label) || []).length;
             return `${labelWithYearTitle(node)} — ${counts[0]} sottogruppi (Sottocategoria), ${rc} voci in Mappa`;
           })
           .on("click", () => enterDetailView2D(node));
-        g.append("text")
+        focusG.append("text")
           .attr("text-anchor", "middle")
+          .attr("x", 0)
           .attr("y", r + 18)
-          .style("font-size", "12px")
-          .style("font-weight", "700")
-          .style("font-family", '"Space Grotesk", system-ui, sans-serif')
-          .style("fill", "#0a0a0a")
+          .style("font-size", "13px")
+          .style("font-weight", "500")
+          .style("font-family", 'var(--font-body)')
+          .style("fill", "#424245")
           .text(shortenToThreeWords(node.label) + formatYearSuffix(node));
         const playLayer1 = g.append("g")
           .attr("class", "chrono-play-layer")
@@ -1188,29 +2351,26 @@
         const pathHalo1 = playLayer1.append("path")
           .attr("fill", "none")
           .attr("stroke", "#ffffff")
-          .attr("stroke-width", 6)
+          .attr("stroke-width", 5)
           .attr("stroke-linecap", "round");
         const pathMain1 = playLayer1.append("path")
           .attr("fill", "none")
-          .attr("stroke", "#0a0a0a")
-          .attr("stroke-width", 3)
+          .attr("stroke", "#636366")
+          .attr("stroke-width", 2.25)
           .attr("stroke-linecap", "round");
         chordChronoPlayCache = {
-          angleById,
+          positionById,
           ringR: 0,
           pathHalo: pathHalo1,
           pathMain: pathMain1
         };
         updateChordChronoPlayPath();
         wireChordZoom(svg, zoomWrap, w, h);
+        notifyHelpLayout();
         return;
       }
 
       const linkList = !detailFocusId ? buildRelationalLinksForChord(ordered) : [];
-      const ptRing = (node) => {
-        const ang = angleById.get(node.id);
-        return { x: ringR * Math.cos(ang), y: ringR * Math.sin(ang) };
-      };
       const linksG = g.append("g")
         .attr("class", "relational-chords")
         .style("pointer-events", "all");
@@ -1231,37 +2391,59 @@
         }
         const p0 = ptRing(d.source);
         const p1 = ptRing(d.target);
-        const pathD = relationalChordPathD(p0.x, p0.y, p1.x, p1.y);
+        const pathD = relationalChordPathD(p0.x, p0.y, p1.x, p1.y, ringR);
+        const w = d.weight;
+        const baseW = 0.95 + Math.min(w, 10) * 0.22;
+        const tip = `${shortenToThreeWords(d.source.label)} ↔ ${shortenToThreeWords(d.target.label)} — legame in base a Mappa / macro-tema / tag (clic per il dettaglio)`;
         sel.select("path.relational-chord-hit")
           .attr("d", pathD)
           .attr("fill", "none")
           .attr("stroke", "transparent")
-          .attr("stroke-width", 18)
+          .attr("stroke-width", 20)
           .attr("pointer-events", "stroke")
-          .attr("stroke-linecap", "round");
+          .attr("stroke-linecap", "round")
+          .attr("title", tip);
         sel.select("path.relational-chord")
           .attr("d", pathD)
           .attr("fill", "none")
           .attr("stroke", blendNodeColorsForChordStroke(d.source, d.target))
-          .attr("stroke-width", 0.55 + Math.min(d.weight, 10) * 0.16)
-          .attr("stroke-opacity", Math.min(0.44, 0.09 + (d.weight - 2) * 0.035))
+          .attr("stroke-width", baseW)
+          .attr("stroke-opacity", 1)
           .attr("stroke-linecap", "round")
+          .attr("stroke-linejoin", "round")
           .style("pointer-events", "none")
           .style("vector-effect", "non-scaling-stroke");
       });
+
+      const playLayer = g.append("g")
+        .attr("class", "chrono-play-layer")
+        .style("pointer-events", "none");
+      const pathHalo = playLayer.append("path")
+        .attr("class", "chrono-play-halo")
+        .attr("fill", "none")
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 5)
+        .attr("stroke-linecap", "round")
+        .attr("stroke-linejoin", "round");
+      const pathMain = playLayer.append("path")
+        .attr("class", "chrono-play-main")
+        .attr("fill", "none")
+        .attr("stroke", "#636366")
+        .attr("stroke-width", 2.25)
+        .attr("stroke-linecap", "round")
+        .attr("stroke-linejoin", "round");
 
       const nodesG = g.append("g").attr("class", "genre-nodes");
       nodesG.selectAll("circle.genre-dot")
         .data(ordered)
         .join("circle")
         .attr("class", "genre-dot")
-        .attr("cx", (d) => ringR * Math.cos(angleById.get(d.id)))
-        .attr("cy", (d) => ringR * Math.sin(angleById.get(d.id)))
+        .attr("cx", (d) => ptRing(d).x)
+        .attr("cy", (d) => ptRing(d).y)
         .attr("r", (d, i) => radii[i])
         .attr("fill", (d) => nodeColorRgbString(d))
-        .attr("stroke", "#0a0a0a")
-        .attr("stroke-width", 2)
-        .attr("filter", "url(#dot-shadow)")
+        .attr("stroke", "rgba(0, 0, 0, 0.2)")
+        .attr("stroke-width", 1.38)
         .style("cursor", "pointer")
         .attr("title", (d, i) => {
           const rc = (getMappaRowsForGenre(d.label) || []).length;
@@ -1272,45 +2454,59 @@
           enterDetailView2D(d);
         });
 
-      const labelGap = 14 + rMax * 0.35;
-      nodesG.selectAll("text.genre-dot-label")
-        .data(ordered)
+      const nLabels = ordered.length;
+      const labelGap = 28 + rMax * 0.95 + Math.min(24, Math.max(0, nLabels - 9) * 0.78);
+      const labelTitlePx = nLabels > 24 ? 10 : nLabels > 18 ? 10.75 : 11.5;
+      const labelYearPx = Math.max(8.75, labelTitlePx - 1.1);
+      const labelAnchors = genreLabelAnchors(ordered, ptRing, radii, labelGap);
+      const labelDrawOrder = ordered.map((d, i) => ({ d, i })).sort((a, b) => {
+        if (a.d.label === "Calendari") return 1;
+        if (b.d.label === "Calendari") return -1;
+        return a.i - b.i;
+      });
+      const labelsG = g.append("g")
+        .attr("class", "genre-node-labels")
+        .style("pointer-events", "none");
+      labelsG.selectAll("text.genre-dot-label")
+        .data(labelDrawOrder)
         .join("text")
         .attr("class", "genre-dot-label")
         .attr("text-anchor", "middle")
-        .attr("x", (d) => (ringR + labelGap) * Math.cos(angleById.get(d.id)))
-        .attr("y", (d) => (ringR + labelGap) * Math.sin(angleById.get(d.id)))
-        .attr("dy", "0.35em")
-        .style("font-size", "10px")
-        .style("font-weight", "700")
-        .style("font-family", '"Space Grotesk", system-ui, sans-serif')
-        .style("fill", "#0a0a0a")
-        .style("paint-order", "stroke fill")
-        .style("stroke", "#ffffff")
-        .style("stroke-width", "3px")
-        .style("pointer-events", "none")
-        .text((d) => shortenToThreeWords(d.label) + formatYearSuffix(d));
-
-      const playLayer = g.append("g")
-        .attr("class", "chrono-play-layer")
-        .style("pointer-events", "none");
-      const pathHalo = playLayer.append("path")
-        .attr("class", "chrono-play-halo")
-        .attr("fill", "none")
-        .attr("stroke", "#ffffff")
-        .attr("stroke-width", 6)
-        .attr("stroke-linecap", "round")
-        .attr("stroke-linejoin", "round");
-      const pathMain = playLayer.append("path")
-        .attr("class", "chrono-play-main")
-        .attr("fill", "none")
-        .attr("stroke", "#0a0a0a")
-        .attr("stroke-width", 3)
-        .attr("stroke-linecap", "round")
-        .attr("stroke-linejoin", "round");
+        .attr("dominant-baseline", "middle")
+        .attr("transform", (row) => {
+          const a = labelAnchors[row.i];
+          const lx = a && Number.isFinite(a.lx) ? a.lx : 0;
+          const ly = a && Number.isFinite(a.ly) ? a.ly : 0;
+          return `translate(${lx},${ly})`;
+        })
+        .each(function (row) {
+          const d = row.d;
+          const root = d3.select(this);
+          root.selectAll("tspan").remove();
+          const yrRaw = formatYearSuffix(d).trim();
+          const yrInner = yrRaw.replace(/^\(\s*/, "").replace(/\s*\)$/, "").trim();
+          const hasYear = Boolean(yrInner);
+          root
+            .append("tspan")
+            .attr("class", "genre-dot-label__title")
+            .attr("x", 0)
+            .attr("dy", hasYear ? "-0.36em" : "0")
+            .style("font-size", `${labelTitlePx}px`)
+            .text(shortenToThreeWords(d.label));
+          if (hasYear) {
+            root
+              .append("tspan")
+              .attr("class", "genre-dot-label__year")
+              .attr("x", 0)
+              .attr("dy", "0.98em")
+              .style("font-size", `${labelYearPx}px`)
+              .text(`· ${yrInner}`);
+          }
+        });
+      labelsG.raise();
 
       chordChronoPlayCache = {
-        angleById,
+        positionById,
         ringR,
         pathHalo,
         pathMain
@@ -1318,18 +2514,60 @@
       updateChordChronoPlayPath();
 
       wireChordZoom(svg, zoomWrap, w, h);
+      notifyHelpLayout();
     }
 
     function wireChordZoom(svg, zoomWrap, w, h) {
+      if (!svg || !zoomWrap || typeof d3 === "undefined" || typeof d3.zoom !== "function") {
+        chordZoomBehavior = null;
+        updateZoomReadout(1);
+        updateZoomButtonsEnabled();
+        return;
+      }
+      svg.on(".zoom", null);
+      const cx = w * 0.5;
+      const cy = h * 0.5;
       chordZoomBehavior = d3.zoom()
-        .scaleExtent([0.32, 5])
+        .scaleExtent([0.4, 14])
         .extent([[0, 0], [w, h]])
+        .translateExtent([[-2.5 * w, -2.5 * h], [3.5 * w, 3.5 * h]])
+        .filter((event) => {
+          if (event.type === "wheel") return true;
+          if (event.button === 1) return false;
+          return !event.ctrlKey || event.type === "wheel";
+        })
         .on("zoom", (event) => {
           zoomWrap.attr("transform", event.transform);
           updateZoomReadout(event.transform.k);
         });
+
       svg.call(chordZoomBehavior);
-      svg.on("dblclick.zoom", null);
+      svg.call(chordZoomBehavior.transform, d3.zoomIdentity.translate(cx, cy));
+
+      const resetTransform = () => {
+        svg.transition().duration(220).call(
+          chordZoomBehavior.transform,
+          d3.zoomIdentity.translate(cx, cy)
+        );
+      };
+      zoomWrap
+        .selectAll(".chord-map-bg, .chord-map-ring")
+        .on("dblclick.reset-zoom", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          resetTransform();
+        });
+
+      updateZoomReadout(1);
+      updateZoomButtonsEnabled();
+    }
+
+    function updateZoomButtonsEnabled() {
+      const zoomInBtn = document.getElementById("zoom-in");
+      const zoomOutBtn = document.getElementById("zoom-out");
+      const ok = Boolean(chordSvgD3 && chordZoomBehavior);
+      if (zoomInBtn) zoomInBtn.disabled = !ok;
+      if (zoomOutBtn) zoomOutBtn.disabled = !ok;
     }
 
     function mountFiltersFromGraph(g) {
@@ -1337,14 +2575,12 @@
       if (!root || !g?.filterMeta) return;
       root.innerHTML = "";
       const dims = [
-        { key: "audience", title: g.filterTitles.audience, values: g.filterMeta.audience },
-        { key: "artistic", title: g.filterTitles.artistic, values: g.filterMeta.artistic },
-        { key: "professional", title: g.filterTitles.professional, values: g.filterMeta.professional }
+        { key: "audience", title: g.filterTitles.audience, values: filterUiValues(g.filterMeta.audience) },
+        { key: "artistic", title: g.filterTitles.artistic, values: filterUiValues(g.filterMeta.artistic) }
       ];
       filterState = {
-        audience: new Set(g.filterMeta.audience),
-        artistic: new Set(g.filterMeta.artistic),
-        professional: new Set(g.filterMeta.professional)
+        audience: new Set(dims[0].values),
+        artistic: new Set(dims[1].values)
       };
       dims.forEach(({ key, title, values }) => {
         const wrap = document.createElement("div");
@@ -1376,6 +2612,7 @@
         wrap.appendChild(row);
         root.appendChild(wrap);
       });
+      notifyHelpLayout();
     }
 
     function badgeColorForDim(dimKey, val) {
@@ -1509,26 +2746,30 @@
     }
 
     function updateChronoRangeHint() {
-      const el = document.getElementById("chrono-range");
-      if (!el || !graph?.chronoOrder?.length) {
-        if (el) el.textContent = "";
-        return;
+      try {
+        const el = document.getElementById("chrono-range");
+        if (!el || !graph?.chronoOrder?.length) {
+          if (el) el.textContent = "";
+          return;
+        }
+        const path = graph.chronoOrder.filter(nodeVisible);
+        if (path.length === 0) {
+          el.textContent = "Nessun genere visibile: regola i filtri per vedere il percorso.";
+          return;
+        }
+        const first = path[0];
+        const last = path[path.length - 1];
+        const y0 = first.year;
+        const y1 = last.year;
+        const same = path.length === 1;
+        if (same) {
+          el.textContent = `Un solo punto visibile: ${y0} — ${first.label}.`;
+          return;
+        }
+        el.textContent = `Inizio percorso: ${y0} — ${first.label}. Fine: ${y1} — ${last.label}. (${path.length} generi)`;
+      } finally {
+        notifyHelpLayout();
       }
-      const path = graph.chronoOrder.filter(nodeVisible);
-      if (path.length === 0) {
-        el.textContent = "Nessun genere visibile: regola i filtri per vedere il percorso.";
-        return;
-      }
-      const first = path[0];
-      const last = path[path.length - 1];
-      const y0 = first.year;
-      const y1 = last.year;
-      const same = path.length === 1;
-      if (same) {
-        el.textContent = `Un solo punto visibile: ${y0} — ${first.label}.`;
-        return;
-      }
-      el.textContent = `Inizio percorso: ${y0} — ${first.label}. Fine: ${y1} — ${last.label}. (${path.length} generi)`;
     }
 
     function loadMappaFotografiaTable() {
@@ -1632,7 +2873,7 @@
       btn.dataset.bound = "1";
       btn.addEventListener("click", () => exitDetailView2D());
       window.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && detailFocusId) exitDetailView2D();
+        if (e.key === "Escape" && detailFocusId && !helpModeActive) exitDetailView2D();
       });
     }
 
@@ -1684,6 +2925,7 @@
             : `Da Mappa Fotografia.csv — categoria «${mappaKey}», ${n} voci per questo genere.`;
         } else srcEl.textContent = "Nessuna categoria in Mappa Fotografia.csv associata a questo genere.";
       }
+      if (srcEl) lastDetailMappaSourceText = srcEl.textContent || "";
       groupsEl.innerHTML = "";
       if (rows.length === 0) {
         emptyEl.hidden = false;
@@ -1692,6 +2934,7 @@
           : (mappaKey
             ? "Nessuna riga trovata per questa categoria nel CSV."
             : "Aggiungi una corrispondenza nello script (GENRE_TO_MAPPA_CATEGORY) per collegare questo genere alla mappa.");
+        notifyHelpLayout();
         return;
       }
       emptyEl.hidden = true;
@@ -1719,16 +2962,16 @@
         wrap.appendChild(ul);
         groupsEl.appendChild(wrap);
       });
+      notifyHelpLayout();
     }
 
     function buildGraph2D(csv) {
       const details = [];
       const links = [];
-      const cols = csv.columns || [];
       const filterTitles = {
-        audience: cols[1] || "Colonna 2",
-        artistic: cols[2] || "Colonna 3",
-        professional: cols[3] || "Colonna 4"
+        audience: "Dominio",
+        artistic: "Scopo",
+        professional: "Ambito"
       };
 
       const rows = csv.getRows().filter((r) => String(r.get(0) || "").trim().length > 0);
@@ -1791,9 +3034,12 @@
       if (!d.tags || !graph?.filterMeta) return true;
       const t = d.tags;
       const fm = graph.filterMeta;
-      if (fm.audience.length && !filterState.audience.has(t.audience)) return false;
-      if (fm.artistic.length && !filterState.artistic.has(t.artistic)) return false;
-      if (fm.professional.length && !filterState.professional.has(t.professional)) return false;
+      if (filterUiValues(fm.audience).length) {
+        if (t.audience && t.audience !== "Nessuno" && !filterState.audience.has(t.audience)) return false;
+      }
+      if (filterUiValues(fm.artistic).length) {
+        if (t.artistic && t.artistic !== "Nessuno" && !filterState.artistic.has(t.artistic)) return false;
+      }
       return true;
     }
 
@@ -1810,13 +3056,13 @@
       if (node.level === 2 && node.tags) {
         const t = node.tags;
         const colors = [];
-        if (filterState.audience.has(t.audience) && paletteAudience[t.audience]) {
+        if ((filterState.audience.has(t.audience) || t.audience === "Nessuno") && paletteAudience[t.audience]) {
           colors.push(paletteAudience[t.audience]);
         }
-        if (filterState.artistic.has(t.artistic) && paletteArtistic[t.artistic]) {
+        if ((filterState.artistic.has(t.artistic) || t.artistic === "Nessuno") && paletteArtistic[t.artistic]) {
           colors.push(paletteArtistic[t.artistic]);
         }
-        if (filterState.professional.has(t.professional) && palettePro[t.professional]) {
+        if (t.professional && palettePro[t.professional]) {
           colors.push(palettePro[t.professional]);
         }
         if (colors.length > 0) {
@@ -1855,26 +3101,22 @@
     function attachZoomControls() {
       const zoomInBtn = document.getElementById("zoom-in");
       const zoomOutBtn = document.getElementById("zoom-out");
-      zoomInBtn.addEventListener("click", () => {
-        if (chordSvgD3 && chordZoomBehavior) {
-          chordSvgD3.transition().duration(140).call(chordZoomBehavior.scaleBy, 1.14);
-        }
-      });
-      zoomOutBtn.addEventListener("click", () => {
-        if (chordSvgD3 && chordZoomBehavior) {
-          chordSvgD3.transition().duration(140).call(chordZoomBehavior.scaleBy, 1 / 1.14);
-        }
-      });
-
-      window.addEventListener("keydown", (e) => {
-        if (!chordSvgD3 || !chordZoomBehavior) return;
-        if (e.key === "+" || e.key === "=") {
-          chordSvgD3.transition().duration(100).call(chordZoomBehavior.scaleBy, 1.08);
-        }
-        if (e.key === "-") {
-          chordSvgD3.transition().duration(100).call(chordZoomBehavior.scaleBy, 1 / 1.08);
-        }
-      });
+      if (zoomInBtn && zoomInBtn.dataset.zoomBound !== "1") {
+        zoomInBtn.dataset.zoomBound = "1";
+        zoomInBtn.addEventListener("click", () => {
+          if (!chordSvgD3 || !chordZoomBehavior) return;
+          chordSvgD3.transition().duration(160).call(chordZoomBehavior.scaleBy, 1.28);
+        });
+      }
+      if (zoomOutBtn && zoomOutBtn.dataset.zoomBound !== "1") {
+        zoomOutBtn.dataset.zoomBound = "1";
+        zoomOutBtn.addEventListener("click", () => {
+          if (!chordSvgD3 || !chordZoomBehavior) return;
+          chordSvgD3.transition().duration(160).call(chordZoomBehavior.scaleBy, 1 / 1.28);
+        });
+      }
+      updateZoomButtonsEnabled();
+      updateZoomReadout(1);
     }
 
     function updateZoomReadout(scaleK) {
