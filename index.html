@@ -459,12 +459,22 @@
     }
 
     .chrono-range {
-      margin: 0 0 10px;
+      margin: 0 0 14px;
       font-size: 12px;
-      line-height: 1.4;
+      line-height: 1.45;
       color: var(--muted);
       font-weight: 500;
       letter-spacing: -0.01em;
+    }
+
+    #ui > .chrono-range {
+      display: none;
+    }
+
+    body.help-mode #ui > .chrono-range:not(:empty) {
+      display: block;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
     }
 
     .chord-legend {
@@ -902,25 +912,6 @@
       display: block;
     }
 
-    .help-filters-left-below {
-      display: none;
-      margin: 0 0 18px;
-      padding: 14px 14px 16px;
-      font-size: 13px;
-      line-height: 1.5;
-      color: var(--muted);
-      font-weight: 400;
-      white-space: pre-line;
-      background: var(--panel-solid);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
-    }
-
-    body.help-mode .help-filters-left-below {
-      display: block;
-    }
-
     body.help-mode #detail-panel.detail-panel--open {
       filter: brightness(0.42);
       opacity: 0.88;
@@ -952,8 +943,8 @@
     <h1>Quadrato — generi</h1>
     <p id="subtitle-diagram" class="subtitle-diagram" aria-label="Lettura del quadrato e dei pallini"></p>
     <p id="subtitle-diagram-hint" class="subtitle-diagram-hint" aria-label="Suggerimento sul diagramma"></p>
+    <p id="chrono-range" class="chrono-range" aria-live="polite"></p>
     <div id="ui-interactive">
-    <p id="chrono-range" class="chrono-range sr-only" aria-live="polite"></p>
     <div class="zoom-controls">
       <button id="zoom-out" class="zoom-btn" type="button" aria-label="Riduci zoom">−</button>
       <button id="zoom-in" class="zoom-btn" type="button" aria-label="Aumenta zoom">+</button>
@@ -998,7 +989,6 @@
       <p class="filters-panel-hint">
         Combinazioni su <strong>Dominio</strong> e <strong>Scopo</strong>. Sul quadrato: in alto Privato (sinistra) e Pubblico (destra); in basso Scientifico (sinistra) e Artistico (destra). La posizione segue questi quattro angoli.
       </p>
-      <div id="help-filters-left-below" class="help-filters-left-below" aria-label="Collegamenti, zoom e ordine cronologico"></div>
       <div id="filters-root" class="filter-groups"></div>
       <p id="help-filters-hint" class="help-filters-hint"></p>
     </div>
@@ -1130,11 +1120,13 @@
     let helpHotspotSyncTimer = null;
 
     const HELP_COPY = {
-      diagram: "Clic su un pallino per aprire i dettagli del genere. Clic su una curva colorata tra due pallini per vedere cosa lega quei generi.\n\nLettura del quadrato — Ogni angolo corrisponde a un valore di tag: in alto a sinistra Privato, in alto a destra Pubblico (Dominio); in basso a sinistra Scientifico, in basso a destra Artistico (Scopo). Gli aloni colorati sono centrati su ogni pallino e usano lo stesso colore del genere (media dei tag Dominio e Scopo), in linea con la posizione sul quadrato. La posizione di ogni genere è la media pesata verso gli angoli coerenti con i suoi tag; «Nessuno» su un asse tende al centro tra i due angoli di quella riga o colonna. Raggio dei pallini: sottogruppi Mappa e peso righe.\n\nCurve colorate: affinità tra generi (Mappa, macro-tema, Dominio e Scopo nel CSV). Clic sulla curva: il riepilogo del legame compare nella legenda del pannello sinistro, sotto le righe della legenda.",
+      diagram: "Clic su un pallino per aprire i dettagli del genere. Clic su una curva colorata tra due pallini per vedere cosa lega quei generi.\n\nLettura del quadrato — Ogni angolo corrisponde a un valore di tag: in alto a sinistra Privato, in alto a destra Pubblico (Dominio); in basso a sinistra Scientifico, in basso a destra Artistico (Scopo). Gli aloni colorati sono centrati su ogni pallino e usano lo stesso colore del genere (media dei tag Dominio e Scopo), in linea con la posizione sul quadrato. La posizione di ogni genere è la media pesata verso gli angoli coerenti con i suoi tag; «Nessuno» su un asse tende al centro tra i due angoli di quella riga o colonna. Raggio dei pallini: sottogruppi Mappa e peso righe.\n\nFiltri (pannello a destra): stessi quattro poli — mostrano o nascondono i pallini senza spostarli, anche mentre un dettaglio genere è aperto.\n\nCurve colorate: affinità tra generi (Mappa, macro-tema, Dominio e Scopo nel CSV). Clic sulla curva: il riepilogo del legame compare nella legenda del pannello sinistro, sotto le righe della legenda.",
       diagramTooltip:
         "Clic su un pallino o su una curva colorata per aprire il dettaglio del genere o il riepilogo del legame. Passaggio del mouse sul pallino: si vedono solo le curve collegate a quel genere (se le curve sono visibili; altrimenti usa il pulsante «Mostra collegamenti»).",
       left: "Collegamenti: il pulsante sotto i controlli zoom nasconde o mostra tutte le curve di affinità tra i pallini.\n\nZoom sulla mappa: rotellina del mouse o pinch (touch) per ingrandire l’area del diagramma; trascina per spostare. Pulsanti + e − per zoom a step. Doppio clic sullo sfondo chiaro o sul quadrato tratteggiato ripristina zoom e posizione.",
-      filters: "Combinazioni su Dominio e Scopo del CSV. I filtri mostrano o nascondono i pallini senza spostarli. L’ordine cronologico dei generi visibili è riassunto a sinistra (sintesi sotto i controlli zoom). Le curve interne riflettono affinità tra generi ancora visibili.",
+      filters: "Combinazioni su Dominio e Scopo del CSV. I filtri mostrano o nascondono i pallini senza spostarli. Per i tag «Nessuno» si combinano riquadro e tendenza: i quattro rettangoli colorati del quadrato (come in mappa) corrispondono a Privato, Pubblico, Scientifico e Artistico; spariscono i generi che cadono nel riquadro di un polo deselezionato, oppure che tendono verso quel polo nei pesi sul quadrato. L’ordine cronologico dei generi visibili è riassunto a sinistra. Le curve interne collegano solo generi ancora visibili.",
+      filtersHelpUi:
+        "«Chiudi dettaglio» chiude solo il pannello del genere sotto. Per uscire dalla guida usa «Chiudi aiuto» in basso allo schermo.",
       link: "Riepiloga perché due generi risultano collegati (categoria Mappa, macro-tema, valori condivisi di Dominio e Scopo) e la somma dei criteri usata per lo spessore e l’opacità della curva. Il blocco si apre nella legenda del pannello sinistro, sotto le righe della legenda, dopo un clic sulla curva."
     };
 
@@ -1146,11 +1138,8 @@
           || "Apri un genere con un clic sul pallino per vedere qui i sottogruppi dalla Mappa Fotografia.csv.";
       }
       if (key === "left") {
-        const cr = document.getElementById("chrono-range");
-        const extra = (cr && cr.textContent && cr.textContent.trim())
-          ? `\n\n${cr.textContent.trim()}`
-          : "";
-        return HELP_COPY.left + extra;
+        /* Testo zoom/collegamenti è nel blocco #subtitle-diagram; niente tooltip flottante. */
+        return "";
       }
       if (key === "diagram") {
         return "";
@@ -1160,7 +1149,9 @@
 
     (function initSubtitleDiagram() {
       const el = document.getElementById("subtitle-diagram");
-      if (el) el.textContent = HELP_COPY.diagram;
+      if (el) {
+        el.textContent = `${HELP_COPY.diagram}\n\n${HELP_COPY.left}`;
+      }
       const hint = document.getElementById("subtitle-diagram-hint");
       if (hint) hint.textContent = HELP_COPY.diagramTooltip || "";
     })();
@@ -1239,16 +1230,6 @@
       }, 40);
     }
 
-    function refreshHelpFiltersLeftBelow() {
-      const el = document.getElementById("help-filters-left-below");
-      if (!el) return;
-      if (!helpModeActive) {
-        el.textContent = "";
-        return;
-      }
-      el.textContent = helpTextForKey("left");
-    }
-
     function hideHelpTooltip() {
       const tt = document.getElementById("help-tooltip");
       if (tt) {
@@ -1300,14 +1281,14 @@
         hideHelpTooltip();
         const fhOff = document.getElementById("help-filters-hint");
         if (fhOff) fhOff.textContent = "";
-        refreshHelpFiltersLeftBelow();
         document.querySelectorAll(".help-hotspot").forEach((h) => {
           h.hidden = true;
         });
       } else {
         const fhOn = document.getElementById("help-filters-hint");
-        if (fhOn) fhOn.textContent = HELP_COPY.filters;
-        refreshHelpFiltersLeftBelow();
+        if (fhOn) {
+          fhOn.textContent = `${HELP_COPY.filters}\n\n${HELP_COPY.filtersHelpUi}`;
+        }
         document.querySelectorAll(".help-hotspot").forEach((h) => {
           h.hidden = false;
         });
@@ -1364,7 +1345,9 @@
           if (!helpModeActive) return;
           clearHelpSpotlight();
           setHelpSpotlight(spotlightId);
-          showHelpTooltip(helpTextForKey(key), ev.clientX, ev.clientY);
+          const tip = helpTextForKey(key);
+          if (tip) showHelpTooltip(tip, ev.clientX, ev.clientY);
+          else hideHelpTooltip();
         });
         el.addEventListener("mouseleave", () => {
           if (!helpModeActive) return;
@@ -1574,6 +1557,13 @@
         return { wNW: 0.25, wNE: 0.25, wSE: 0.25, wSW: 0.25 };
       }
       return { wNW: wNW / s, wNE: wNE / s, wSE: wSE / s, wSW: wSW / s };
+    }
+
+    /** Coordinate ideali sul quadrato (mezza lato = 1), coerenti con `genrePositionFromFourAngles` senza jitter. */
+    function layoutHalfUnitXYFromWeights(w) {
+      const x = -w.wNW + w.wNE + w.wSE - w.wSW;
+      const y = -w.wNW - w.wNE + w.wSE - w.wSW;
+      return { x, y };
     }
 
     function genrePositionFromFourAngles(node, half) {
@@ -2792,6 +2782,15 @@
         if (t.checked) set.add(val);
         else set.delete(val);
         updateChronoRangeHint();
+        if (detailFocusId && graph?.details?.length) {
+          const focused = graph.details.find(
+            (d) => d.level === 2 && String(d.id) === String(detailFocusId)
+          );
+          if (focused && !detailDimsVisible(focused)) {
+            exitDetailView2D();
+            return;
+          }
+        }
         renderChordDiagram();
       });
     }
@@ -2911,7 +2910,6 @@
         }
         el.textContent = `Ordine cronologico (generi visibili): da ${y0} — ${first.label} a ${y1} — ${last.label}. (${path.length} generi)`;
       } finally {
-        refreshHelpFiltersLeftBelow();
         notifyHelpLayout();
       }
     }
@@ -3182,21 +3180,73 @@
       if (!d.tags || !graph?.filterMeta) return true;
       const t = d.tags;
       const fm = graph.filterMeta;
-      if (filterUiValues(fm.audience).length) {
-        if (t.audience && t.audience !== "Nessuno" && !filterState.audience.has(t.audience)) return false;
+      const audVals = filterUiValues(fm.audience);
+      const artVals = filterUiValues(fm.artistic);
+      if (audVals.length && filterState.audience.size === 0) return false;
+      if (artVals.length && filterState.artistic.size === 0) return false;
+      if (audVals.length) {
+        const aud = String(t.audience || "").trim();
+        if (aud && aud !== "Nessuno" && !filterState.audience.has(aud)) return false;
       }
-      if (filterUiValues(fm.artistic).length) {
-        if (t.artistic && t.artistic !== "Nessuno" && !filterState.artistic.has(t.artistic)) return false;
+      if (artVals.length) {
+        const art = String(t.artistic || "").trim();
+        if (art && art !== "Nessuno" && !filterState.artistic.has(art)) return false;
+      }
+      const w = fourCornerWeights(d);
+      const { x, y } = layoutHalfUnitXYFromWeights(w);
+      const e = 1e-8;
+      const eps = 1e-9;
+      const neutralCenter = Math.abs(x) < 1e-5 && Math.abs(y) < 1e-5;
+      if (audVals.length) {
+        const aud = String(t.audience || "").trim();
+        if (!aud || aud === "Nessuno") {
+          if (!filterState.audience.has("Privato")) {
+            if (neutralCenter) {
+              if (w.wNW > w.wNE + eps) return false;
+            } else if ((x <= e && y <= e) || w.wNW > w.wNE + eps) {
+              return false;
+            }
+          }
+          if (!filterState.audience.has("Pubblico")) {
+            if (neutralCenter) {
+              if (w.wNE > w.wNW + eps) return false;
+            } else if ((x >= -e && y <= e) || w.wNE > w.wNW + eps) {
+              return false;
+            }
+          }
+        }
+      }
+      if (artVals.length) {
+        const art = String(t.artistic || "").trim();
+        if (!art || art === "Nessuno") {
+          if (!filterState.artistic.has("Artistico")) {
+            if (neutralCenter) {
+              if (w.wSE > w.wSW + eps) return false;
+            } else if ((x >= -e && y >= -e) || w.wSE > w.wSW + eps) {
+              return false;
+            }
+          }
+          if (!filterState.artistic.has("Scientifico")) {
+            if (neutralCenter) {
+              if (w.wSW > w.wSE + eps) return false;
+            } else if ((x <= e && y >= -e) || w.wSW > w.wSE + eps) {
+              return false;
+            }
+          }
+        }
       }
       return true;
     }
 
-    /** Visibilità nel grafico (filtri +, in dettaglio, solo il sottoinsieme collegato al pallino). */
+    /** Visibilità nel grafico (filtri sempre; in dettaglio anche sottoinsieme collegato al pallino). */
     function nodeVisible(node) {
       if (detailFocusId) {
         if (node.level === 2) {
-          if (!detailVisibleNodeIds) return String(node.id) === String(detailFocusId);
-          return detailVisibleNodeIds.has(String(node.id));
+          const inDetailSubset = detailVisibleNodeIds
+            ? detailVisibleNodeIds.has(String(node.id))
+            : String(node.id) === String(detailFocusId);
+          if (!inDetailSubset) return false;
+          return detailDimsVisible(node);
         }
         return false;
       }
