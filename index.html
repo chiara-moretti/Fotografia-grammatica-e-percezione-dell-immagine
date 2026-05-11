@@ -91,6 +91,11 @@
         max-height: min(44vh, 420px);
       }
 
+      #detail-panel {
+        margin: 12px 0 0;
+        max-height: min(36vh, 320px);
+      }
+
       #chord-root {
         min-height: 180px;
       }
@@ -170,31 +175,6 @@
       pointer-events: none;
     }
 
-    #status-bar {
-      position: fixed;
-      right: 16px;
-      bottom: 16px;
-      left: auto;
-      z-index: 8;
-      max-width: min(360px, calc(100vw - 32px));
-      padding: 10px 14px;
-      background: var(--panel);
-      backdrop-filter: var(--blur);
-      -webkit-backdrop-filter: var(--blur);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-md);
-      font-size: 12px;
-      font-weight: 500;
-      line-height: 1.35;
-      color: var(--muted);
-      box-shadow: var(--shadow-sm);
-      pointer-events: none;
-    }
-
-    #status-bar.status-bar--error {
-      color: #ff3b30;
-    }
-
     #left-column {
       position: relative;
       z-index: 12;
@@ -211,7 +191,8 @@
       border: 1px solid var(--border-strong);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-md);
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
     #ui {
@@ -279,7 +260,7 @@
       display: none;
       flex: 0 1 auto;
       min-height: 0;
-      max-height: min(48%, 420px);
+      max-height: none;
       overflow-y: auto;
       width: 100%;
       box-sizing: border-box;
@@ -300,6 +281,9 @@
 
     #chord-legend-panel.chord-legend.chord-legend-panel--visible {
       display: block;
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: none;
     }
 
     #chord-legend-panel .chord-legend-title {
@@ -387,6 +371,18 @@
       overflow-x: hidden;
       overflow-y: auto;
       pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .filters-panel-main {
+      flex: 0 0 auto;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
     }
 
     #filters-panel h2 {
@@ -400,11 +396,16 @@
     }
 
     #filters-panel .filters-panel-hint {
+      display: none;
       margin: 0 0 16px;
       font-size: 13px;
       line-height: 1.45;
       color: var(--muted);
       font-weight: 400;
+    }
+
+    body.help-mode #filters-panel .filters-panel-hint {
+      display: block;
     }
 
     .filter-groups {
@@ -523,49 +524,55 @@
     }
 
     #detail-panel {
-      position: fixed;
-      left: 16px;
-      bottom: 16px;
-      z-index: 45;
-      width: min(380px, calc(100vw - 32px));
-      max-height: min(58vh, 520px);
+      position: relative;
+      flex: 0 1 auto;
+      width: 100%;
+      min-width: 0;
+      min-height: 0;
+      margin: 14px 0 0;
+      padding: 16px 14px 18px;
       box-sizing: border-box;
-      padding: 18px 20px 20px;
       background: var(--panel-solid);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow-x: hidden;
       overflow-y: auto;
       display: none;
       pointer-events: auto;
       font-family: var(--font-body);
+      align-self: stretch;
     }
 
     #detail-panel.detail-panel--open {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      max-height: min(46vh, 520px);
     }
 
     #detail-panel #detail-close {
       display: inline-flex;
       align-items: center;
+      justify-content: flex-start;
       gap: 6px;
-      margin-bottom: 14px;
-      padding: 6px 14px;
+      margin: 0 0 10px;
+      /* Stessa colonna del titolo: niente “pill” con padding che sposta il testo */
+      padding: 4px 8px 4px 0;
       font-size: 14px;
       font-weight: 500;
       letter-spacing: -0.01em;
       text-transform: none;
       color: var(--accent);
-      background: rgba(0, 113, 227, 0.08);
+      background: transparent;
       border: none;
-      border-radius: var(--radius-pill);
+      border-radius: var(--radius-md);
       cursor: pointer;
       font-family: inherit;
-      transition: background 0.2s ease;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     #detail-panel #detail-close:hover {
-      background: rgba(0, 113, 227, 0.14);
+      background: rgba(0, 113, 227, 0.08);
       color: var(--accent-hover);
     }
 
@@ -821,7 +828,6 @@
     body.help-mode #chord-root,
     body.help-mode #filters-panel,
     body.help-mode #left-column,
-    body.help-mode #status-bar,
     body.help-mode #detail-panel.detail-panel--open,
     body.help-mode #link-relation-panel.link-relation-panel--open {
       transition: none !important;
@@ -868,6 +874,12 @@
       box-shadow: var(--shadow-md);
     }
 
+    body.help-mode #filters-panel:has(#detail-panel.help-spotlight-target) {
+      filter: none;
+      opacity: 1;
+      box-shadow: var(--shadow-md);
+    }
+
     body.help-mode #filters-panel:hover {
       background: var(--panel-solid) !important;
       filter: none !important;
@@ -890,16 +902,23 @@
       display: block;
     }
 
-    body.help-mode #status-bar {
-      filter: brightness(0.45);
-      opacity: 0.85;
+    .help-filters-left-below {
+      display: none;
+      margin: 0 0 18px;
+      padding: 14px 14px 16px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+      font-weight: 400;
+      white-space: pre-line;
+      background: var(--panel-solid);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
     }
 
-    body.help-mode #status-bar.help-spotlight-target {
-      filter: none;
-      opacity: 1;
-      position: relative;
-      box-shadow: var(--shadow-sm);
+    body.help-mode .help-filters-left-below {
+      display: block;
     }
 
     body.help-mode #detail-panel.detail-panel--open {
@@ -948,7 +967,7 @@
 
   <div id="chord-legend-panel" class="chord-legend" aria-label="Legenda curve tra generi" aria-hidden="true">
     <p class="chord-legend-title">Legenda collegamenti</p>
-    <p class="chord-legend-intro">Le curve tra due pallini indicano affinità (categoria in Mappa, macro-tema e/o stessi tag del CSV). Più criteri coincidono, più la linea è spessa e scura. Clic sulla curva per il riepilogo.</p>
+    <p class="chord-legend-intro">Le curve tra due pallini indicano affinità (categoria in Mappa, macro-tema e/o stessi valori di Dominio e Scopo nel CSV). Più criteri coincidono, più la linea è spessa e scura. Clic sulla curva per il riepilogo.</p>
     <div class="chord-legend-row">
       <span class="chord-legend-swatch chord-legend-swatch--cat" aria-hidden="true"></span>
       <span>Stessa voce in <strong>Mappa Fotografia.csv</strong> (categoria)</span>
@@ -959,7 +978,7 @@
     </div>
     <div class="chord-legend-row">
       <span class="chord-legend-swatch chord-legend-swatch--tag" aria-hidden="true"></span>
-      <span>Stesso valore su una colonna <strong>tag</strong> del CSV (Dominio / Scopo / Ambito)</span>
+      <span>Stesso valore su <strong>Dominio</strong> o <strong>Scopo</strong> nel CSV</span>
     </div>
     <aside id="link-relation-panel" aria-hidden="true" aria-label="Dettaglio collegamento tra generi">
       <button id="link-relation-close" type="button">← Chiudi</button>
@@ -974,24 +993,24 @@
   <main id="chord-root" aria-label="Quadrato generi e collegamenti"></main>
 
   <aside id="filters-panel" aria-label="Filtri mappa">
-    <h2>Filtri</h2>
-    <p class="filters-panel-hint">
-      Combinazioni su <strong>Dominio</strong> e <strong>Scopo</strong>. Sul quadrato: in alto Privato (sinistra) e Pubblico (destra); in basso Scientifico (sinistra) e Artistico (destra). La posizione segue questi quattro angoli. <strong>Ambito</strong> non è filtrabile ma resta nel colore dei punti e nei collegamenti.
-    </p>
-    <div id="filters-root" class="filter-groups"></div>
-    <p id="help-filters-hint" class="help-filters-hint"></p>
+    <div class="filters-panel-main">
+      <h2>Filtri</h2>
+      <p class="filters-panel-hint">
+        Combinazioni su <strong>Dominio</strong> e <strong>Scopo</strong>. Sul quadrato: in alto Privato (sinistra) e Pubblico (destra); in basso Scientifico (sinistra) e Artistico (destra). La posizione segue questi quattro angoli.
+      </p>
+      <div id="help-filters-left-below" class="help-filters-left-below" aria-label="Collegamenti, zoom e ordine cronologico"></div>
+      <div id="filters-root" class="filter-groups"></div>
+      <p id="help-filters-hint" class="help-filters-hint"></p>
+    </div>
+    <div id="detail-panel" role="region" aria-label="Dettaglio categoria" aria-hidden="true">
+      <button id="detail-close" type="button">← Chiudi dettaglio</button>
+      <h2 id="detail-category-title"></h2>
+      <p id="detail-mappa-source" class="detail-mappa-source"></p>
+      <div id="detail-groups"></div>
+      <p id="detail-empty" class="detail-empty" hidden></p>
+    </div>
   </aside>
   </div>
-
-  <div id="status-bar" aria-live="polite"></div>
-
-  <aside id="detail-panel" aria-hidden="true" aria-label="Dettaglio categoria">
-    <button id="detail-close" type="button">← Chiudi dettaglio</button>
-    <h2 id="detail-category-title"></h2>
-    <p id="detail-mappa-source" class="detail-mappa-source"></p>
-    <div id="detail-groups"></div>
-    <p id="detail-empty" class="detail-empty" hidden></p>
-  </aside>
 
   <button type="button" id="help-toggle" aria-expanded="false" aria-controls="help-hotspot-layer">Aiuto</button>
   <div id="help-dim" aria-hidden="true"></div>
@@ -1006,7 +1025,6 @@
     let table;
     let graph;
     let loadError = "";
-    let rowsLoaded = 0;
 
     /** @type {d3.ZoomBehavior<SVGSVGElement, unknown> | null} */
     let chordZoomBehavior = null;
@@ -1092,6 +1110,9 @@
     let mappaByCategory = new Map();
     let mappaCsvError = "";
     let detailFocusId = null;
+    // In modalità dettaglio vogliamo mostrare nel grafico solo il pallino selezionato
+    // e gli eventuali altri pallini con cui ha collegamenti (per evitare "sotto-categorie" e rumore).
+    let detailVisibleNodeIds = null;
 
     const paletteAudience = {
       Pubblico: [9, 129, 74],
@@ -1103,27 +1124,21 @@
       Scientifico: [115, 60, 99],
       Nessuno: [0, 52, 89]
     };
-    const palettePro = {
-      Professionale: [0, 126, 167],
-      Amatoriale: [246, 174, 45],
-      Nessuno: [0, 52, 89]
-    };
 
     let helpModeActive = false;
     let lastDetailMappaSourceText = "";
     let helpHotspotSyncTimer = null;
 
     const HELP_COPY = {
-      diagram: "Clic su un pallino per aprire i dettagli del genere. Clic su una curva colorata tra due pallini per vedere cosa lega quei generi.\n\nLettura del quadrato — Ogni angolo corrisponde a un valore di tag: in alto a sinistra Privato, in alto a destra Pubblico (Dominio); in basso a sinistra Scientifico, in basso a destra Artistico (Scopo). Gli aloni colorati sono centrati su ogni pallino e usano lo stesso colore del genere (media dei tag Dominio / Scopo / Ambito), così la tinta segue dove stanno i generi sul quadrato. La posizione di ogni genere è la media pesata verso gli angoli coerenti con i suoi tag; «Nessuno» su un asse tende al centro tra i due angoli di quella riga o colonna. L’Ambito resta nel colore del punto e nei collegamenti, non nei filtri. Raggio dei pallini: sottogruppi Mappa e peso righe.\n\nCurve colorate: affinità tra generi (Mappa, macro-tema, tag CSV). Clic sulla curva: il riepilogo del legame compare nella legenda del pannello sinistro, sotto le righe della legenda.",
+      diagram: "Clic su un pallino per aprire i dettagli del genere. Clic su una curva colorata tra due pallini per vedere cosa lega quei generi.\n\nLettura del quadrato — Ogni angolo corrisponde a un valore di tag: in alto a sinistra Privato, in alto a destra Pubblico (Dominio); in basso a sinistra Scientifico, in basso a destra Artistico (Scopo). Gli aloni colorati sono centrati su ogni pallino e usano lo stesso colore del genere (media dei tag Dominio e Scopo), in linea con la posizione sul quadrato. La posizione di ogni genere è la media pesata verso gli angoli coerenti con i suoi tag; «Nessuno» su un asse tende al centro tra i due angoli di quella riga o colonna. Raggio dei pallini: sottogruppi Mappa e peso righe.\n\nCurve colorate: affinità tra generi (Mappa, macro-tema, Dominio e Scopo nel CSV). Clic sulla curva: il riepilogo del legame compare nella legenda del pannello sinistro, sotto le righe della legenda.",
       diagramTooltip:
         "Clic su un pallino o su una curva colorata per aprire il dettaglio del genere o il riepilogo del legame. Passaggio del mouse sul pallino: si vedono solo le curve collegate a quel genere (se le curve sono visibili; altrimenti usa il pulsante «Mostra collegamenti»).",
       left: "Collegamenti: il pulsante sotto i controlli zoom nasconde o mostra tutte le curve di affinità tra i pallini.\n\nZoom sulla mappa: rotellina del mouse o pinch (touch) per ingrandire l’area del diagramma; trascina per spostare. Pulsanti + e − per zoom a step. Doppio clic sullo sfondo chiaro o sul quadrato tratteggiato ripristina zoom e posizione.",
-      filters: "Combinazioni su Dominio e Scopo del CSV. Con filtri attivi, i generi visibili sul quadrato seguono l’ordine cronologico. Senza filtri, l’ordine è per tema / categoria; le curve interne mostrano affinità tra generi.",
-      status: "Indica quante righe del CSV principale sono state caricate oppure un messaggio di errore se il file non è raggiungibile (serve un server locale, non file://).",
-      link: "Riepiloga perché due generi risultano collegati (categoria Mappa, macro-tema, tag) e la somma dei criteri usata per lo spessore e l’opacità della curva. Il blocco si apre nella legenda del pannello sinistro, sotto le righe della legenda, dopo un clic sulla curva."
+      filters: "Combinazioni su Dominio e Scopo del CSV. I filtri mostrano o nascondono i pallini senza spostarli. L’ordine cronologico dei generi visibili è riassunto a sinistra (sintesi sotto i controlli zoom). Le curve interne riflettono affinità tra generi ancora visibili.",
+      link: "Riepiloga perché due generi risultano collegati (categoria Mappa, macro-tema, valori condivisi di Dominio e Scopo) e la somma dei criteri usata per lo spessore e l’opacità della curva. Il blocco si apre nella legenda del pannello sinistro, sotto le righe della legenda, dopo un clic sulla curva."
     };
 
-    const HELP_SPOTLIGHT_IDS = ["chord-root", "left-column", "filters-panel", "status-bar", "detail-panel", "link-relation-panel"];
+    const HELP_SPOTLIGHT_IDS = ["chord-root", "left-column", "filters-panel", "detail-panel", "link-relation-panel"];
 
     function helpTextForKey(key) {
       if (key === "detail") {
@@ -1133,7 +1148,7 @@
       if (key === "left") {
         const cr = document.getElementById("chrono-range");
         const extra = (cr && cr.textContent && cr.textContent.trim())
-          ? `\n\nOrdine cronologico (sintesi): ${cr.textContent.trim()}`
+          ? `\n\n${cr.textContent.trim()}`
           : "";
         return HELP_COPY.left + extra;
       }
@@ -1224,6 +1239,16 @@
       }, 40);
     }
 
+    function refreshHelpFiltersLeftBelow() {
+      const el = document.getElementById("help-filters-left-below");
+      if (!el) return;
+      if (!helpModeActive) {
+        el.textContent = "";
+        return;
+      }
+      el.textContent = helpTextForKey("left");
+    }
+
     function hideHelpTooltip() {
       const tt = document.getElementById("help-tooltip");
       if (tt) {
@@ -1275,12 +1300,14 @@
         hideHelpTooltip();
         const fhOff = document.getElementById("help-filters-hint");
         if (fhOff) fhOff.textContent = "";
+        refreshHelpFiltersLeftBelow();
         document.querySelectorAll(".help-hotspot").forEach((h) => {
           h.hidden = true;
         });
       } else {
         const fhOn = document.getElementById("help-filters-hint");
         if (fhOn) fhOn.textContent = HELP_COPY.filters;
+        refreshHelpFiltersLeftBelow();
         document.querySelectorAll(".help-hotspot").forEach((h) => {
           h.hidden = false;
         });
@@ -1347,7 +1374,6 @@
       }
 
       bindRegion(document.getElementById("left-column"), "left", "left-column");
-      bindRegion(document.getElementById("status-bar"), "status", "status-bar");
       bindRegion(document.getElementById("detail-panel"), "detail", "detail-panel");
       bindRegion(document.getElementById("link-relation-panel"), "link", "link-relation-panel");
     }
@@ -1398,8 +1424,8 @@
         links: [],
         detailInterweaves: [],
         chronoOrder: [],
-        filterMeta: { audience: [], artistic: [], professional: [] },
-        filterTitles: { audience: "", artistic: "", professional: "" }
+        filterMeta: { audience: [], artistic: [] },
+        filterTitles: { audience: "", artistic: "" }
       };
 
       loadTable(
@@ -1409,17 +1435,14 @@
         (loadedTable) => {
           table = loadedTable;
           graph = buildGraph2D(table);
-          rowsLoaded = graph.details.length;
           loadError = "";
           mountFiltersFromGraph(graph);
           updateChronoRangeHint();
           renderChordDiagram();
-          updateStatusBar();
         },
         () => {
           loadError = "Errore CSV: apri con server locale (non file://).";
           renderChordDiagram();
-          updateStatusBar();
         }
       );
     }
@@ -1432,13 +1455,6 @@
         chordResizeTimer = null;
         renderChordDiagram();
       }, 120);
-    }
-
-    function updateStatusBar() {
-      const el = document.getElementById("status-bar");
-      if (!el) return;
-      el.textContent = loadError || `Righe caricate: ${rowsLoaded}`;
-      el.classList.toggle("status-bar--error", Boolean(loadError));
     }
 
     function nodeColorRgbString(node) {
@@ -1458,19 +1474,41 @@
       return (metaList || []).filter((v) => String(v).trim() !== "Nessuno");
     }
 
+    /** Poli Dominio per il peso sul quadrato: sempre entrambi attivi (i filtri non spostano i pallini). */
+    function polesAudienceActiveForLayout() {
+      return { priv: true, pub: true };
+    }
+
+    /** Poli Scopo per il peso sul quadrato: sempre entrambi attivi (i filtri non spostano i pallini). */
+    function polesArtisticActiveForLayout() {
+      return { art: true, sci: true };
+    }
+
+    /** Generi da spostare leggermente verso il polo Artistico (SE) nel quadrato, oltre ai tag CSV. */
+    function genreArtisticLayoutNudgeAmount(node) {
+      const lab = String(node?.label || "").trim();
+      if (lab !== "Immagini ricordo" && !/^ritratto/i.test(lab)) return 0;
+      const { art: artOn } = polesArtisticActiveForLayout();
+      if (!artOn) return 0;
+      const art = String(node?.tags?.artistic || "").trim();
+      if (art === "Artistico") return 0;
+      if (art === "Scientifico") return 0.18;
+      return 0.2;
+    }
+
     /** Scopo (colonna «Artistico» nel CSV) = Scientifico: in rilassamento serve un po’ più di separazione. */
     function isScientificoScopo(node) {
       return String(node?.tags?.artistic || "").trim().toLowerCase() === "scientifico";
     }
 
-    /** Ambito (colonna Professionale / Amatoriale): piccolo offset visivo, non è più filtro. */
-    function isProfessionaleAmbito(node) {
+    /** Tag «Professionale» (colonna Professionale / Amatoriale nel CSV): piccolo offset nel layout punti, non colore. */
+    function isProfessionaleTag(node) {
       return String(node?.tags?.professional || "").trim().toLowerCase() === "professionale";
     }
 
     /**
-     * Quattro angoli del quadrato (in alto Privato / Pubblico, in basso Scientifico / Artistico):
-     * posizione = media pesata dei quattro angoli in base ai tag Dominio e Scopo.
+     * Quattro angoli del quadrato tratteggiato (in alto Privato / Pubblico, in basso Scientifico / Artistico):
+     * media pesata dai tag Dominio e Scopo nel CSV (i filtri mascherano i pallini ma non ricalcolano le posizioni).
      * NW = Privato, NE = Pubblico, SE = Artistico, SW = Scientifico.
      */
     function fourCornerWeights(node) {
@@ -1481,17 +1519,55 @@
       let wNE = 0;
       let wSE = 0;
       let wSW = 0;
-      if (aud === "Privato") wNW = 1;
-      else if (aud === "Pubblico") wNE = 1;
-      else {
-        wNW = spread;
-        wNE = spread;
+      const { priv: audPriv, pub: audPub } = polesAudienceActiveForLayout();
+      if (aud === "Privato") {
+        wNW = audPriv ? 1 : 0;
+        wNE = 0;
+      } else if (aud === "Pubblico") {
+        wNW = 0;
+        wNE = audPub ? 1 : 0;
+      } else {
+        if (audPriv && audPub) {
+          wNW = spread;
+          wNE = spread;
+        } else if (audPriv && !audPub) {
+          wNW = 2 * spread;
+          wNE = 0;
+        } else if (!audPriv && audPub) {
+          wNW = 0;
+          wNE = 2 * spread;
+        } else {
+          wNW = 0.25;
+          wNE = 0.25;
+        }
       }
-      if (art === "Artistico") wSE = 1;
-      else if (art === "Scientifico") wSW = 1;
-      else {
-        wSE = spread;
-        wSW = spread;
+      const { art: artOn, sci: sciOn } = polesArtisticActiveForLayout();
+      if (art === "Artistico") {
+        wSE = artOn ? 1 : 0;
+        wSW = 0;
+      } else if (art === "Scientifico") {
+        wSE = 0;
+        wSW = sciOn ? 1 : 0;
+      } else {
+        if (artOn && sciOn) {
+          wSE = spread;
+          wSW = spread;
+        } else if (artOn && !sciOn) {
+          wSE = 2 * spread;
+          wSW = 0;
+        } else if (!artOn && sciOn) {
+          wSE = 0;
+          wSW = 2 * spread;
+        } else {
+          wSE = 0.25;
+          wSW = 0.25;
+        }
+      }
+      const nudge = genreArtisticLayoutNudgeAmount(node);
+      if (nudge > 0 && wSW > 1e-9) {
+        const mv = Math.min(wSW, nudge);
+        wSE += mv;
+        wSW -= mv;
       }
       const s = wNW + wNE + wSE + wSW;
       if (s < 1e-9) {
@@ -1507,11 +1583,10 @@
       const w = fourCornerWeights(node);
       const x = half * (-w.wNW + w.wNE + w.wSE - w.wSW);
       const y = half * (-w.wNW - w.wNE + w.wSE - w.wSW);
-      const jitter = half * 0.038;
+      const jitter = half * 0.032;
       const jx = (u01 - 0.5) * 2 * jitter;
       const jy = (u02 - 0.5) * 2 * jitter;
-      const scale = 0.9;
-      return { x: x * scale + jx, y: y * scale + jy };
+      return { x: x + jx, y: y + jy };
     }
 
     /** Dimensioni e rettangolo schermo del contenitore del diagramma (centro = metà area SVG). */
@@ -1713,7 +1788,7 @@
 
     /** Etichette ai quattro angoli: Privato, Pubblico, Artistico, Scientifico — sempre dentro l’area utile. */
     function drawCompassSquareDecor(gRoot, half, filterTitles) {
-      const ft = filterTitles || { audience: "Dominio", artistic: "Scopo", professional: "Ambito" };
+      const ft = filterTitles || { audience: "Dominio", artistic: "Scopo" };
       const ag = gRoot.append("g").attr("class", "filter-hex-anchors").style("pointer-events", "none");
       ag.append("line")
         .attr("x1", -half)
@@ -1796,27 +1871,13 @@
       });
     }
 
-    /** True se almeno un valore di filtro è escluso (sottoinsieme rispetto ai valori mostrati). */
-    function filtersNarrowed() {
-      if (!graph?.filterMeta) return false;
-      for (const key of ["audience", "artistic"]) {
-        const all = filterUiValues(graph.filterMeta[key]);
-        if (!all.length) continue;
-        if (filterState[key].size < all.length) return true;
-      }
-      return false;
-    }
-
     /**
-     * Ordine per legami sul quadrato: con filtri attivi coincide col cronologico;
-     * altrimenti categoria Mappa → macro-tema → tag → nome. La posizione segue i quattro angoli (Dominio in alto, Scopo in basso).
+     * Ordine usato per layout, collisioni e curve: sempre tutti i generi del CSV in ordine
+     * categoria Mappa → macro-tema → Dominio/Scopo → nome (i filtri non cambiano posizioni né etichette).
      */
     function orderedForRelationalChord() {
       if (!graph?.details) return [];
-      const vis = graph.details.filter((d) => nodeVisible(d));
-      if (filtersNarrowed() && graph.chronoOrder?.length) {
-        return graph.chronoOrder.filter((d) => nodeVisible(d));
-      }
+      const vis = graph.details.filter((d) => nodeLayoutVisible(d));
       return vis.slice().sort((a, b) => {
         const ka = genreToMappaCategoryKey(a.label) || "\uffff";
         const kb = genreToMappaCategoryKey(b.label) || "\uffff";
@@ -1826,8 +1887,8 @@
         const tb = thematicCluster(b.label) || "";
         cmp = ta.localeCompare(tb, "it");
         if (cmp !== 0) return cmp;
-        const sa = `${a.tags.audience}|${a.tags.artistic}|${a.tags.professional}`;
-        const sb = `${b.tags.audience}|${b.tags.artistic}|${b.tags.professional}`;
+        const sa = `${a.tags.audience}|${a.tags.artistic}`;
+        const sb = `${b.tags.audience}|${b.tags.artistic}`;
         cmp = sa.localeCompare(sb, "it");
         if (cmp !== 0) return cmp;
         return a.label.localeCompare(b.label, "it");
@@ -1847,7 +1908,6 @@
       const tb = b.tags || {};
       if (ta.audience && ta.audience === tb.audience && ta.audience !== "Nessuno") w += 1;
       if (ta.artistic && ta.artistic === tb.artistic && ta.artistic !== "Nessuno") w += 1;
-      if (ta.professional && ta.professional === tb.professional && ta.professional !== "Nessuno") w += 1;
       return w;
     }
 
@@ -1856,8 +1916,7 @@
       const lines = [];
       const ft = graph?.filterTitles || {
         audience: "Dominio",
-        artistic: "Scopo",
-        professional: "Ambito"
+        artistic: "Scopo"
       };
       const ka = genreToMappaCategoryKey(a.label);
       const kb = genreToMappaCategoryKey(b.label);
@@ -1877,9 +1936,6 @@
       }
       if (ta.artistic && ta.artistic === tb.artistic && ta.artistic !== "Nessuno") {
         lines.push(`${ft.artistic}: valore condiviso «${ta.artistic}».`);
-      }
-      if (ta.professional && ta.professional === tb.professional && ta.professional !== "Nessuno") {
-        lines.push(`${ft.professional}: valore condiviso «${ta.professional}».`);
       }
       return lines;
     }
@@ -2052,7 +2108,7 @@
      * con richiamo verso la posizione iniziale così la mappa resta leggibile.
      * La separazione è fortemente favorita in orizzontale (spinta anisotropa + extra gap se quasi in colonna).
      * Coppie con entrambi Scopo «Scientifico»: distanza minima ancora maggiore.
-     * Coppie con Scopo «Scientifico» su un genere e Ambito «Professionale» sull’altro: distanza ancora maggiore.
+     * Coppie con Scopo «Scientifico» su un genere e tag «Professionale» sull’altro: distanza ancora maggiore.
      * È previsto spazio extra tra i centri (`labelClearance`) così titoli radiali e pallini restano leggibili.
      */
     function relaxDotCollisionPreserving(ordered, positionById, radii, ringR) {
@@ -2062,7 +2118,8 @@
       const minGap = 28;
       /** Extra tra i centri per etichette radiali leggibili (testo + alone attorno al titolo). */
       const labelClearance = 52;
-      const maxXY = ringR * 0.96;
+      const insetPad = 4;
+      const maxBoundFor = (i) => Math.max(ringR * 0.2, ringR - radii[i] - insetPad);
       /** Quanto “stringere” in X la direzione di respingimento (>1 = molto più spinta orizzontale). */
       const pushHoriz = 3.25;
       const pushVert = 0.34;
@@ -2070,7 +2127,7 @@
       const vertStackBonus = 24;
       /** Extra distanza tra due generi con Scopo «Scientifico» (stesso polo verticale). */
       const scientificoPairExtra = 44;
-      /** Extra tra un genere con Scopo «Scientifico» e uno con Ambito «Professionale» (due vertici distinti). */
+      /** Extra tra un genere con Scopo «Scientifico» e uno con tag «Professionale» (due vertici distinti). */
       const sciProfCrossExtra = 62;
       const anchors = ordered.map((node) => {
         const p = positionById.get(node.id);
@@ -2097,8 +2154,8 @@
             const bothScientifico =
               isScientificoScopo(ordered[i]) && isScientificoScopo(ordered[j]);
             const sciProfCross =
-              (isScientificoScopo(ordered[i]) && isProfessionaleAmbito(ordered[j])) ||
-              (isProfessionaleAmbito(ordered[i]) && isScientificoScopo(ordered[j]));
+              (isScientificoScopo(ordered[i]) && isProfessionaleTag(ordered[j])) ||
+              (isProfessionaleTag(ordered[i]) && isScientificoScopo(ordered[j]));
             const want =
               radii[i] +
               radii[j] +
@@ -2131,15 +2188,9 @@
           pts[i].y += (an.y - pts[i].y) * anchorW * anchorVertMul;
         }
         for (let i = 0; i < n; i++) {
-          const ax = Math.abs(pts[i].x);
-          const ay = Math.abs(pts[i].y);
-          if (ax > maxXY || ay > maxXY) {
-            const sx = ax > maxXY ? maxXY / ax : 1;
-            const sy = ay > maxXY ? maxXY / ay : 1;
-            const s = Math.min(sx, sy);
-            pts[i].x *= s;
-            pts[i].y *= s;
-          }
+          const b = maxBoundFor(i);
+          pts[i].x = Math.min(b, Math.max(-b, pts[i].x));
+          pts[i].y = Math.min(b, Math.max(-b, pts[i].y));
         }
       }
       ordered.forEach((node, i) => {
@@ -2311,6 +2362,70 @@
         .attr("fill", "#fafafa")
         .attr("stroke", "rgba(0, 0, 0, 0.06)")
         .attr("stroke-width", 0.75);
+
+      const clipId = `chord-inner-square-${hashCode(`${w}x${h}x${ringR}`)}`;
+      const qd = g.append("defs").attr("class", "chord-quad-defs");
+      qd.append("clipPath")
+        .attr("id", clipId)
+        .append("rect")
+        .attr("x", -ringR)
+        .attr("y", -ringR)
+        .attr("width", ringR * 2)
+        .attr("height", ringR * 2)
+        .attr("rx", 6)
+        .attr("ry", 6);
+      const rgbA = (rgb, a) => `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`;
+      const mkLin = (id, x1, y1, x2, y2, rgb) => {
+        const lg = qd
+          .append("linearGradient")
+          .attr("id", id)
+          .attr("gradientUnits", "userSpaceOnUse")
+          .attr("x1", x1)
+          .attr("y1", y1)
+          .attr("x2", x2)
+          .attr("y2", y2);
+        lg.append("stop").attr("offset", "0%").attr("stop-color", rgbA(rgb, 0.2));
+        lg.append("stop").attr("offset", "55%").attr("stop-color", rgbA(rgb, 0.07));
+        lg.append("stop").attr("offset", "100%").attr("stop-color", rgbA(rgb, 0.02));
+      };
+      const r = ringR;
+      mkLin(`${clipId}-nw`, -r, -r, 0, 0, paletteAudience.Privato);
+      mkLin(`${clipId}-ne`, r, -r, 0, 0, paletteAudience.Pubblico);
+      mkLin(`${clipId}-se`, r, r, 0, 0, paletteArtistic.Artistico);
+      mkLin(`${clipId}-sw`, -r, r, 0, 0, paletteArtistic.Scientifico);
+
+      const quadG = g.append("g")
+        .attr("class", "chord-quad-tints")
+        .attr("clip-path", `url(#${clipId})`);
+      quadG
+        .append("rect")
+        .attr("x", -r)
+        .attr("y", -r)
+        .attr("width", r)
+        .attr("height", r)
+        .attr("fill", `url(#${clipId}-nw)`);
+      quadG
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", -r)
+        .attr("width", r)
+        .attr("height", r)
+        .attr("fill", `url(#${clipId}-ne)`);
+      quadG
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", r)
+        .attr("height", r)
+        .attr("fill", `url(#${clipId}-se)`);
+      quadG
+        .append("rect")
+        .attr("x", -r)
+        .attr("y", 0)
+        .attr("width", r)
+        .attr("height", r)
+        .attr("fill", `url(#${clipId}-sw)`);
+
       g.append("rect")
         .attr("class", "chord-map-ring")
         .attr("x", -ringR)
@@ -2353,7 +2468,14 @@
         return p && Number.isFinite(p.x) && Number.isFinite(p.y) ? p : { x: 0, y: 0 };
       };
 
-      drawGenreDotHalos(g, ringR, ordered, ptRing, radii);
+      const orderedDraw = ordered.filter((d) => nodeVisible(d));
+      const indexInLayout = (d) => ordered.indexOf(d);
+      const radiiDraw = orderedDraw.map((d) => {
+        const ix = indexInLayout(d);
+        return ix >= 0 ? radii[ix] : rMin;
+      });
+
+      drawGenreDotHalos(g, ringR, orderedDraw, ptRing, radiiDraw);
       drawCompassSquareDecor(g, ringR, graph.filterTitles);
 
       if (n === 1) {
@@ -2364,6 +2486,9 @@
           .attr("class", "single-genre-focus")
           .attr("transform", `translate(${pc.x},${pc.y})`);
         if (detailFocusId) {
+          // In modalità dettaglio, non mostriamo sotto-categorie dentro il grafico:
+          // restano visibili solo i collegamenti del pallino con gli altri.
+        } else {
           renderDetailSubgroupOrbit(focusG, node, r, ringR);
         }
         focusG.append("circle")
@@ -2393,7 +2518,14 @@
         return;
       }
 
-      const linkList = !detailFocusId ? buildRelationalLinksForChord(ordered) : [];
+      let linkList = buildRelationalLinksForChord(ordered);
+      linkList = linkList.filter((l) => nodeVisible(l.source) && nodeVisible(l.target));
+      // In modalità dettaglio, vogliamo mostrare solo i collegamenti incidenti al pallino selezionato.
+      if (detailFocusId) {
+        linkList = linkList.filter(
+          (l) => String(l.source.id) === String(detailFocusId) || String(l.target.id) === String(detailFocusId)
+        );
+      }
       const linksG = g.append("g")
         .attr("class", "relational-chords")
         .style("pointer-events", "all");
@@ -2455,19 +2587,21 @@
 
       const nodesG = g.append("g").attr("class", "genre-nodes");
       nodesG.selectAll("circle.genre-dot")
-        .data(ordered)
+        .data(orderedDraw)
         .join("circle")
         .attr("class", "genre-dot")
         .attr("cx", (d) => ptRing(d).x)
         .attr("cy", (d) => ptRing(d).y)
-        .attr("r", (d, i) => radii[i])
+        .attr("r", (d, i) => radiiDraw[i])
         .attr("fill", (d) => nodeColorRgbString(d))
         .attr("stroke", "rgba(0, 0, 0, 0.2)")
         .attr("stroke-width", 1.38)
         .style("cursor", "pointer")
         .attr("title", (d, i) => {
+          const ix = indexInLayout(d);
+          const ci = ix >= 0 ? ix : i;
           const rc = (getMappaRowsForGenre(d.label) || []).length;
-          return `${labelWithYearTitle(d)} — ${counts[i]} sottogruppi (Sottocategoria), ${rc} voci in Mappa`;
+          return `${labelWithYearTitle(d)} — ${counts[ci]} sottogruppi (Sottocategoria), ${rc} voci in Mappa`;
         })
         .on("click", (event, d) => {
           event.stopPropagation();
@@ -2485,11 +2619,14 @@
       const labelTitlePx = nLabels > 24 ? 10 : nLabels > 18 ? 10.75 : 11.5;
       const labelYearPx = Math.max(8.75, labelTitlePx - 1.1);
       const labelAnchors = genreLabelAnchors(ordered, ptRing, radii, labelGap);
-      const labelDrawOrder = ordered.map((d, i) => ({ d, i })).sort((a, b) => {
-        if (a.d.label === "Calendari") return 1;
-        if (b.d.label === "Calendari") return -1;
-        return a.i - b.i;
-      });
+      const labelDrawOrder = orderedDraw
+        .map((d) => ({ d, i: indexInLayout(d) }))
+        .filter((row) => row.i >= 0)
+        .sort((a, b) => {
+          if (a.d.label === "Calendari") return 1;
+          if (b.d.label === "Calendari") return -1;
+          return a.i - b.i;
+        });
       const labelsG = g.append("g")
         .attr("class", "genre-node-labels")
         .style("pointer-events", "none");
@@ -2569,7 +2706,7 @@
         );
       };
       zoomWrap
-        .selectAll(".chord-map-bg, .chord-map-ring")
+        .selectAll(".chord-map-bg, .chord-map-ring, .chord-quad-tints")
         .on("dblclick.reset-zoom", function (event) {
           event.preventDefault();
           event.stopPropagation();
@@ -2634,11 +2771,8 @@
     }
 
     function badgeColorForDim(dimKey, val) {
-      const map =
-        dimKey === "audience" ? paletteAudience
-          : dimKey === "artistic" ? paletteArtistic
-            : palettePro;
-      const rgb = map[val];
+      const map = dimKey === "audience" ? paletteAudience : dimKey === "artistic" ? paletteArtistic : null;
+      const rgb = map && map[val];
       if (rgb) return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
       return "rgb(140, 150, 175)";
     }
@@ -2693,6 +2827,9 @@
 
     function chordHoverSet(nodeId) {
       if (!relationalChordsUserVisible) return;
+      // In modalità dettaglio, l'hover non deve mai "spegnere" le curve visibili:
+      // manteniamo sempre come riferimento il pallino selezionato.
+      if (detailFocusId) nodeId = detailFocusId;
       chordHoverNodeId = nodeId;
       chordHoverCancelClear();
       const sel = chordLinksSelection();
@@ -2774,6 +2911,7 @@
         }
         el.textContent = `Ordine cronologico (generi visibili): da ${y0} — ${first.label} a ${y1} — ${last.label}. (${path.length} generi)`;
       } finally {
+        refreshHelpFiltersLeftBelow();
         notifyHelpLayout();
       }
     }
@@ -2887,6 +3025,18 @@
       if (!node || node.level !== 2 || !graph) return;
       closeLinkRelationPanel();
       detailFocusId = node.id;
+      // Calcolo l'insieme di generi da mostrare nel grafico: il pallino cliccato
+      // + solo quelli con cui ha collegamenti sufficienti.
+      // Nota: i collegamenti del chord usano soglia `relationalChordWeight(...) >= 2`.
+      const visibleIds = new Set();
+      visibleIds.add(String(node.id));
+      const allGenres = graph?.details?.filter((d) => d.level === 2) || [];
+      for (const other of allGenres) {
+        if (String(other.id) === String(node.id)) continue;
+        const w = relationalChordWeight(node, other);
+        if (w >= 2) visibleIds.add(String(other.id));
+      }
+      detailVisibleNodeIds = visibleIds;
       updateDetailPanelDom(true);
       refreshDetailPanel();
       renderChordDiagram();
@@ -2894,6 +3044,7 @@
 
     function exitDetailView2D() {
       detailFocusId = null;
+      detailVisibleNodeIds = null;
       updateDetailPanelDom(false);
       renderChordDiagram();
     }
@@ -2972,29 +3123,24 @@
       const links = [];
       const filterTitles = {
         audience: "Dominio",
-        artistic: "Scopo",
-        professional: "Ambito"
+        artistic: "Scopo"
       };
 
       const rows = csv.getRows().filter((r) => String(r.get(0) || "").trim().length > 0);
       const audienceSet = new Set();
       const artisticSet = new Set();
-      const professionalSet = new Set();
 
       rows.forEach((row) => {
         const aud = String(row.get(1) || "").trim();
         const art = String(row.get(2) || "").trim();
-        const pro = String(row.get(3) || "").trim();
         if (aud) audienceSet.add(aud);
         if (art) artisticSet.add(art);
-        if (pro) professionalSet.add(pro);
       });
 
       const sortVals = (a, b) => a.localeCompare(b, "it");
       const filterMeta = {
         audience: [...audienceSet].sort(sortVals),
-        artistic: [...artisticSet].sort(sortVals),
-        professional: [...professionalSet].sort(sortVals)
+        artistic: [...artisticSet].sort(sortVals)
       };
 
       const dataRows = rows.filter((r) => String(r.get(0) || "").trim().length > 0);
@@ -3045,12 +3191,21 @@
       return true;
     }
 
+    /** Visibilità nel grafico (filtri +, in dettaglio, solo il sottoinsieme collegato al pallino). */
     function nodeVisible(node) {
       if (detailFocusId) {
-        if (node.level === 2) return node.id === detailFocusId;
+        if (node.level === 2) {
+          if (!detailVisibleNodeIds) return String(node.id) === String(detailFocusId);
+          return detailVisibleNodeIds.has(String(node.id));
+        }
         return false;
       }
       if (node.level === 2) return detailDimsVisible(node);
+      return true;
+    }
+
+    /** Sempre tutti i generi per il layout (posizioni, collisioni, ancore etichette): filtri e dettaglio influiscono solo sul disegno. */
+    function nodeLayoutVisible() {
       return true;
     }
 
@@ -3063,9 +3218,6 @@
         }
         if ((filterState.artistic.has(t.artistic) || t.artistic === "Nessuno") && paletteArtistic[t.artistic]) {
           colors.push(paletteArtistic[t.artistic]);
-        }
-        if (t.professional && palettePro[t.professional]) {
-          colors.push(palettePro[t.professional]);
         }
         if (colors.length > 0) {
           const c = [0, 0, 0];
