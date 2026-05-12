@@ -1120,11 +1120,11 @@
     let helpHotspotSyncTimer = null;
 
     const HELP_COPY = {
-      diagram: "Clic su un pallino per aprire i dettagli del genere. Clic su una curva colorata tra due pallini per vedere cosa lega quei generi.\n\nLettura del quadrato — Ogni angolo corrisponde a un valore di tag: in alto a sinistra Privato, in alto a destra Pubblico (Dominio); in basso a sinistra Scientifico, in basso a destra Artistico (Scopo). Gli aloni colorati sono centrati su ogni pallino e usano lo stesso colore del genere (media dei tag Dominio e Scopo), in linea con la posizione sul quadrato. La posizione di ogni genere è la media pesata verso gli angoli coerenti con i suoi tag; «Nessuno» su un asse tende al centro tra i due angoli di quella riga o colonna. Raggio dei pallini: sottogruppi Mappa e peso righe.\n\nFiltri (pannello a destra): stessi quattro poli — mostrano o nascondono i pallini senza spostarli, anche mentre un dettaglio genere è aperto.\n\nCurve colorate: affinità tra generi (Mappa, macro-tema, Dominio e Scopo nel CSV). Clic sulla curva: il riepilogo del legame compare nella legenda del pannello sinistro, sotto le righe della legenda.",
+      diagram: "Clic su un pallino per aprire i dettagli del genere. Clic su una curva colorata tra due pallini per vedere cosa lega quei generi.\n\nLettura del quadrato — Ogni angolo corrisponde a un valore di tag: in alto a sinistra Privato, in alto a destra Pubblico (Dominio); in basso a sinistra Scientifico, in basso a destra Artistico (Scopo). Gli aloni colorati sono centrati su ogni pallino e usano lo stesso colore del genere (media dei tag Dominio e Scopo), in linea con la posizione sul quadrato. La posizione di ogni genere è la media pesata verso gli angoli coerenti con i suoi tag nel CSV. Raggio dei pallini: sottogruppi Mappa e peso righe.\n\nFiltri (pannello a destra): stessi quattro poli — mostrano o nascondono i pallini senza spostarli, anche mentre un dettaglio genere è aperto.\n\nCurve colorate: affinità tra generi (Mappa, macro-tema, Dominio e Scopo nel CSV). Clic sulla curva: il riepilogo del legame compare nella legenda del pannello sinistro, sotto le righe della legenda.",
       diagramTooltip:
         "Clic su un pallino o su una curva colorata per aprire il dettaglio del genere o il riepilogo del legame. Passaggio del mouse sul pallino: si vedono solo le curve collegate a quel genere (se le curve sono visibili; altrimenti usa il pulsante «Mostra collegamenti»).",
       left: "Collegamenti: il pulsante sotto i controlli zoom nasconde o mostra tutte le curve di affinità tra i pallini.\n\nZoom sulla mappa: rotellina del mouse o pinch (touch) per ingrandire l’area del diagramma; trascina per spostare. Pulsanti + e − per zoom a step. Doppio clic sullo sfondo chiaro o sul quadrato tratteggiato ripristina zoom e posizione.",
-      filters: "Combinazioni su Dominio e Scopo del CSV. I filtri mostrano o nascondono i pallini senza spostarli. Per i tag «Nessuno» si combinano riquadro e tendenza: i quattro rettangoli colorati del quadrato (come in mappa) corrispondono a Privato, Pubblico, Scientifico e Artistico; spariscono i generi che cadono nel riquadro di un polo deselezionato, oppure che tendono verso quel polo nei pesi sul quadrato. L’ordine cronologico dei generi visibili è riassunto a sinistra. Le curve interne collegano solo generi ancora visibili.",
+      filters: "Combinazioni su Dominio e Scopo del CSV. I filtri mostrano o nascondono i pallini in base ai valori di tag (escluso «Nessuno» nei checkbox), senza spostarli. L’ordine cronologico dei generi visibili è riassunto a sinistra in modalità aiuto. Le curve interne collegano solo generi ancora visibili.",
       filtersHelpUi:
         "«Chiudi dettaglio» chiude solo il pannello del genere sotto. Per uscire dalla guida usa «Chiudi aiuto» in basso allo schermo.",
       link: "Riepiloga perché due generi risultano collegati (categoria Mappa, macro-tema, valori condivisi di Dominio e Scopo) e la somma dei criteri usata per lo spessore e l’opacità della curva. Il blocco si apre nella legenda del pannello sinistro, sotto le righe della legenda, dopo un clic sulla curva."
@@ -1467,18 +1467,6 @@
       return { art: true, sci: true };
     }
 
-    /** Generi da spostare leggermente verso il polo Artistico (SE) nel quadrato, oltre ai tag CSV. */
-    function genreArtisticLayoutNudgeAmount(node) {
-      const lab = String(node?.label || "").trim();
-      if (lab !== "Immagini ricordo" && !/^ritratto/i.test(lab)) return 0;
-      const { art: artOn } = polesArtisticActiveForLayout();
-      if (!artOn) return 0;
-      const art = String(node?.tags?.artistic || "").trim();
-      if (art === "Artistico") return 0;
-      if (art === "Scientifico") return 0.18;
-      return 0.2;
-    }
-
     /** Scopo (colonna «Artistico» nel CSV) = Scientifico: in rilassamento serve un po’ più di separazione. */
     function isScientificoScopo(node) {
       return String(node?.tags?.artistic || "").trim().toLowerCase() === "scientifico";
@@ -1546,24 +1534,11 @@
           wSW = 0.25;
         }
       }
-      const nudge = genreArtisticLayoutNudgeAmount(node);
-      if (nudge > 0 && wSW > 1e-9) {
-        const mv = Math.min(wSW, nudge);
-        wSE += mv;
-        wSW -= mv;
-      }
       const s = wNW + wNE + wSE + wSW;
       if (s < 1e-9) {
         return { wNW: 0.25, wNE: 0.25, wSE: 0.25, wSW: 0.25 };
       }
       return { wNW: wNW / s, wNE: wNE / s, wSE: wSE / s, wSW: wSW / s };
-    }
-
-    /** Coordinate ideali sul quadrato (mezza lato = 1), coerenti con `genrePositionFromFourAngles` senza jitter. */
-    function layoutHalfUnitXYFromWeights(w) {
-      const x = -w.wNW + w.wNE + w.wSE - w.wSW;
-      const y = -w.wNW - w.wNE + w.wSE - w.wSW;
-      return { x, y };
     }
 
     function genrePositionFromFourAngles(node, half) {
@@ -1896,8 +1871,8 @@
       if (ca && cb && ca === cb) w += 3;
       const ta = a.tags || {};
       const tb = b.tags || {};
-      if (ta.audience && ta.audience === tb.audience && ta.audience !== "Nessuno") w += 1;
-      if (ta.artistic && ta.artistic === tb.artistic && ta.artistic !== "Nessuno") w += 1;
+      if (ta.audience && ta.audience === tb.audience) w += 1;
+      if (ta.artistic && ta.artistic === tb.artistic) w += 1;
       return w;
     }
 
@@ -1921,10 +1896,10 @@
       }
       const ta = a.tags || {};
       const tb = b.tags || {};
-      if (ta.audience && ta.audience === tb.audience && ta.audience !== "Nessuno") {
+      if (ta.audience && ta.audience === tb.audience) {
         lines.push(`${ft.audience}: valore condiviso «${ta.audience}».`);
       }
-      if (ta.artistic && ta.artistic === tb.artistic && ta.artistic !== "Nessuno") {
+      if (ta.artistic && ta.artistic === tb.artistic) {
         lines.push(`${ft.artistic}: valore condiviso «${ta.artistic}».`);
       }
       return lines;
@@ -3192,49 +3167,6 @@
         const art = String(t.artistic || "").trim();
         if (art && art !== "Nessuno" && !filterState.artistic.has(art)) return false;
       }
-      const w = fourCornerWeights(d);
-      const { x, y } = layoutHalfUnitXYFromWeights(w);
-      const e = 1e-8;
-      const eps = 1e-9;
-      const neutralCenter = Math.abs(x) < 1e-5 && Math.abs(y) < 1e-5;
-      if (audVals.length) {
-        const aud = String(t.audience || "").trim();
-        if (!aud || aud === "Nessuno") {
-          if (!filterState.audience.has("Privato")) {
-            if (neutralCenter) {
-              if (w.wNW > w.wNE + eps) return false;
-            } else if ((x <= e && y <= e) || w.wNW > w.wNE + eps) {
-              return false;
-            }
-          }
-          if (!filterState.audience.has("Pubblico")) {
-            if (neutralCenter) {
-              if (w.wNE > w.wNW + eps) return false;
-            } else if ((x >= -e && y <= e) || w.wNE > w.wNW + eps) {
-              return false;
-            }
-          }
-        }
-      }
-      if (artVals.length) {
-        const art = String(t.artistic || "").trim();
-        if (!art || art === "Nessuno") {
-          if (!filterState.artistic.has("Artistico")) {
-            if (neutralCenter) {
-              if (w.wSE > w.wSW + eps) return false;
-            } else if ((x >= -e && y >= -e) || w.wSE > w.wSW + eps) {
-              return false;
-            }
-          }
-          if (!filterState.artistic.has("Scientifico")) {
-            if (neutralCenter) {
-              if (w.wSW > w.wSE + eps) return false;
-            } else if ((x <= e && y >= -e) || w.wSW > w.wSE + eps) {
-              return false;
-            }
-          }
-        }
-      }
       return true;
     }
 
@@ -3259,15 +3191,21 @@
       return true;
     }
 
+    /**
+     * Colore del pallino: sempre dai tag Dominio/Scopo nel CSV (media delle palette), indipendentemente dai filtri.
+     * I filtri mostrano o nascondono i punti ma non devono cambiare la cromia semantica.
+     */
     function nodeColor(node) {
       if (node.level === 2 && node.tags) {
         const t = node.tags;
+        const aud = String(t.audience || "").trim();
+        const art = String(t.artistic || "").trim();
         const colors = [];
-        if ((filterState.audience.has(t.audience) || t.audience === "Nessuno") && paletteAudience[t.audience]) {
-          colors.push(paletteAudience[t.audience]);
+        if (aud && Object.prototype.hasOwnProperty.call(paletteAudience, aud)) {
+          colors.push(paletteAudience[aud]);
         }
-        if ((filterState.artistic.has(t.artistic) || t.artistic === "Nessuno") && paletteArtistic[t.artistic]) {
-          colors.push(paletteArtistic[t.artistic]);
+        if (art && Object.prototype.hasOwnProperty.call(paletteArtistic, art)) {
+          colors.push(paletteArtistic[art]);
         }
         if (colors.length > 0) {
           const c = [0, 0, 0];
